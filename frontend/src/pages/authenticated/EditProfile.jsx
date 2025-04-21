@@ -45,8 +45,8 @@ function EditProfile() {
     const handleInputChange = (e) => {
         const { name, type, value, checked } = e.target;
         setUserData((prevData) => ({
-          ...prevData,
-          [name]: type === "checkbox" ? checked : value,
+            ...prevData,
+            [name]: type === "checkbox" ? checked : value,
         }));
     };
 
@@ -72,79 +72,79 @@ function EditProfile() {
     const updateUser = async () => {
         // Validación similar a Register.jsx
         if (!userData.firstName || userData.firstName.length > 40) {
-          showAlert("El nombre no puede estar vacío ni tener más de 40 caracteres.");
-          return;
+            showAlert("El nombre no puede estar vacío ni tener más de 40 caracteres.");
+            return;
         }
-      
+
         if (!userData.lastName || userData.lastName.length > 40) {
-          showAlert("El apellido no puede estar vacío ni tener más de 40 caracteres.");
-          return;
+            showAlert("El apellido no puede estar vacío ni tener más de 40 caracteres.");
+            return;
         }
-      
+
         if (!userData.username || userData.username.length > 50) {
-          showAlert("El nombre de usuario no puede estar vacío ni tener más de 50 caracteres.");
-          return;
+            showAlert("El nombre de usuario no puede estar vacío ni tener más de 50 caracteres.");
+            return;
         }
-      
+
         const dniPattern = /^[0-9]{8}[A-Za-z]$/;
         if (!dniPattern.test(userData.dni)) {
-          showAlert("El DNI es incorrecto. Debe tener 8 números seguidos de una letra.");
-          return;
+            showAlert("El DNI es incorrecto. Debe tener 8 números seguidos de una letra.");
+            return;
         }
-      
+
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(userData.email)) {
-          showAlert("El correo electrónico no es válido.");
-          return;
+            showAlert("El correo electrónico no es válido.");
+            return;
         }
-      
+
         const telephonePattern = /^[0-9]{9}$/;
         if (!telephonePattern.test(userData.telephone)) {
-          showAlert("El teléfono debe contener exactamente 9 dígitos.");
-          return;
-        }
-      
-        try {
-          const userDataToUpdate = {
-            ...userData,
-            password: "no-password",
-          };
-            
-          const response = await fetch(`/api/users/${userData.id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwtToken}`,
-            },
-            body: JSON.stringify(userDataToUpdate),
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            const errorMessage = data.message || data.error || "Error al actualizar el perfil.";
-            throw new Error(errorMessage);
-          }
-      
-          localStorage.setItem("user", JSON.stringify(data));
-          setUserData(data);
-          setEditing(false);
-      
-          if (originalUsername !== userData.username) {
-            showAlert("Has cambiado tu nombre de usuario. Por favor, inicia sesión nuevamente.");
-            handleLogout();
+            showAlert("El teléfono debe contener exactamente 9 dígitos.");
             return;
-          }
-      
-          showAlert("Perfil actualizado con éxito");
-          window.location.href = "/profile";
-        } catch (error) {
-          console.error("Error actualizando perfil:", error);
-          showAlert(error.message || "Error al actualizar el perfil.");
         }
-      };
-      
-      
+
+        try {
+            const userDataToUpdate = {
+                ...userData,
+                password: "no-password",
+            };
+
+            const response = await fetch(`/api/users/${userData.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${jwtToken}`,
+                },
+                body: JSON.stringify(userDataToUpdate),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errorMessage = data.message || data.error || "Error al actualizar el perfil.";
+                throw new Error(errorMessage);
+            }
+
+            localStorage.setItem("user", JSON.stringify(data));
+            setUserData(data);
+            setEditing(false);
+
+            if (originalUsername !== userData.username) {
+                showAlert("Has cambiado tu nombre de usuario. Por favor, inicia sesión nuevamente.");
+                handleLogout();
+                return;
+            }
+
+            showAlert("Perfil actualizado con éxito");
+            window.location.href = "/profile";
+        } catch (error) {
+            console.error("Error actualizando perfil:", error);
+            showAlert(error.message || "Error al actualizar el perfil.");
+        }
+    };
+
+
 
     const formatDateTime = (dateString) => {
         if (!dateString) return "-"
@@ -213,13 +213,13 @@ function EditProfile() {
                             <div className="info-section">
                                 <h2>Información Personal</h2>
                                 <div
-                                className="info-grid"
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(3, 1fr)", 
-                                    gap: "1.5rem",
-                                    wordBreak: "break-word", 
-                                }}
+                                    className="info-grid"
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(3, 1fr)",
+                                        gap: "1.5rem",
+                                        wordBreak: "break-word",
+                                    }}
                                 >
 
                                     <div className="info-item">
@@ -338,7 +338,7 @@ function EditProfile() {
                                         alignItems: "center",
                                         gap: "0.5rem",
                                     }}
-                                    >
+                                >
                                     <input
                                         type="checkbox"
                                         id="receivesEmails"
@@ -350,10 +350,10 @@ function EditProfile() {
                                     <label
                                         htmlFor="receivesEmails"
                                         style={{
-                                        margin: 0,
-                                        fontSize: "1rem",
-                                        cursor: "pointer",
-                                        userSelect: "none",
+                                            margin: 0,
+                                            fontSize: "1rem",
+                                            cursor: "pointer",
+                                            userSelect: "none",
                                         }}
                                     >
                                         Quiero recibir notificaciones por email

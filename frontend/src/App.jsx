@@ -36,6 +36,7 @@ import ProviderDashboard from "./pages/provider/ProviderDashboard.jsx"
 import Support from "./pages/authenticated/Support.jsx"
 import VentasProveedor from "./pages/provider/HistorialVentas"
 import { AlertProvider } from "./context/AlertContext.jsx"
+import DetallesOtherService from "./pages/clients/DetallesOtherService.jsx"
 
 function App() {
   const { currentUser, loading, setCurrentUser } = useCurrentUser(null)
@@ -63,6 +64,7 @@ function App() {
                   <Route path="/invitaciones" element={<Invitations />} />
                   <Route path="/invitaciones/:currentEventId" element={<EventInvitations />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/detallesOtherServices/:id" element={<DetallesOtherService />} />
                 </>
               )}
               {/*Rutas de Supplier*/}

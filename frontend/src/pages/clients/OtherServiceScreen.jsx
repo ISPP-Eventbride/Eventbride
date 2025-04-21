@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 import {
   Filter,
@@ -38,6 +39,7 @@ const OtherServiceScreen = () => {
   const [venueTimes, setVenueTimes] = useState({})
   const [loading, setLoading] = useState(true)
   const [isConfirming, setIsConfirming] = useState(false)
+  const navigate = useNavigate();
 
 
   const currentUser = JSON.parse(localStorage.getItem("user"))
@@ -332,11 +334,11 @@ const OtherServiceScreen = () => {
           {otherServices.map((service) => {
 
             return (
-              <div key={service.id} className="service-card" onClick={() => handleServiceClick(service.id)}>
-                <div className="card-header">
+              <div key={service.id} className="service-card" >
+                <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
                   <h3 className="service-title">{service.name}</h3>
                 </div>
-                <div className="card-body">
+                <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
                   {
                     service.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
                   }
