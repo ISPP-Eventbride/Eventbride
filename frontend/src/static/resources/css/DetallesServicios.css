@@ -53,6 +53,13 @@
     margin-bottom: 20px;
 }
 
+.stars-display2 {
+    display: flex;
+    justify-content: left;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
 /* Info principal */
 .details-info {
     flex: 1;

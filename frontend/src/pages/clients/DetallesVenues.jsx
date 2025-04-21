@@ -100,6 +100,17 @@ export default function VenueDetailsPage() {
         // Aquí puedes hacer una llamada a la API para guardar la reseña
     };
 
+    const renderCommentStars = (value) =>
+        [1, 2, 3, 4, 5].map((n) =>
+          n <= Math.floor(value) ? (
+            <FaStar key={n} size={16} color="#37d976" />
+          ) : value >= n - 0.5 ? (
+            <FaStarHalfAlt key={n} size={16} color="#37d976" />
+          ) : (
+            <FaRegStar key={n} size={16} color="#ccc" />
+          )
+        );
+
     if (isLoading) return <p>Cargando detalles...</p>;
     if (error) return <p>Error al cargar detalles</p>;
     if (!serviceDetails) return null;
@@ -209,6 +220,9 @@ export default function VenueDetailsPage() {
                                     <p style={{ margin: 0 }}>
                                         <strong>{r.user?.username || "Anónimo"}:</strong> {r.comment}
                                     </p>
+                                    <div className="stars-display2" style={{ marginBottom: "4px" }}>
+                                        {renderCommentStars(r.stars)}
+                                    </div>
                                     <span style={{ fontSize: "12px", color: "#999" }}>
                                         {new Date(r.createdAt).toLocaleString()}
                                     </span>
