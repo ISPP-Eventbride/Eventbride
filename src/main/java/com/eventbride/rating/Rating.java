@@ -23,7 +23,7 @@ public class Rating extends BaseEntity {
     @Column(name = "stars", nullable = false)
     @Min(1)
     @Max(5)
-    private Integer stars;
+    private Double stars;
 
     @Column(name = "comment", length = 5000)
     @Size(max = 3000)

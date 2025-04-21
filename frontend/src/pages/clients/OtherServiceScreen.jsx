@@ -344,21 +344,17 @@ const OtherServiceScreen = () => {
                   }
                   <span className="service-badge">{formatServiceType(service.otherServiceType)}</span>
 
-                  <div className="service-info">
-                    <MapPin size={18} className="info-icon" />
-                    <span className="info-text">{service.cityAvailable}</span>
-                  </div>
-
-                  <div className="service-info">
-                    <DollarSign size={18} className="info-icon" />
-                    <span className="info-text">
-                      {service.limitedByPricePerGuest
-                        ? `${service.servicePricePerGuest}€ por invitado`
-                        : service.limitedByPricePerHour
-                          ? `${service.servicePricePerHour}€ por hora`
-                          : `${service.fixedPrice}€ precio fijo`}
-                    </span>
-                  </div>
+                  <div className="card-info">
+                  <span className="card-text">
+                    <img style={{ maxHeight: "25%", maxWidth: "100%" }}
+                      src={service.picture || "https://iili.io/3EpzvZx.png"}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://iili.io/3EpzvZx.png";
+                      }}
+                      alt="Imagen del servicio"></img>
+                  </span>
+                </div>
                 </div>
                 <div className="card-footer">
                   {service.available ? (
@@ -508,10 +504,10 @@ const OtherServiceScreen = () => {
                 <div className="card-info">
                   <span className="card-text">
                     <img style={{ height: "25%", width: "100%" }}
-                      src={serviceDetails.picture || "https://iili.io/3Ywlapf.png"}
+                      src={serviceDetails.picture || "https://iili.io/3EpzvZx.png"}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://iili.io/3Ywlapf.png";
+                        e.target.src = "https://iili.io/3EpzvZx.png";
                       }}
                       alt="Imagen del servicio"></img>
                   </span>

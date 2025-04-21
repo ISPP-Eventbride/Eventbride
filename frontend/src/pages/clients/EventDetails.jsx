@@ -436,7 +436,7 @@ function EventDetails() {
                     <div className="service-image-container">
                       <img
                         className="service-image"
-                        src={prop.venueDTO.picture || "https://iili.io/3Ywlapf.png"}
+                        src={prop.venueDTO.picture || "https://iili.io/3EpzvZx.png"}
                         alt={prop.venueDTO.name}
                         style={{
                           objectFit: "cover",
@@ -533,10 +533,10 @@ function EventDetails() {
                     <div className="service-image-container" style={{ objectFit: "cover", maxHeight: "100%" }}>
                       <img
                         className="service-image"
-                        src={prop.otherServiceDTO.picture || "https://iili.io/3Ywlapf.png"}
+                        src={prop.otherServiceDTO.picture || "https://iili.io/3EpzvZx.png"}
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = "https://iili.io/3Ywlapf.png";
+                          e.target.src = "https://iili.io/3EpzvZx.png";
                         }}
                         alt="Imagen del servicio"
                         style={{

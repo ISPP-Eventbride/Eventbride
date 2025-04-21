@@ -116,7 +116,7 @@
 
 .btn-primary {
     align-self: flex-end;
-    background-color: #37d976;
+    background-color: #d9be75;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -127,7 +127,7 @@
 }
 
 .btn-primary:hover {
-    background-color: #2fb867;
+    background-color: #c5ad69;
 }
 
 

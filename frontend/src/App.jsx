@@ -37,6 +37,7 @@ import Support from "./pages/authenticated/Support.jsx"
 import VentasProveedor from "./pages/provider/HistorialVentas"
 import { AlertProvider } from "./context/AlertContext.jsx"
 import DetallesOtherService from "./pages/clients/DetallesOtherService.jsx"
+import DetallesVenues from "./pages/clients/DetallesVenues.jsx"
 
 function App() {
   const { currentUser, loading, setCurrentUser } = useCurrentUser(null)
@@ -65,6 +66,7 @@ function App() {
                   <Route path="/invitaciones/:currentEventId" element={<EventInvitations />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/detallesOtherServices/:id" element={<DetallesOtherService />} />
+                  <Route path="/detallesVenues/:id" element={<DetallesVenues />} />
                 </>
               )}
               {/*Rutas de Supplier*/}

@@ -89,8 +89,12 @@ export default function ServiceDetailsPage() {
         <div className="sidebar">
           <div className="photo-circle">
             <img
-              src={serviceDetails.picture || "/placeholder.svg"}
-              alt={serviceDetails.name}
+              src={serviceDetails.picture || "https://iili.io/3EpzvZx.png"}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://iili.io/3EpzvZx.png";
+              }}
+              alt="Imagen del servicio"
             />
           </div>
           <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{marginBottom: "10vh" }}>
@@ -148,7 +152,7 @@ export default function ServiceDetailsPage() {
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="close-button" onClick={() => setIsModalOpen(false)} style={{ backgroundColor: "red" }}>
+            <button className="close-button" onClick={() => setIsModalOpen(false)} style={{ backgroundColor: "#dc3545" }}>
               &times;
             </button>
             <h2>Valorar servicio</h2>

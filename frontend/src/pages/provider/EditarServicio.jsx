@@ -221,7 +221,7 @@ const EditarServicio = () => {
                                     alt="Previsualización"
                                     onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = "https://iili.io/3Ywlapf.png";
+                                        e.target.src = "https://iili.io/3EpzvZx.png";
                                     }}
                                     style={{ maxWidth: '600px', maxHeight: '400px', marginTop: '-2rem' }}
                                 />
