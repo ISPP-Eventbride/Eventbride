@@ -2,6 +2,7 @@ package com.eventbride.rating;
 
 import com.eventbride.user.User;
 import com.eventbride.venue.Venue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +22,7 @@ import lombok.Setter;
 public class Rating extends BaseEntity {
 
     @Column(name = "stars", nullable = false)
-    @Min(1)
+    @Min(0)
     @Max(5)
     private Double stars;
 
@@ -38,9 +39,11 @@ public class Rating extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "venue_id")
+    @JsonIgnore
     private Venue venue;
 
     @ManyToOne
     @JoinColumn(name = "other_service_id")
+    @JsonIgnore
     private OtherService otherService;
 }

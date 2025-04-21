@@ -48,9 +48,9 @@ INSERT IGNORE INTO events (id, event_type, guests, event_date, payment_date, con
 (4, 'COMMUNION', 100, '2026-12-31', '2026-09-30', 90, TRUE, 4, "Comunión de Jesús"),
 (6, 'WEDDING', 100, '2026-06-30', '2026-01-28', 90, TRUE, 1, "Boda de Antonio y María del Mar"),
 (5, 'WEDDING', 100, '2026-12-31', '2026-07-31', 90, TRUE, 5, "Boda de Juan y Nerea"),
-(7, 'CHRISTENING', 50, '2026-07-30', '2026-06-30', 40, TRUE, 2, "Bautizo de Pedro"),
-(8, 'COMMUNION', 30, '2026-08-30', '2026-05-30', 25, TRUE, 3, "Comunión de Pilar"),
-(9, 'WEDDING', 200, '2026-09-30', '2026-04-30', 190, TRUE, 4, "Boda de Pau y Sofía"),
+(7, 'CHRISTENING', 50, '2026-07-30', '2026-06-30', 40, TRUE, 3, "Bautizo de Paco"),
+(8, 'COMMUNION', 30, '2026-08-30', '2026-05-30', 25, TRUE, 2, "Comunión de Pilar"),
+(9, 'WEDDING', 200, '2026-09-30', '2026-04-30', 190, TRUE, 4, "Boda de Pepe y Sofía"),
 (10, 'CHRISTENING', 100, '2026-10-30', '2026-09-30', 90, TRUE, 5, "Bautizo de María");
 
 
@@ -115,6 +115,18 @@ INSERT IGNORE INTO event_properties (id, event_id, other_service_id, venue_id, s
 INSERT IGNORE INTO notifications (id, user_id, subject, message, type, created_at) VALUES 
 (1, 2, 'Evento creado', 'Tu evento ha sido creado exitosamente.', 'EVENT_CREATED', '2025-02-12 22:00:00'),
 (2, 14, 'Nueva solicitud de reserva', 'Has recibido una nueva reserva para uno de tus servicios, acepta o rechaza.', 'NEW_REQUEST', '2025-02-12 22:00:00');
+
+INSERT IGNORE INTO  ratings (id, stars, comment, created_at, user_id, venue_id, other_service_id) VALUES
+(1, 5, 'El lugar es increíble y el servicio fue excepcional.', '2025-02-12 22:00:00', 1, 1, null),
+(2, 4, 'La comida estuvo buena pero el servicio un poco lento.', '2025-02-12 22:00:00', 2, null, 3),
+(3, 1, 'No cumplió con mis expectativas.', '2025-02-12 22:00:00', 3, null, 4),
+(4, 5, 'Todo perfecto!', '2025-02-12 22:00:00', 4, 2, null),
+(5, 3.5, 'Buen servicio pero podría mejorar.', '2025-02-12 22:00:00', 5, null, 4),
+(6, 5, 'El lugar es increíble y el servicio fue excepcional.', '2025-02-12 22:00:00', 1, null, 2),
+(7, 1.5, 'Servicio lento, raciones escasísimas. Mejillones al vapor secos y sin limpiar, además de haber mejillones contados, 13 para ser más exactos. Íbamos con las expectativas muy altas y decepción auténtica. El plato de ranas a la mitad… Por decir algo bueno, las cañas están bien tiradas', '2025-02-12 22:00:00', 2, 1, null),
+(8, 3, 'Esperaba más.', '2025-02-12 22:00:00', 3, null, 3),
+(9, 5, 'Excelente servicio.', '2025-02-12 22:00:00', 4, null, 6),
+(10, 0, 'Camarero, hay una mosca en mi sopa!', '2025-02-12 22:00:00', 5, null, 2);
 
 -- NUEVOS DATOS SIMULADOS (NO INTERFIEREN CON LOS DATOS EXISTENTES)
 

@@ -99,7 +99,11 @@ public class SecurityConfig {
                                                                 "/api/invitation/eventInvitations/{eventId}",
                                                                 "/api/invitation/**",
                                                                 "/api/users/getAdmin",
-                                                                "/api/invitation/create/**")
+                                                                "/api/invitation/create/**",
+                                                                "/api/ratings//other-service/{id}",
+                                                                "/api/ratings//venue/{id}",
+                                                                "/api/ratings/average/other-service/{id}",
+                                                                "/api/ratings/average/venue/{id}")
                                                 .hasAnyAuthority("CLIENT", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(manager -> manager

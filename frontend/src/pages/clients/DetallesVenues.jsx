@@ -14,6 +14,9 @@ export default function VenueDetailsPage() {
     const [error, setError] = useState(null);
     const [jwtToken, setJwtToken] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [ratings, setRatings] = useState([]);
+    const [averageRating, setAverageRating] = useState(0);
+
 
     // Cargar JWT
     useEffect(() => {
@@ -32,6 +35,29 @@ export default function VenueDetailsPage() {
             .then((res) => setServiceDetails(res.data))
             .catch((err) => setError(err))
             .finally(() => setIsLoading(false));
+    }, [id, jwtToken]);
+
+    useEffect(() => {
+        if (!id || !jwtToken) return;
+
+        apiClient
+            .get(`/api/ratings/venue/${id}`, {
+                headers: { Authorization: `Bearer ${jwtToken}` }
+            })
+            .then((res) => setRatings(res.data))
+            .catch((err) => console.error("Error cargando ratings:", err));
+    }, [id, jwtToken]);
+
+
+    useEffect(() => {
+        if (!id || !jwtToken) return;
+
+        apiClient
+            .get(`/api/ratings/average/venue/${id}`, {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            })
+            .then((res) => setAverageRating(res.data || 0))
+            .catch((err) => console.error("Error al cargar promedio de rating", err));
     }, [id, jwtToken]);
 
 
@@ -58,11 +84,11 @@ export default function VenueDetailsPage() {
                     style={{ cursor: "pointer", marginRight: 6 }}
                 >
                     {full ? (
-                        <FaStar size={24} color="#37d976" />
+                        <FaStar size={30} color="#37d976" />
                     ) : half ? (
-                        <FaStarHalfAlt size={24} color="#37d976" />
+                        <FaStarHalfAlt size={30} color="#37d976" />
                     ) : (
-                        <FaRegStar size={24} color="#ccc" />
+                        <FaRegStar size={30} color="#ccc" />
                     )}
                 </span>
             );
@@ -92,17 +118,28 @@ export default function VenueDetailsPage() {
                             onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = "https://iili.io/3EpzvZx.png";
-                              }}
-                              alt="Imagen del servicio"
+                            }}
+                            alt="Imagen del servicio"
                         />
                     </div>
+
+                    {averageRating > 0 && (
+                        <div className="stars-display" style={{ marginBottom: "1rem" }}>
+                            {[1, 2, 3, 4, 5].map((n) =>
+                                n <= Math.floor(averageRating) ? (
+                                    <FaStar key={n} size={30} color="#37d976" />
+                                ) : averageRating >= n - 0.5 ? (
+                                    <FaStarHalfAlt key={n} size={30} color="#37d976" />
+                                ) : (
+                                    <FaRegStar key={n} size={30} color="#ccc" />
+                                )
+                            )}
+                        </div>
+                    )}
+
                     <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "10vh" }}>
                         Valorar
                     </button>
-
-                    <Link className="btn-primary" to="/venues" style={{ backgroundColor: "#f8f9fa", color: "black" }}>
-                        Volver
-                    </Link>
                 </div>
 
                 <div className="details-info">
@@ -162,9 +199,28 @@ export default function VenueDetailsPage() {
 
                     <div className="info-section">
                         <h2>Comentarios:</h2>
+                        {ratings.length === 0 ? (
+                            <p style={{ color: "#999" }}>Este servicio aún no tiene valoraciones.</p>
+                        ) : (
+                            ratings.map((r, i) => (
+                                <div key={i} className="comment-block" style={{ marginBottom: "16px" }}>
+                                    <div className="stars-display" style={{ marginBottom: "4px" }}>
+                                    </div>
+                                    <p style={{ margin: 0 }}>
+                                        <strong>{r.user?.username || "Anónimo"}:</strong> {r.comment}
+                                    </p>
+                                    <span style={{ fontSize: "12px", color: "#999" }}>
+                                        {new Date(r.createdAt).toLocaleString()}
+                                    </span>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
+            <Link className="btn-primary" to="/venues" style={{ backgroundColor: "transparent", color: "black" }}>
+                Volver
+            </Link>
 
             {/* MODAL DE VALORACIÓN */}
             {isModalOpen && (
