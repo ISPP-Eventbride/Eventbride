@@ -15,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -60,4 +61,22 @@ public class User extends Person implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
     }
+
+    @AssertTrue(message = "El DNI no es válido")
+    public boolean isDniValido() {
+        if (dni == null || !dni.matches("\\d{8}[A-Za-z]")) {
+            return false;
+        }
+    
+        String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+        try {
+            int numero = Integer.parseInt(dni.substring(0, 8));
+            char letraEsperada = letras.charAt(numero % 23);
+            char letraReal = Character.toUpperCase(dni.charAt(8));
+            return letraEsperada == letraReal;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
 }

@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import com.eventbride.service.Service;
+import com.eventbride.dto.ChangePasswordDTO;
 import com.eventbride.dto.UserDTO;
 import com.eventbride.notification.Notification;
 import com.eventbride.notification.NotificationRepository;
@@ -21,7 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
+import java.util.Set;
 @org.springframework.stereotype.Service
 public class UserService {
 
@@ -94,33 +99,28 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Comprueba si el username al que se quiere actualizar ya está en uso
+        // Validaciones de unicidad
         if (!user.getUsername().equals(userDetails.getUsername()) &&
             userRepository.existsByUsername(userDetails.getUsername())) {
             throw new IllegalArgumentException("El nombre de usuario ya está en uso");
         }
 
-        // Comprueba si el email al que se quiere actualizar ya está en uso
         if (!user.getEmail().equals(userDetails.getEmail()) &&
             userRepository.existsByEmail(userDetails.getEmail())) {
             throw new IllegalArgumentException("El correo electrónico ya está en uso");
         }
 
-        // Comprueba si el DNI al que se quiere actualizar ya está en uso
         if (!user.getDni().equals(userDetails.getDni()) &&
             userRepository.existsByDni(userDetails.getDni())) {
             throw new IllegalArgumentException("El DNI ya está registrado");
         }
-        if (user.getProfilePicture()==null || user.getProfilePicture()==""){
-            user.setProfilePicture("https://cdn-icons-png.flaticon.com/512/17/17004.png");
+
+        // Validar formato del teléfono
+        if (!String.valueOf(userDetails.getTelephone()).matches("^[6789]\\d{8}$")) {
+            throw new IllegalArgumentException("El teléfono debe tener 9 dígitos y comenzar por 6, 7, 8 o 9");
         }
 
-        // Validar el formato del telefono
-        if (!String.valueOf(userDetails.getTelephone()).matches("^[0-9]{9}$")) {
-            throw new IllegalArgumentException("El teléfono debe tener 9 números");
-        }
-
-        // Actualizar los campos del usuario
+        // Actualizar campos
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
@@ -131,11 +131,23 @@ public class UserService {
         user.setPlan(userDetails.getPlan());
         user.setPaymentPlanDate(userDetails.getPaymentPlanDate());
         user.setExpirePlanDate(userDetails.getExpirePlanDate());
-        user.setProfilePicture(userDetails.getProfilePicture());
+        user.setProfilePicture(
+            (userDetails.getProfilePicture() == null || userDetails.getProfilePicture().isBlank())
+            ? "https://cdn-icons-png.flaticon.com/512/17/17004.png"
+            : userDetails.getProfilePicture()
+        );
         user.setReceivesEmails(userDetails.getReceivesEmails());
+
+        // Validar restricciones con Bean Validation (@AssertTrue incluida)
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        for (ConstraintViolation<User> v : violations) {
+            throw new IllegalArgumentException(v.getMessage());
+        }
 
         return userRepository.save(user);
     }
+
 
     @Transactional
     public void deleteUser(Integer id) {
@@ -145,6 +157,24 @@ public class UserService {
     @Transactional
     public User save(User user) throws DataAccessException {
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(Integer id, ChangePasswordDTO cpDTO, Boolean isAdmin) throws IllegalArgumentException {  
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+    
+        if (!isAdmin && !passwordEncoder.matches(cpDTO.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+    
+        String newPassword = cpDTO.getNewPassword();
+        if (newPassword == null || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número");
+        }
+    
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     @Transactional
