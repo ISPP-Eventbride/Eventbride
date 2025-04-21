@@ -123,7 +123,7 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">Nombre</label>
+                <label htmlFor="firstName">Nombre <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -138,7 +138,7 @@ const Register = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="lastName">Apellido</label>
+                <label htmlFor="lastName">Apellido <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -154,7 +154,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="username">Nombre de usuario</label>
+              <label htmlFor="username">Nombre de usuario <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="text"
@@ -169,7 +169,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="profilePicture">URL de foto de perfil (Opcional)</label>
+              <label htmlFor="profilePicture">URL de foto de perfil</label>
               <div className="input-wrapper">
                 <input
                   type="url"
@@ -183,7 +183,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Correo electrónico</label>
+              <label htmlFor="email">Correo electrónico <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="email"
@@ -199,7 +199,7 @@ const Register = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="telephone">Teléfono</label>
+                <label htmlFor="telephone">Teléfono <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="tel"
@@ -214,7 +214,7 @@ const Register = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="dni">DNI</label>
+                <label htmlFor="dni">DNI <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -230,7 +230,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">Contraseña <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="password"
@@ -245,7 +245,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="role">Tipo de usuario</label>
+              <label htmlFor="role">Tipo de usuario <span className="asterisk">*</span> </label>
               <div className="select-wrapper">
                 <select id="role" name="role" value={form.role} onChange={handleChange} required>
                   <option value="">Selecciona tu rol</option>
