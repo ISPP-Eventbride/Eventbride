@@ -343,18 +343,10 @@ const OtherServiceScreen = () => {
                     service.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
                   }
                   <span className="service-badge">{formatServiceType(service.otherServiceType)}</span>
-
-                  <div className="card-info">
-                  <span className="card-text">
-                    <img style={{ maxHeight: "25%", maxWidth: "100%" }}
-                      src={service.picture || "https://iili.io/3EpzvZx.png"}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://iili.io/3EpzvZx.png";
-                      }}
-                      alt="Imagen del servicio"></img>
-                  </span>
-                </div>
+                  <div className="details-section">
+                    <span className="details-label">Descripción:</span>
+                    <p className="details-text">{service.description}</p>
+                  </div>
                 </div>
                 <div className="card-footer">
                   {service.available ? (

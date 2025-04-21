@@ -330,9 +330,9 @@ const VenuesScreen = () => {
           <p>No se encontraron venues con los criterios seleccionados.</p>
         </div>
       ) : (
-        <div className="venues-grid" style={{ marginTop: "2%" }}>
+        <div className="services-grid" style={{ marginTop: "2%" }}>
           {venues.map((venue) => (
-            <div key={venue.id} className="venue-card" >
+            <div key={venue.id} className="service-card" >
               <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
                 <h3 className="card-title">{venue.name}</h3>
               </div>
@@ -340,16 +340,9 @@ const VenuesScreen = () => {
                 {
                   venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
                 }
-                <div className="card-info">
-                  <span className="card-text">
-                    <img style={{ height: "25%", width: "100%" }}
-                      src={venue.picture || "https://iili.io/3EpzvZx.png"}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://iili.io/3EpzvZx.png";
-                      }}
-                      alt="Imagen del servicio"></img>
-                  </span>
+                <div className="details-section">
+                  <span className="details-label">Descripción:</span>
+                  <p className="details-text">{venue.description}</p>
                 </div>
               </div>
               <div className="card-footer">
