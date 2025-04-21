@@ -160,7 +160,7 @@ export default function ServiceDetailsPage() {
                   ? `${serviceDetails.servicePricePerGuest}€ / invitado`
                   : serviceDetails.limitedByPricePerHour
                     ? `${serviceDetails.servicePricePerHour}€ / hora`
-                    : `${serviceDetails.fixedPrice}€ fijo`}
+                    : `${serviceDetails.fixedPrice}€`}
               </span>
             </div>
             <div className="info-itemm">
