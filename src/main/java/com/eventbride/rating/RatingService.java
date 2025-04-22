@@ -1,16 +1,18 @@
 package com.eventbride.rating;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Service
 public class RatingService {
-    
+
     @Autowired
     private RatingRepository ratingRepository;
 
@@ -24,14 +26,23 @@ public class RatingService {
 
     public double getRoundedAverageRatingByOtherService(Long serviceId) {
         Double avg = ratingRepository.findAverageStarsByOtherServiceId(serviceId);
-        if (avg == null) return 0.0;
-    
+        if (avg == null)
+            return 0.0;
+
         return Math.round(avg * 2) / 2.0;
     }
+
     public double getRoundedAverageRatingByVenue(Long serviceId) {
         Double avg = ratingRepository.findAverageStarsByVenueId(serviceId);
-        if (avg == null) return 0.0;
-    
+        if (avg == null)
+            return 0.0;
+
         return Math.round(avg * 2) / 2.0;
-    }    
+    }
+
+    @Transactional
+    public Rating createRating(Rating rating) {
+        rating.setCreatedAt(LocalDateTime.now());
+        return ratingRepository.save(rating);
+    }
 }
