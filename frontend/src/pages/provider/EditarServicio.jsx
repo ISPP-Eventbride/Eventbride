@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
-import { Edit, Check, AlertCircle, Save } from 'lucide-react';
+import { Edit, AlertCircle, Save } from 'lucide-react';
 import apiClient from '../../apiClient';
 import "../../static/resources/css/EditarServicio.css";
 
@@ -162,7 +162,7 @@ const EditarServicio = () => {
                         <div className="form-group">
 
                             <label htmlFor="name">
-                                Nombre
+                                Nombre <span className="asterisk">*</span>
                             </label>
                             {errors.name && <p className="error-text">{errors.name}</p>}
                             <input
@@ -180,7 +180,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="cityAvailable">
-                                Ciudad Disponible
+                                Ciudad Disponible <span className="asterisk">*</span>
                             </label>
                             {errors.cityAvailable && <p className="error-text">{errors.cityAvailable}</p>}
                             <input
@@ -198,7 +198,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="picture">
-                                URL de la Imagen
+                                URL de la Imagen <span className="asterisk">*</span>
                             </label>
                             {errors.picture && <p className="error-text">{errors.picture}</p>}
                             <input
@@ -230,7 +230,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="description">
-                                Descripción
+                                Descripción <span className="asterisk">*</span>
                             </label>
                             {errors.description && <p className="error-text">{errors.description}</p>}
                             <textarea
@@ -252,7 +252,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="limitedBy">
-                                Tipo de Precio
+                                Tipo de Precio <span className="asterisk">*</span>
                             </label>
                             <select
                                 id="limitedBy"
@@ -269,7 +269,7 @@ const EditarServicio = () => {
                         {limitedBy === "perGuest" && (
                             <div className="form-group">
                                 <label htmlFor="servicePricePerGuest">
-                                    Precio por Invitado (€)
+                                    Precio por Invitado (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.servicePricePerGuest && <p className="error-text">{errors.servicePricePerGuest}</p>}
                                 <input
@@ -289,7 +289,7 @@ const EditarServicio = () => {
                         {limitedBy === "perHour" && (
                             <div className="form-group">
                                 <label htmlFor="servicePricePerHour">
-                                    Precio por Hora (€)
+                                    Precio por Hora (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.servicePricePerHour && <p className="error-text">{errors.servicePricePerHour}</p>}
                                 <input
@@ -309,7 +309,7 @@ const EditarServicio = () => {
                         {limitedBy === "fixed" && (
                             <div className="form-group">
                                 <label htmlFor="fixedPrice">
-                                    Precio Fijo (€)
+                                    Precio Fijo (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.fixedPrice && <p className="error-text">{errors.fixedPrice}</p>}
                                 <input
@@ -333,7 +333,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="postalCode">
-                                    Código Postal
+                                    Código Postal <span className="asterisk">*</span>
                                 </label>
                                 {errors.postalCode && <p className="error-text">{errors.postalCode}</p>}
                                 <input
@@ -351,7 +351,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="coordinates">
-                                    Coordenadas
+                                    Coordenadas <span className="asterisk">*</span>
                                 </label>
                                 {errors.coordinates && <p className="error-text">{errors.coordinates}</p>}
                                 <input
@@ -369,7 +369,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="address">
-                                    Dirección
+                                    Dirección <span className="asterisk">*</span>
                                 </label>
                                 {errors.address && <p className="error-text">{errors.address}</p>}
                                 <input
@@ -388,7 +388,7 @@ const EditarServicio = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label htmlFor="maxGuests">
-                                        Máximo de Invitados
+                                        Máximo de Invitados <span className="asterisk">*</span>
                                     </label>
                                     {errors.maxGuests && <p className="error-text">{errors.maxGuests}</p>}
                                     <input
@@ -405,7 +405,7 @@ const EditarServicio = () => {
 
                                 <div className="form-group">
                                     <label htmlFor="surface">
-                                        Superficie (m²)
+                                        Superficie (m²) <span className="asterisk">*</span>
                                     </label>
                                     {errors.surface && <p className="error-text">{errors.surface}</p>}
                                     <input
@@ -424,7 +424,7 @@ const EditarServicio = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label htmlFor="earliestTime">
-                                        Hora de Apertura
+                                        Hora de Apertura <span className="asterisk">*</span>
                                     </label>
                                     {errors.earliestTime && <p className="error-text">{errors.earliestTime}</p>}
                                     <input
@@ -440,7 +440,7 @@ const EditarServicio = () => {
 
                                 <div className="form-group">
                                     <label htmlFor="latestTime">
-                                        Hora de Cierre
+                                        Hora de Cierre <span className="asterisk">*</span>
                                     </label>
                                     {errors.latestTime && <p className="error-text">{errors.latestTime}</p>}
                                     <input
@@ -461,7 +461,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="otherServiceType">
-                                    Tipo de Servicio
+                                    Tipo de Servicio <span className="asterisk">*</span>
                                 </label>
                                 <select
                                     id="otherServiceType"
@@ -479,7 +479,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="extraInformation">
-                                    Información Adicional
+                                    Información Adicional <span className="asterisk">*</span>
                                 </label>
                                 {errors.extraInformation && <p className="error-text">{errors.extraInformation}</p>}
                                 <textarea
