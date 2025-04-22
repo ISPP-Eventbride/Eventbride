@@ -140,9 +140,12 @@ export default function ServiceDetailsPage() {
 
   return (
     <div className="details-container">
-      <div className="details-header">
+      <div className="details-header" >
         <h1>{serviceDetails.name}</h1>
       </div>
+      <Link className="btn-primary" to="/other-services" style={{ backgroundColor: "transparent", color: "black", display: "flex", justifyContent: "flex-end", flexDirection: "row"}}>
+        Volver
+      </Link>
 
       <div className="details-wrapper">
         <div className="sidebar">
@@ -237,9 +240,6 @@ export default function ServiceDetailsPage() {
           </div>
         </div>
       </div>
-      <Link className="btn-primary" to="/other-services" style={{ backgroundColor: "transparent", color: "black", marginTop: "15vh" }}>
-        Volver
-      </Link>
 
       {/* MODAL DE VALORACIÓN */}
       {isModalOpen && (

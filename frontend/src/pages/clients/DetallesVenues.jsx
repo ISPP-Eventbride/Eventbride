@@ -145,6 +145,9 @@ export default function VenueDetailsPage() {
             <div className="details-header">
                 <h1>{serviceDetails.name}</h1>
             </div>
+            <Link className="btn-primary" to="/other-services" style={{ backgroundColor: "transparent", color: "black", display: "flex", justifyContent: "flex-end", flexDirection: "row" }}>
+                Volver
+            </Link>
 
             <div className="details-wrapper">
                 <div className="sidebar">
@@ -258,9 +261,7 @@ export default function VenueDetailsPage() {
                     </div>
                 </div>
             </div>
-            <Link className="btn-primary" to="/venues" style={{ backgroundColor: "transparent", color: "black" }}>
-                Volver
-            </Link>
+
 
             {/* MODAL DE VALORACIÓN */}
             {isModalOpen && (
