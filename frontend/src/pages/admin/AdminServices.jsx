@@ -342,7 +342,7 @@ function AdminServices() {
                     >
                       {/* Nombre */}
                       <div className="form-group">
-                        <label>Nombre:</label>
+                        <label>Nombre: {isEditing && <span className="asterisk">*</span>}</label>
                         <input
                           name="name"
                           value={data.name || ""}
@@ -355,7 +355,7 @@ function AdminServices() {
 
                       <div className="form-group">
                                     <label htmlFor="available" className="form-label">
-                                        Disponibilidad
+                                        Disponibilidad 
                                     </label>
                                     <div className="checkbox-container">
                                         <input
@@ -373,7 +373,7 @@ function AdminServices() {
   
                       {/* Ciudad */}
                       <div className="form-group">
-                        <label>Ciudad Disponible:</label>
+                        <label>Ciudad Disponible:{isEditing && <span className="asterisk">*</span>}</label>
                         <input
                           name="cityAvailable"
                           value={data.cityAvailable || ""}
@@ -386,7 +386,7 @@ function AdminServices() {
   
                       {/* Descripción */}
                       <div className="form-group">
-                        <label>Descripción:</label>
+                        <label>Descripción:{isEditing && <span className="asterisk">*</span>}</label>
                         <textarea
                           name="description"
                           value={data.description || ""}
@@ -401,7 +401,7 @@ function AdminServices() {
                       {/* Selección del tipo de precio (solo en edición) */}
                       {isEditing && (
                         <div className="form-group">
-                          <label>Tipo de Precio:</label>
+                          <label>Tipo de Precio:{isEditing && <span className="asterisk">*</span>}</label>
                           <select
                             name="limitedBy"
                             value={data.limitedBy || ""}
@@ -423,7 +423,7 @@ function AdminServices() {
                         <>
                           {data.limitedBy === "perGuest" && (
                             <div className="form-group">
-                              <label>Precio por Invitado (€):</label>
+                              <label>Precio por Invitado (€): {isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="servicePricePerGuest"
@@ -439,7 +439,7 @@ function AdminServices() {
                           )}
                           {data.limitedBy === "perHour" && (
                             <div className="form-group">
-                              <label>Precio por Hora (€):</label>
+                              <label>Precio por Hora (€):{isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="servicePricePerHour"
@@ -455,7 +455,7 @@ function AdminServices() {
                           )}
                           {data.limitedBy === "fixed" && (
                             <div className="form-group">
-                              <label>Precio Fijo (€):</label>
+                              <label>Precio Fijo (€):{isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="fixedPrice"
@@ -511,7 +511,7 @@ function AdminServices() {
                       {service.type === "venues" && (
                         <>
                           <div className="form-group">
-                            <label>Código Postal:</label>
+                            <label>Código Postal:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="postalCode"
                               value={data.postalCode || ""}
@@ -525,7 +525,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Coordenadas:</label>
+                            <label>Coordenadas:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="coordinates"
                               value={data.coordinates || ""}
@@ -539,7 +539,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Dirección:</label>
+                            <label>Dirección:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="address"
                               value={data.address || ""}
@@ -553,7 +553,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Máximo de Invitados:</label>
+                            <label>Máximo de Invitados:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="number"
                               name="maxGuests"
@@ -568,7 +568,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Superficie (m²):</label>
+                            <label>Superficie (m²):{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="number"
                               name="surface"
@@ -583,7 +583,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Hora de Apertura:</label>
+                            <label>Hora de Apertura:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="time"
                               name="earliestTime"
@@ -598,7 +598,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Hora de Cierre:</label>
+                            <label>Hora de Cierre:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="time"
                               name="latestTime"
@@ -618,7 +618,7 @@ function AdminServices() {
                       {service.type === "other-services" && (
                         <>
                           <div className="form-group">
-                            <label>Tipo de Servicio:</label>
+                            <label>Tipo de Servicio:{isEditing && <span className="asterisk">*</span>}</label>
                             <select
                               name="otherServiceType"
                               value={data.otherServiceType || "CATERING"}
@@ -640,7 +640,7 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Información Adicional:</label>
+                            <label>Información Adicional:{isEditing && <span className="asterisk">*</span>}</label>
                             <textarea
                               name="extraInformation"
                               value={data.extraInformation || ""}

@@ -145,11 +145,12 @@ function AdminEventProps() {
           <div className="service-info" style= {{alignItems: 'center'}}>
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="form-group">
-                        <label>Estado:</label>
+                        <label>Estado: {editMode && <span className="asterisk">*</span>}</label>
                         <select
                         name="status"
                         value={formData.status}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         disabled={!editMode}
                         >
                         {statusOptions.map(opt => (
@@ -159,23 +160,25 @@ function AdminEventProps() {
                     </div>
 
                     <div className="form-group">
-                        <label>Hora de inicio:</label>
+                        <label>Hora de inicio:{editMode && <span className="asterisk">*</span>}</label>
                         <input
                         type="time"
                         name="startTime"
                         value={formData.startTime}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         readOnly={!editMode}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>Hora de finalización:</label>
+                        <label>Hora de finalización:{editMode && <span className="asterisk">*</span>}</label>
                         <input
                         type="time"
                         name="finishTime"
                         value={formData.finishTime}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         readOnly={!editMode}
                         />
                     </div>
