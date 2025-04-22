@@ -215,6 +215,10 @@ const VenuesScreen = () => {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este venue.")
       return
     }
+    if (times.startTime >= times.endTime) {
+      showAlert("Por favor, ingresa un intervalo horario válido.")
+      return
+    }
     // Combinar la fecha del evento con la hora que indicó el usuario
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
@@ -491,6 +495,7 @@ const VenuesScreen = () => {
                           type="time"
                           className="input-field"
                           value={venueTimes[eventObj.id]?.startTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
                         />
                       </div>
@@ -506,6 +511,7 @@ const VenuesScreen = () => {
                           type="time"
                           className="input-field"
                           value={venueTimes[eventObj.id]?.endTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
                         />
                       </div>

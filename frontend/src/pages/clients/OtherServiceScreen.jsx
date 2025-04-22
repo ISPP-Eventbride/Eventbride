@@ -197,6 +197,10 @@ const OtherServiceScreen = () => {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este servicio.")
       return
     }
+    if (times.startTime >= times.endTime) {
+      showAlert("Por favor, ingresa un intervalo horario válido.")
+      return
+    }
 
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
@@ -420,6 +424,7 @@ const OtherServiceScreen = () => {
                           type="time"
                           className="time-input"
                           value={venueTimes[eventObj.id]?.startTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
                         />
                       </div>
@@ -433,6 +438,7 @@ const OtherServiceScreen = () => {
                           type="time"
                           className="time-input"
                           value={venueTimes[eventObj.id]?.endTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
                         />
                       </div>
