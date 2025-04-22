@@ -4,6 +4,8 @@ import { Edit, AlertCircle, Save } from 'lucide-react';
 import apiClient from '../../apiClient';
 import "../../static/resources/css/EditarServicio.css";
 
+const PicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
+
 const EditarServicio = () => {
     const navigate = useNavigate();
     const { id, serviceType } = useParams();
@@ -202,15 +204,27 @@ const EditarServicio = () => {
                             </label>
                             {errors.picture && <p className="error-text">{errors.picture}</p>}
                             <input
-                                type="text"
+                                type="url"
                                 id="picture"
                                 name="picture"
                                 value={formData.picture}
                                 onChange={handleChange}
+                                pattern={PicturePattern.source}
                                 required
                                 minLength="1"
                                 maxLength="1000"
                                 className="form-input"
+                                onInvalid={e => {
+                                    const val = e.target.value;
+                                    if (!val) {
+                                      e.target.setCustomValidity("La URL es obligatoria");
+                                    } else {
+                                      e.target.setCustomValidity(
+                                        "La URL debe empezar por http(s):// y terminar en .png|.jpg|…"
+                                      );
+                                    }
+                                }}
+                                onInput={e => e.target.setCustomValidity("")}
                             />
                         </div>
 

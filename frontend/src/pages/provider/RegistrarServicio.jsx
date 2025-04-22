@@ -19,6 +19,8 @@ import {
 } from "lucide-react"
 import "../../static/resources/css/RegistrarServicio.css"
 
+const PicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
+
 const RegistrarServicio = () => {
     // Obtener datos user desde localStorage
     const currentUser = JSON.parse(localStorage.getItem("user"))
@@ -335,16 +337,28 @@ const RegistrarServicio = () => {
                                     </div>
                                 )}
                                 <input
-                                    type="text"
+                                    type="url"
                                     id="picture"
                                     name="picture"
                                     value={formData.picture}
                                     onChange={handleChange}
                                     required
+                                    pattern={PicturePattern.source}
                                     minLength="1"
                                     maxLength="1000"
                                     className="form-input"
                                     placeholder="Ej: https://ejemplo.com/imagen.jpg"
+                                    onInvalid={e => {
+                                        const val = e.target.value;
+                                        if (!val) {
+                                          e.target.setCustomValidity("La URL es obligatoria");
+                                        } else {
+                                          e.target.setCustomValidity(
+                                            "La URL debe empezar por http(s):// y terminar en .png|.jpg|…"
+                                          );
+                                        }
+                                    }}
+                                    onInput={e => e.target.setCustomValidity("")}
                                 />
                             </div>
 
