@@ -39,11 +39,10 @@ public class Rating extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "venue_id")
-    @JsonIgnore
     private Venue venue;
 
     @ManyToOne
-    @JoinColumn(name = "other_service_id")
     @JsonIgnore
+    @JoinColumn(name = "other_service_id")
     private OtherService otherService;
 }

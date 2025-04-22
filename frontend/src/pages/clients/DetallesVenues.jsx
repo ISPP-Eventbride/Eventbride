@@ -16,7 +16,9 @@ export default function VenueDetailsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ratings, setRatings] = useState([]);
     const [averageRating, setAverageRating] = useState(0);
+    const [alreadyRated, setAlreadyRated] = useState(false);
 
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
     // Cargar JWT
     useEffect(() => {
@@ -61,6 +63,13 @@ export default function VenueDetailsPage() {
     }, [id, jwtToken]);
 
 
+    useEffect(() => {
+        if (!id || !jwtToken) return;
+
+        setAlreadyRated(ratings.some((r) => r.user?.id === currentUser.id));
+    }, [id, jwtToken, ratings, currentUser.id]);
+
+
     const renderStars = () =>
         [1, 2, 3, 4, 5].map((n) => {
             const full = n <= Math.floor(rating);
@@ -84,9 +93,9 @@ export default function VenueDetailsPage() {
                     style={{ cursor: "pointer", marginRight: 6 }}
                 >
                     {full ? (
-                        <FaStar size={30} color="#37d976" />
+                        <FaStar size={30} color="rgb(255, 186, 209)" />
                     ) : half ? (
-                        <FaStarHalfAlt size={30} color="#37d976" />
+                        <FaStarHalfAlt size={30} color="rgb(255, 186, 209)" />
                     ) : (
                         <FaRegStar size={30} color="#ccc" />
                     )}
@@ -97,18 +106,34 @@ export default function VenueDetailsPage() {
 
     const submitReview = () => {
         console.log("Review:", { id, rating, comment });
-        // Aquí puedes hacer una llamada a la API para guardar la reseña
+        fetch("/api/ratings", {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwtToken}`,
+            },
+            method: "POST",
+            body: JSON.stringify(
+                {
+                    stars: rating,
+                    comment: comment,
+                    createdAt: null,
+                    userId: currentUser.id,
+                    otherServiceId: null,
+                    venueId: serviceDetails.id,
+                }
+            ),
+        })
     };
 
     const renderCommentStars = (value) =>
         [1, 2, 3, 4, 5].map((n) =>
-          n <= Math.floor(value) ? (
-            <FaStar key={n} size={16} color="#37d976" />
-          ) : value >= n - 0.5 ? (
-            <FaStarHalfAlt key={n} size={16} color="#37d976" />
-          ) : (
-            <FaRegStar key={n} size={16} color="#ccc" />
-          )
+            n <= Math.floor(value) ? (
+                <FaStar key={n} size={16} color="rgb(255, 186, 209)" />
+            ) : value >= n - 0.5 ? (
+                <FaStarHalfAlt key={n} size={16} color="rgb(255, 186, 209)" />
+            ) : (
+                <FaRegStar key={n} size={16} color="#ccc" />
+            )
         );
 
     if (isLoading) return <p>Cargando detalles...</p>;
@@ -138,19 +163,20 @@ export default function VenueDetailsPage() {
                         <div className="stars-display" style={{ marginBottom: "1rem" }}>
                             {[1, 2, 3, 4, 5].map((n) =>
                                 n <= Math.floor(averageRating) ? (
-                                    <FaStar key={n} size={30} color="#37d976" />
+                                    <FaStar key={n} size={30} color="rgb(255, 186, 209)" />
                                 ) : averageRating >= n - 0.5 ? (
-                                    <FaStarHalfAlt key={n} size={30} color="#37d976" />
+                                    <FaStarHalfAlt key={n} size={30} color="rgb(255, 186, 209)" />
                                 ) : (
                                     <FaRegStar key={n} size={30} color="#ccc" />
                                 )
                             )}
                         </div>
                     )}
-
-                    <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "10vh" }}>
-                        Valorar
-                    </button>
+                    {!alreadyRated &&
+                        <button className="btn-primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "10vh" }}>
+                            Valorar
+                        </button>
+                    }
                 </div>
 
                 <div className="details-info">
@@ -254,7 +280,7 @@ export default function VenueDetailsPage() {
                         />
                         <button
                             className="btn-primary"
-                            style={{ backgroundColor: "#37d976" }}
+                            style={{ backgroundColor: "rgb(255, 186, 209)" }}
                             onClick={() => {
                                 submitReview();
                                 setIsModalOpen(false);
