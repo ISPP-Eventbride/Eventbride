@@ -2,6 +2,7 @@ package com.eventbride.invitation;
 
 import com.eventbride.dto.EventDTO;
 import com.eventbride.dto.InvitationDTO;
+import com.eventbride.email.EmailService;
 import com.eventbride.event.Event;
 import com.eventbride.event.EventRepository;
 import com.eventbride.notification.Notification;
@@ -32,6 +33,9 @@ public class InvitationService {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	@Autowired
+	private EmailService emailService;
 	
 	@Transactional()
 	public Invitation createVoidInvitation(Integer eventId, Integer maxGuests, User user, String guestEmail, String confirmationLink) throws IllegalArgumentException {
@@ -59,6 +63,11 @@ public class InvitationService {
 		invitation.setEmail(guestEmail);
 		invitation.setEvent(event);
 		invitation.setInvitationType(Invitation.InvitationType.SENT);
+		
+		// Guarda primero la invitación para obtener el ID generado
+		Invitation savedInvitation = invitationRepository.save(invitation);
+		
+		// Ahora puedes usar ese ID en el enlace de confirmación
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setFrom("eventbride6@gmail.com");
 		mailMessage.setTo(guestEmail);
@@ -67,18 +76,16 @@ public class InvitationService {
 				". \nEl evento se llevará a cabo en la fecha: " + event.getEventDate() +
 				", en "
 				+ event.getEventProperties().stream()
-						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue()
-						.getName()
-				+
-				", con dirección "
+						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue().getName()
+				+ ", con dirección "
 				+ event.getEventProperties().stream()
-						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue()
-						.getAddress()
-				+
-				". \n Para confirmar su asistencia debe acceder al siguiente enlace: " + confirmationLink + "/" + invitation.getId() +
-				". \nMuchas gracias!");
-
-		return invitationRepository.save(invitation);
+						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue().getAddress()
+				+ ". \n Para confirmar su asistencia debe acceder al siguiente enlace: "
+				+ confirmationLink + "/" + savedInvitation.getId() + ". \nMuchas gracias!");
+		
+		emailService.sendEmail(mailMessage);
+		
+		return savedInvitation;
 	}
 
 	public Invitation getInvitationById(Integer invitationId) throws IllegalArgumentException {
@@ -111,7 +118,7 @@ public class InvitationService {
 			throw new IllegalArgumentException("Faltan datos en la invitación");
 		}
 
-		BeanUtils.copyProperties(invitation, existingInvitation, "id", "event", "invitationType");
+		BeanUtils.copyProperties(invitation, existingInvitation, "id", "event", "invitationType", "email");
 		existingInvitation.setInvitationType(Invitation.InvitationType.ACCEPTED);
 		notificationService.createNotification(Notification.NotificationType.INVITATION_CONFIRMED,
 				existingInvitation.getEvent().getUser(), existingInvitation.getEvent(), null, invitation);
@@ -135,8 +142,8 @@ public class InvitationService {
 				+
 				". \nMuchas gracias!");
 
-		mailSender.send(mailMessage);
-		;
+		emailService.sendEmail(mailMessage);
+		
 
 		return invitationRepository.save(existingInvitation);
 	}

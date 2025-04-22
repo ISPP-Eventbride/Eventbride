@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -32,15 +33,22 @@ public class InvitationController {
 	private UserService userService;
 
 	@PostMapping("/create/{id}")
-	public ResponseEntity<?> createInvitation(@PathVariable int id, @RequestBody int maxGuests, @RequestBody String guestEmail, @RequestBody String confirmationEmail) throws IllegalArgumentException{
+	public ResponseEntity<?> createInvitation(
+		@PathVariable int id,
+		@RequestBody Map<String, Object> payload
+	) throws IllegalArgumentException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Optional<User> user = userService.getUserByUsername(auth.getName());
-	
+
 		if (!user.isPresent()) {
 			throw new IllegalArgumentException("El usuario no existe");
 		}
-	
-		Invitation res = invitationService.createVoidInvitation(id, maxGuests, user.get(), guestEmail, confirmationEmail);
+
+		Integer maxGuests = ((Number) payload.get("maxGuests")).intValue();
+		String guestEmail = (String) payload.get("guestEmail");
+		String confirmationLink = (String) payload.get("confirmationLink");
+
+		Invitation res = invitationService.createVoidInvitation(id, maxGuests, user.get(), guestEmail, confirmationLink);
 		InvitationDTO invitationDTO = new InvitationDTO(res);
 		return new ResponseEntity<>(invitationDTO, HttpStatus.CREATED);
 	}
