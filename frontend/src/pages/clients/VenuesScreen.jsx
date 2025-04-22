@@ -231,8 +231,8 @@ const VenuesScreen = () => {
       showAlert("¡Operación realizada con éxito!")
       setAddModalVisible(false)
     } catch (error) {
-      console.error("Error al añadir el venue:", error)
-      showAlert("Este evento ya tiene un servicio asociado.")
+      console.error("Error al añadir el venue:", error.code, error.response.data.error)
+      showAlert(error.response.data.error || "Error al añadir el venue")
     }
   }
 

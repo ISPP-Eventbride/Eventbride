@@ -267,6 +267,14 @@ public class EventPropertiesController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "No puedes asignar un venue deshabilitado a un evento"));
         }
+        if(startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "La fecha de inicio no puede ser posterior o igual a la fecha de fin"));
+        }
+        if(startDate.toLocalTime().isBefore(venue.getEarliestTime()) || endDate.toLocalTime().isAfter(venue.getLatestTime())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "La fecha de inicio o fin no puede estar fuera del horario del venue"));
+        }
 
         Event updatedEvent = eventPropertiesService.addVenueToEvent(eventId, venueId, startDate, endDate);
         return ResponseEntity.ok(updatedEvent);
