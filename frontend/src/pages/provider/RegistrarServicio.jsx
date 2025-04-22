@@ -543,8 +543,22 @@ const RegistrarServicio = () => {
                                             type="time"
                                             id="latestTime"
                                             name="latestTime"
+                                            min = {formData.earliestTime}
                                             value={formData.latestTime}
-                                            onChange={handleChange}
+                                            onChange={e => {
+                                                handleChange(e);
+                                                const input = e.target;
+                                                // pongo el custom message si es anterior o igual
+                                                if (formData.earliestTime && input.value <= formData.earliestTime) {
+                                                  input.setCustomValidity(
+                                                    "La hora de cierre debe ser posterior a la de apertura"
+                                                  );
+                                                } else {
+                                                  input.setCustomValidity("");
+                                                }
+                                                // fuerzo repintado de la validación en caliente
+                                                input.reportValidity();
+                                              }}
                                             required
                                             className="form-input"
                                         />

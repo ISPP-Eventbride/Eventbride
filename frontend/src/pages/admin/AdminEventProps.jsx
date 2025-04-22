@@ -176,8 +176,23 @@ function AdminEventProps() {
                         <input
                         type="time"
                         name="finishTime"
+                        min={formData.startTime}
                         value={formData.finishTime}
-                        onChange={handleInputChange}
+                        onChange={e => {
+                          handleInputChange(e);
+                          const input = e.target;
+                          // pongo el custom message si es anterior o igual
+                          if (formData.startTime && input.value <= formData.startTime) {
+                            input.setCustomValidity(
+                              "La hora de fin debe ser posterior a la de comienzo"
+                            );
+                          } else {
+                            
+                            input.setCustomValidity("");
+                          }
+                          // fuerzo repintado de la validación en caliente
+                          input.reportValidity();
+                        }}
                         required={editMode === true}
                         readOnly={!editMode}
                         />
