@@ -32,7 +32,7 @@ public class InvitationController {
 	private UserService userService;
 
 	@PostMapping("/create/{id}")
-	public ResponseEntity<?> createInvitation(@PathVariable int id, @RequestBody int maxGuests) throws IllegalArgumentException{
+	public ResponseEntity<?> createInvitation(@PathVariable int id, @RequestBody int maxGuests, @RequestBody String guestEmail, @RequestBody String confirmationEmail) throws IllegalArgumentException{
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Optional<User> user = userService.getUserByUsername(auth.getName());
 	
@@ -40,7 +40,7 @@ public class InvitationController {
 			throw new IllegalArgumentException("El usuario no existe");
 		}
 	
-		Invitation res = invitationService.createVoidInvitation(id, maxGuests, user.get());
+		Invitation res = invitationService.createVoidInvitation(id, maxGuests, user.get(), guestEmail, confirmationEmail);
 		InvitationDTO invitationDTO = new InvitationDTO(res);
 		return new ResponseEntity<>(invitationDTO, HttpStatus.CREATED);
 	}

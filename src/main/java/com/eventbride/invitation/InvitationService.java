@@ -34,7 +34,7 @@ public class InvitationService {
 	private NotificationService notificationService;
 	
 	@Transactional()
-	public Invitation createVoidInvitation(Integer eventId, Integer maxGuests, User user) throws IllegalArgumentException {
+	public Invitation createVoidInvitation(Integer eventId, Integer maxGuests, User user, String guestEmail, String confirmationLink) throws IllegalArgumentException {
 
 		// Comprobamos que en las eventpropeties del evento exista una venue
 		Event event = eventRepository.findById(eventId).orElse(null);
@@ -56,10 +56,27 @@ public class InvitationService {
 
 		Invitation invitation = new Invitation();
 		invitation.setMaxGuests(maxGuests);
-		String randomEmail = "randomEmail" + Math.random() + "@gmail.com";
-		invitation.setEmail(randomEmail);
+		invitation.setEmail(guestEmail);
 		invitation.setEvent(event);
 		invitation.setInvitationType(Invitation.InvitationType.SENT);
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setFrom("eventbride6@gmail.com");
+		mailMessage.setTo(guestEmail);
+		mailMessage.setSubject("Invitación a evento");
+		mailMessage.setText("Hola, \nHas sido invitado al evento: " + event.getName() +
+				". \nEl evento se llevará a cabo en la fecha: " + event.getEventDate() +
+				", en "
+				+ event.getEventProperties().stream()
+						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue()
+						.getName()
+				+
+				", con dirección "
+				+ event.getEventProperties().stream()
+						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue()
+						.getAddress()
+				+
+				". \n Para confirmar su asistencia debe acceder al siguiente enlace: " + confirmationLink + "/" + invitation.getId() +
+				". \nMuchas gracias!");
 
 		return invitationRepository.save(invitation);
 	}
