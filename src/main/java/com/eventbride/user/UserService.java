@@ -268,7 +268,7 @@ public class UserService {
 		user.setChangePasswordToken(uuid);
 		userRepository.save(user);
 
-		String link = "http://localhost:5173/cambiar-contraseña/" + uuid;
+		String link = "http://ispp-2425-03.ew.r.appspot.com/cambiar-contraseña/" + uuid;
 
 		// ENVIAR CORREO
 		SimpleMailMessage mailMessage = new SimpleMailMessage();

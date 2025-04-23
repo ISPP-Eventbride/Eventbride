@@ -2,6 +2,7 @@ import {useState} from "react";
 import apiClient from "../../apiClient.js";
 import {LogIn} from "lucide-react";
 import "../../static/resources/css/ChangePassword.css"
+import {useAlert} from "../../context/AlertContext.jsx";
 
 function ChangePasswordRegistration () {
   const [form, setForm] = useState({ email: ""});
@@ -10,6 +11,7 @@ function ChangePasswordRegistration () {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const {showAlert} = useAlert();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,13 +19,14 @@ function ChangePasswordRegistration () {
     setError(null);
 
     try {
-      const response = await apiClient.get(`/api/users/change-password-request/${form.email}`);
-      if(response.data.error){
-        throw new Error(response.data.error);
+      const response = await fetch(`/api/users/change-password-request/${form.email}`);
+      if(response.status===400){
+        const data = await response.json()
+        throw new Error(data.error)
       }
-      alert("Correo enviado")
+      showAlert("Correo enviado")
     } catch (err) {
-      setError(err);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
