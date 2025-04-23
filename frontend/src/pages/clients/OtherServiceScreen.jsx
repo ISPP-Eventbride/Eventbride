@@ -215,6 +215,7 @@ const OtherServiceScreen = () => {
       setModalVisible(false)
     } catch (error) {
       console.error("Error al añadir el servicio:", error)
+      showAlert(error.response.data.error || "Error al añadir el servicio")
     } finally {
       setIsConfirming(false)
     }
@@ -437,6 +438,7 @@ const OtherServiceScreen = () => {
                         <input
                           type="time"
                           className="time-input"
+                          min = {venueTimes[eventObj.id]?.startTime}
                           value={venueTimes[eventObj.id]?.endTime || ""}
                           required
                           onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}

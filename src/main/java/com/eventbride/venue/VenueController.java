@@ -72,7 +72,9 @@ public class VenueController {
 		if (!roles.contains("SUPPLIER")) {
 			throw new IllegalArgumentException("No tienes permisos para crear este venue.");
 		}
-
+		if (venue.getEarliestTime().isAfter(venue.getLatestTime()) || venue.getEarliestTime().equals(venue.getLatestTime())) {
+			throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
+		}
 		Venue newVenue = venueService.save(venue);
 		return ResponseEntity.ok(new VenueDTO(newVenue));
 	}
@@ -85,6 +87,9 @@ public class VenueController {
 
 		if (!roles.contains("SUPPLIER")) {
 			return new ResponseEntity<>("No tienes permisos para editar este venue.", HttpStatus.FORBIDDEN);
+		}
+		if (venue.getEarliestTime().isAfter(venue.getLatestTime()) || venue.getEarliestTime().equals(venue.getLatestTime())) {
+			throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
 		}
 
 		try {
@@ -165,6 +170,9 @@ public class VenueController {
 		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 		List<String> roles = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 		if (roles.contains("ADMIN")) {
+			if (venueDetails.getEarliestTime().isAfter(venueDetails.getLatestTime()) || venueDetails.getEarliestTime().equals(venueDetails.getLatestTime())) {
+				throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
+			}
 			try {
 				Venue updatedVenue = venueService.updateVenue(id, venueDetails);
 				return new ResponseEntity<>(new VenueDTO(updatedVenue), HttpStatus.OK);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../static/resources/css/AdminUsers.css";
+import { useAlert } from "../../context/AlertContext"
 
 function AdminEventProps() {
   const navigate = useNavigate();
@@ -12,6 +13,9 @@ function AdminEventProps() {
   const [editMode, setEditMode] = useState(true);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
+
+
+  const { showAlert } = useAlert()
 
   useEffect(() => {
     getEventProp();
@@ -63,11 +67,13 @@ function AdminEventProps() {
   
     if (isNaN(start.getTime()) || isNaN(finish.getTime())) {
       setError("Las fechas u horas introducidas no son válidas.");
+      showAlert("Las fechas u horas introducidas no son válidas.")
       return;
     }
   
     if (finish <= start) {
       setError("La hora de finalización debe ser posterior a la hora de inicio.");
+      showAlert("La hora de finalización debe ser posterior a la hora de inicio.")
       return;
     }
 
@@ -102,6 +108,7 @@ function AdminEventProps() {
       })
       .catch(err => {
         console.error("Error actualizando:", err);
+        showAlert(err.message || "Error inesperado")
         setError(err.message || "Error inesperado");
       });
   }
@@ -176,23 +183,9 @@ function AdminEventProps() {
                         <input
                         type="time"
                         name="finishTime"
-                        min={formData.startTime}
+                        min = {formData.earliestTime}
                         value={formData.finishTime}
-                        onChange={e => {
-                          handleInputChange(e);
-                          const input = e.target;
-                          // pongo el custom message si es anterior o igual
-                          if (formData.startTime && input.value <= formData.startTime) {
-                            input.setCustomValidity(
-                              "La hora de fin debe ser posterior a la de comienzo"
-                            );
-                          } else {
-                            
-                            input.setCustomValidity("");
-                          }
-                          // fuerzo repintado de la validación en caliente
-                          input.reportValidity();
-                        }}
+                        onChange={handleInputChange}
                         required={editMode === true}
                         readOnly={!editMode}
                         />

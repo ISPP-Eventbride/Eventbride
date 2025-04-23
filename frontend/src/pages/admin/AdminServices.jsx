@@ -604,21 +604,9 @@ function AdminServices() {
                               name="latestTime"
                               min = {data.earliestTime}
                               value={data.latestTime}
-                              onChange={(e) =>{
+                              onChange={(e) =>
                                 handleInputChange(e, service.id)
-                                const input = e.target;
-                                if (data.earliestTime && input.value <= data.earliestTime) {
-                                  input.setCustomValidity(
-                                    "La hora de cierre debe ser posterior a la de apertura"
-                                  );
-                                } else {
-                                  console.log(data.earliestTime && input.value <= data.earliestTime)
-                                  input.setCustomValidity("");
-                                }
-                                // fuerzo repintado de la validación en caliente
-                                input.reportValidity();
-
-                              }}
+                              }
                               required={isEditing === true}
                               readOnly={!isEditing}
                               className="form-input"

@@ -118,6 +118,9 @@ const EditarServicio = () => {
             latestTime: formData.latestTime
         };
 
+        if(serviceType === 'venue' && updatedFormData.earliestTime >= updatedFormData.latestTime) {
+            setError("La hora de cierre debe ser posterior a la de apertura.");
+        }
         // Eliminar propiedades innecesarias o problemáticas
         delete updatedFormData.id;
         delete updatedFormData.new;
