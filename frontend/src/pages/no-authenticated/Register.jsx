@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import apiClient from "../../apiClient"
 import "../../static/resources/css/Register.css"
+import TermsModal from "./TermsModal"
+
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -22,6 +24,7 @@ const Register = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -280,10 +283,12 @@ const Register = () => {
                   required
                 />
                 <label htmlFor="termsAccept" className="terms-label">
-                  <a href="/terminos-y-condiciones">Acepto los Términos y Condiciones de Eventbride</a>
+                  Acepto los Términos y Condiciones de Eventbride<button type="button" className="terms-link" onClick={() => setShowTerms(true)}>Términos y Condiciones</button>
                 </label>
               </div>
             </div>
+
+            {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
 
             <button type="submit" className={`login-button ${isLoading ? "loading" : ""}`} disabled={isLoading}>
               {isLoading ? (

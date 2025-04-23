@@ -77,11 +77,11 @@ public class UsersIntegrationTest {
 
         // admin
         adminUser = new User();
-        adminUser.setFirstName("Admin");
+        adminUser.setFirstName("AdminTest");
         adminUser.setLastName("User");
-        adminUser.setUsername("admin");
+        adminUser.setUsername("admintest");
         adminUser.setPassword("1234");
-        adminUser.setEmail("admin@example.com");
+        adminUser.setEmail("admintest@example.com");
         adminUser.setDni("12345678X");
         adminUser.setTelephone(123456789);
         adminUser.setRole("ADMIN");
@@ -143,7 +143,7 @@ public class UsersIntegrationTest {
 
     // 1. GET /api/users (getAllUsers)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldReturnAllUsersAsAdmin() throws Exception {
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk()) 
@@ -159,7 +159,7 @@ public class UsersIntegrationTest {
 
     // 2. GET /api/users/DTO (getAllUsersDTO)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldReturnUserDTOList() throws Exception {
         mockMvc.perform(get("/api/users/DTO"))
                 .andExpect(status().isOk())
@@ -175,7 +175,7 @@ public class UsersIntegrationTest {
 
     // 3. GET /api/users/{id} (getUserById)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldReturnUserByIdAsAdmin() throws Exception {
         mockMvc.perform(get("/api/users/" + adminUser.getId()))
                 .andExpect(status().isOk())
@@ -221,7 +221,7 @@ public class UsersIntegrationTest {
 
     // 5. PUT /api/users/admin/{id} (updateUser as ADMIN)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldUpdateUserAsAdmin() throws Exception {
         String updatedUserJson = "{" +
                 "\"firstName\":\"Nuevo\",\"lastName\":\"Nombre\",\"username\":\"juanp\"," +
@@ -247,7 +247,7 @@ public class UsersIntegrationTest {
 
     // 6. DELETE /api/users/{id} (deleteUser)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldDeleteUserAsAdmin() throws Exception {
         mockMvc.perform(delete("/api/users/" + adminUser.getId()))
                 .andExpect(status().isOk());
@@ -277,7 +277,7 @@ public class UsersIntegrationTest {
 
     // 8. PUT /api/users/{id} (updateOwnProfile)
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldUpdateOwnProfile() throws Exception {
         String updatedUserJson = "{" +
         "\"firstName\":\"Yo\",\"lastName\":\"Mismo\",\"username\":\"admin\"," +
@@ -325,7 +325,7 @@ public class UsersIntegrationTest {
     
     // 9. PUT /api/users/premium/{id}
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldUpgradeToPremium() throws Exception {
         String expirationDate = LocalDate.now().plusDays(30).toString();
         mockMvc.perform(put("/api/users/premium/" + adminUser.getId())
@@ -336,7 +336,7 @@ public class UsersIntegrationTest {
 
     // 10. GET /api/users/getAdmin
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldReturnAdminUserId() throws Exception {
         mockMvc.perform(get("/api/users/getAdmin"))
                 .andExpect(status().isOk())

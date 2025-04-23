@@ -32,7 +32,7 @@ public class InvitationService {
 
 	@Autowired
 	private NotificationService notificationService;
-	
+
 	@Transactional()
 	public Invitation createVoidInvitation(Integer eventId, Integer maxGuests, User user) throws IllegalArgumentException {
 
@@ -66,11 +66,11 @@ public class InvitationService {
 
 	public Invitation getInvitationById(Integer invitationId) throws IllegalArgumentException {
 		Optional<Invitation> invitationOpt = invitationRepository.findById(invitationId);
-	
+
 		if (!invitationOpt.isPresent()) {
 			throw new IllegalArgumentException("La invitación no existe");
 		}
-	
+
 		Invitation invitation = invitationOpt.get();
 		Event event = invitation.getEvent();
 
@@ -119,7 +119,7 @@ public class InvitationService {
 				". \nMuchas gracias!");
 
 		mailSender.send(mailMessage);
-		;
+
 
 		return invitationRepository.save(existingInvitation);
 	}
