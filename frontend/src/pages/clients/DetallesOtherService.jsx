@@ -234,7 +234,23 @@ export default function ServiceDetailsPage() {
 
         <div className="details-info">
           <div className="info-grid">
-            {/* ... campos de ciudad, precio, tipo ... */}
+            <div className="info-item">
+              <span className="info-label">Ciudad</span>
+              <span className="info-value">{serviceDetails.cityAvailable}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Precio</span>
+              <span className="info-value">
+                {serviceDetails.limitedByPricePerGuest
+                  ? `${serviceDetails.servicePricePerGuest} €/persona`
+                  : serviceDetails.limitedByPricePerHour
+                    ? `${serviceDetails.servicePricePerHour} €/hora`
+                    : `${serviceDetails.fixedPrice}€`}
+              </span>
+            </div>
+            <div className="info-itemm">
+              <span className="badge">{serviceDetails.otherServiceType}</span>
+            </div>
           </div>
 
           <div className="info-section">
