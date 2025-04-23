@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+
 
 import com.eventbride.dto.RatingDTO;
 import com.eventbride.otherService.OtherServiceRepository;
@@ -43,14 +45,14 @@ public class RatingController {
     }
 
     @GetMapping("/other-service/{id}")
-    public List<Rating> getRatingsForServiceByOtherService(@PathVariable Integer id,
+    public Page<Rating> getRatingsForServiceByOtherService(@PathVariable Integer id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1") int size) {
         return ratingService.getRatingsByOtherServiceId(id, page, size);
     }
 
     @GetMapping("/venue/{id}")
-    public List<Rating> getRatingsForServiceByVenue(@PathVariable Integer id,
+    public Page<Rating> getRatingsForServiceByVenue(@PathVariable Integer id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1") int size) {
         return ratingService.getRatingsByVenueId(id, page, size);
@@ -64,6 +66,11 @@ public class RatingController {
     @GetMapping("/average/venue/{id}")
     public double getAverageRatingByVenue(@PathVariable Long id) {
         return ratingService.getRoundedAverageRatingByVenue(id);
+    }
+
+    @GetMapping("/service/{id}/isVoted/{userId}")
+    public Boolean isServiceVotedBy(@PathVariable Integer id, @PathVariable Integer userId, @RequestParam Boolean isVenue) {
+        return ratingService.isServiceVotedByUser(id, userId, isVenue);
     }
 
     @PostMapping()

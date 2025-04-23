@@ -103,7 +103,8 @@ public class SecurityConfig {
                                                                 "/api/ratings//other-service/{id}",
                                                                 "/api/ratings//venue/{id}",
                                                                 "/api/ratings/average/other-service/{id}",
-                                                                "/api/ratings/average/venue/{id}")
+                                                                "/api/ratings/average/venue/{id}",
+                                                                "/api/ratings/service/{id}/isVoted/{userId}")
                                                 .hasAnyAuthority("CLIENT", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(manager -> manager

@@ -1,6 +1,4 @@
-import { MapPin, DollarSign } from "lucide-react";
-import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
-
+import { FaStar, FaRegStar, FaStarHalfAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import apiClient from '../../apiClient';
 import { useParams, Link } from "react-router-dom";
@@ -15,10 +13,15 @@ export default function ServiceDetailsPage() {
   const [error, setError] = useState(null);
   const [jwtToken, setJwtToken] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Estados para paginación
   const [ratings, setRatings] = useState([]);
+  const [page, setPage] = useState(0);
+  const [size] = useState(3);
+  const [totalPages, setTotalPages] = useState(0);
+
   const [averageRating, setAverageRating] = useState(0);
   const [alreadyRated, setAlreadyRated] = useState(false);
-
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   // Cargar JWT
@@ -27,7 +30,7 @@ export default function ServiceDetailsPage() {
     if (token) setJwtToken(token);
   }, []);
 
-  // Fetch detalles del servicio
+  // Fetch detalles del servicio u otro servicio
   useEffect(() => {
     if (!id || !jwtToken) return;
     setIsLoading(true);
@@ -40,20 +43,24 @@ export default function ServiceDetailsPage() {
       .finally(() => setIsLoading(false));
   }, [id, jwtToken]);
 
+  // Fetch ratings paginados
   useEffect(() => {
     if (!id || !jwtToken) return;
-
     apiClient
       .get(`/api/ratings/other-service/${id}`, {
-        headers: { Authorization: `Bearer ${jwtToken}` }
+        headers: { Authorization: `Bearer ${jwtToken}` },
+        params: { page, size }
       })
-      .then((res) => setRatings(res.data))
+      .then((res) => {
+        setRatings(res.data.content);
+        setTotalPages(res.data.totalPages);
+      })
       .catch((err) => console.error("Error cargando ratings:", err));
-  }, [id, jwtToken]);
+  }, [id, jwtToken, page, size]);
 
+  // Fetch valoración media
   useEffect(() => {
     if (!id || !jwtToken) return;
-
     apiClient
       .get(`/api/ratings/average/other-service/${id}`, {
         headers: { Authorization: `Bearer ${jwtToken}` },
@@ -62,38 +69,40 @@ export default function ServiceDetailsPage() {
       .catch((err) => console.error("Error al cargar promedio de rating", err));
   }, [id, jwtToken]);
 
+  // Comprobar si ya votó
   useEffect(() => {
-    if (!id || !jwtToken) return;
-
-    setAlreadyRated(ratings.some((r) => r.user?.id === currentUser.id));
-  }, [id, jwtToken, ratings, currentUser.id]);
+    if (!serviceDetails?.id || !currentUser?.id || !jwtToken) return;
+    const isVenue = "surface" in serviceDetails;
+    apiClient
+      .get(`/api/ratings/service/${serviceDetails.id}/isVoted/${currentUser.id}`, {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+        params: { isVenue }
+      })
+      .then(res => setAlreadyRated(res.data === true || res.data === 1))
+      .catch(() => setAlreadyRated(false));
+  }, [serviceDetails, currentUser?.id, jwtToken]);
 
   const renderStars = () =>
     [1, 2, 3, 4, 5].map((n) => {
       const full = n <= Math.floor(rating);
       const half = rating >= n - 0.5 && rating < n;
-
       return (
         <span
           key={n}
           onMouseMove={(e) => {
             const { left, width } = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - left;
-            const isHalf = x < width / 2;
-            setRating(isHalf ? n - 0.5 : n);
+            setRating(e.clientX - left < width / 2 ? n - 0.5 : n);
           }}
           onClick={(e) => {
             const { left, width } = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - left;
-            const isHalf = x < width / 2;
-            setRating(isHalf ? n - 0.5 : n);
+            setRating(e.clientX - left < width / 2 ? n - 0.5 : n);
           }}
           style={{ cursor: "pointer", marginRight: 6 }}
         >
           {full ? (
-            <FaStar size={30} color="rgb(255, 186, 209)" />
+            <FaStar size={30} color="#d9be75" />
           ) : half ? (
-            <FaStarHalfAlt size={30} color="rgb(255, 186, 209)" />
+            <FaStarHalfAlt size={30} color="#d9be75" />
           ) : (
             <FaRegStar size={30} color="#ccc" />
           )}
@@ -101,38 +110,62 @@ export default function ServiceDetailsPage() {
       );
     });
 
+  const renderCommentStars = (value) =>
+    [1, 2, 3, 4, 5].map((n) =>
+      n <= Math.floor(value) ? (
+        <FaStar key={n} size={16} color="#d9be75" />
+      ) : value >= n - 0.5 ? (
+        <FaStarHalfAlt key={n} size={16} color="#d9be75" />
+      ) : (
+        <FaRegStar key={n} size={16} color="#ccc" />
+      )
+    );
 
   const submitReview = () => {
-    console.log("Review:", { id, rating, comment });
     fetch("/api/ratings", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
       method: "POST",
-      body: JSON.stringify(
-        {
-          stars: rating,
-          comment: comment,
-          createdAt: null,
-          userId: currentUser.id,
-          otherServiceId: serviceDetails.id,
-          venueId: null,
-        }
-      ),
+      body: JSON.stringify({
+        stars: rating,
+        comment: comment,
+        createdAt: null,
+        userId: currentUser.id,
+        otherServiceId: serviceDetails.id,
+        venueId: null,
+      }),
     })
+      .then(() => {
+        setAlreadyRated(true);
+        setRating(0);
+        setComment("");
+        setPage(0); // volvemos a la página 0
+        // recargamos con params page y size
+        return apiClient.get(
+          `/api/ratings/other-service/${serviceDetails.id}`,
+          {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+            params: { page: 0, size }
+          }
+        );
+      })
+      .then(res => {
+        // aquí usamos res.data.content y res.data.totalPages
+        setRatings(res.data.content);
+        setTotalPages(res.data.totalPages);
+        // después recargamos la media...
+        return apiClient.get(
+          `/api/ratings/average/other-service/${serviceDetails.id}`,
+          { headers: { Authorization: `Bearer ${jwtToken}` } }
+        );
+      })
+      .then(res => setAverageRating(res.data || 0))
+      .catch(err => console.error("Error enviando review:", err));
   };
 
-  const renderCommentStars = (value) =>
-    [1, 2, 3, 4, 5].map((n) =>
-      n <= Math.floor(value) ? (
-        <FaStar key={n} size={16} color="rgb(255, 186, 209)" />
-      ) : value >= n - 0.5 ? (
-        <FaStarHalfAlt key={n} size={16} color="rgb(255, 186, 209)" />
-      ) : (
-        <FaRegStar key={n} size={16} color="#ccc" />
-      )
-    );
+
 
   if (isLoading) return <p>Cargando detalles...</p>;
   if (error) return <p>Error al cargar detalles</p>;
@@ -140,12 +173,20 @@ export default function ServiceDetailsPage() {
 
   return (
     <div className="details-container">
-      <div className="details-header" >
-        <h1>{serviceDetails.name}</h1>
+      <div
+        className="details-header"
+        style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+      >
+        <Link
+          to="/other-services"
+          title="volver a servicios"
+          className="btn-primary"
+          style={{ backgroundColor: "transparent", color: "black", padding: 0, marginBottom: "1vh", marginRight: "1vh" }}
+        >
+          <FaChevronLeft />
+        </Link>
+        <h1 style={{ marginBottom: "1vh" }}>{serviceDetails.name}</h1>
       </div>
-      <Link className="btn-primary" to="/other-services" style={{ backgroundColor: "transparent", color: "black", display: "flex", justifyContent: "flex-end", flexDirection: "row"}}>
-        Volver
-      </Link>
 
       <div className="details-wrapper">
         <div className="sidebar">
@@ -160,50 +201,40 @@ export default function ServiceDetailsPage() {
             />
           </div>
 
-          {averageRating > 0 && (
-            <div className="stars-display" style={{ marginBottom: "1rem" }}>
+          <div
+            className="stars-section"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: "1rem",
+            }}
+          >
+            <span style={{ marginBottom: "0.5rem", fontWeight: "bold" }}>
+              Valoración media
+            </span>
+            <div className="stars-display" style={{ display: "flex", gap: "0.25rem" }}>
               {[1, 2, 3, 4, 5].map((n) =>
                 n <= Math.floor(averageRating) ? (
-                  <FaStar key={n} size={30} color="rgb(255, 186, 209)" />
+                  <FaStar key={n} size={30} color="#d9be75" />
                 ) : averageRating >= n - 0.5 ? (
-                  <FaStarHalfAlt key={n} size={30} color="rgb(255, 186, 209)" />
+                  <FaStarHalfAlt key={n} size={30} color="#d9be75" />
                 ) : (
                   <FaRegStar key={n} size={30} color="#ccc" />
                 )
               )}
             </div>
-          )}
-
-          {!alreadyRated &&
+          </div>
+          {!alreadyRated && (
             <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
               Valorar
             </button>
-          }
+          )}
         </div>
-
 
         <div className="details-info">
           <div className="info-grid">
-            <div className="info-itemm">
-              <MapPin size={16} className="icon" />
-              <span>
-                <strong>Ciudad:</strong> {serviceDetails.cityAvailable}
-              </span>
-            </div>
-            <div className="info-itemm">
-              <DollarSign size={16} className="icon" />
-              <span>
-                <strong>Precio:</strong>{" "}
-                {serviceDetails.limitedByPricePerGuest
-                  ? `${serviceDetails.servicePricePerGuest}€ / invitado`
-                  : serviceDetails.limitedByPricePerHour
-                    ? `${serviceDetails.servicePricePerHour}€ / hora`
-                    : `${serviceDetails.fixedPrice}€`}
-              </span>
-            </div>
-            <div className="info-itemm">
-              <span className="badge">{serviceDetails.otherServiceType}</span>
-            </div>
+            {/* ... campos de ciudad, precio, tipo ... */}
           </div>
 
           <div className="info-section">
@@ -220,7 +251,7 @@ export default function ServiceDetailsPage() {
 
           <div className="info-section">
             <h2>Comentarios:</h2>
-            {ratings.length === 0 ? (
+            {ratings?.length === 0 ? (
               <p style={{ color: "#999" }}>Este servicio aún no tiene valoraciones.</p>
             ) : (
               ratings.map((r, i) => (
@@ -237,6 +268,49 @@ export default function ServiceDetailsPage() {
                 </div>
               ))
             )}
+
+            {/* CONTROLES DE PAGINACIÓN */}
+            {totalPages > 1 && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: 16,
+                }}
+              >
+                <button
+                  onClick={() => setPage(p => Math.max(p - 1, 0))}
+                  disabled={page === 0}
+                  className="btn-primary"
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    cursor: page === 0 ? "not-allowed" : "pointer",
+                    marginRight: "0.5vh",
+                    width: "0.5vh",
+                  }}
+                >
+                  <FaChevronLeft size={20} style={{ color: "black" }} />
+                </button>
+                <span style={{ fontWeight: "bold" }}>
+                  Página {page + 1} de {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                  disabled={page + 1 >= totalPages}
+                  className="btn-primary"
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    width: "0.5vh",
+                    padding: "10px 10px",
+                    cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <FaChevronRight size={20} style={{ color: "black" }} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -245,14 +319,18 @@ export default function ServiceDetailsPage() {
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button className="close-button" onClick={() => setIsModalOpen(false)} style={{ backgroundColor: "#dc3545" }}>
+            <button
+              className="close-button"
+              onClick={() => setIsModalOpen(false)}
+              style={{ backgroundColor: "#dc3545" }}
+            >
               &times;
             </button>
             <h2>Valorar servicio</h2>
             <div className="stars-display">{renderStars()}</div>
             <textarea
               className="comment-box"
-              style={{ backgroundColor: "white" }}
+              style={{ backgroundColor: "white", color: "black" }}
               placeholder="Escribe tu reseña aquí..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
