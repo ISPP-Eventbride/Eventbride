@@ -22,6 +22,7 @@ export default function ServiceDetailsPage() {
 
   const [averageRating, setAverageRating] = useState(0);
   const [alreadyRated, setAlreadyRated] = useState(false);
+  const [canVote, setCanVote] = useState(true);
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   // Cargar JWT
@@ -72,7 +73,7 @@ export default function ServiceDetailsPage() {
   // Comprobar si ya votó
   useEffect(() => {
     if (!serviceDetails?.id || !currentUser?.id || !jwtToken) return;
-    const isVenue = "surface" in serviceDetails;
+    const isVenue = false;
     apiClient
       .get(`/api/ratings/service/${serviceDetails.id}/isVoted/${currentUser.id}`, {
         headers: { Authorization: `Bearer ${jwtToken}` },
@@ -80,6 +81,20 @@ export default function ServiceDetailsPage() {
       })
       .then(res => setAlreadyRated(res.data === true || res.data === 1))
       .catch(() => setAlreadyRated(false));
+
+    apiClient.get(`/api/ratings/service/${serviceDetails.id}/canVote/${currentUser.id}`, {
+      headers: { Authorization: `Bearer ${jwtToken}` },
+      params: { isVenue }
+    })
+      .then(res => {
+        if (res.data === true || res.data === 1) {
+          console.log("set true")
+        } else {
+          setCanVote(false);
+        }
+      }
+      )
+      .catch(() => setCanVote(false));
   }, [serviceDetails, currentUser?.id, jwtToken]);
 
   const renderStars = () =>
@@ -225,7 +240,7 @@ export default function ServiceDetailsPage() {
               )}
             </div>
           </div>
-          {!alreadyRated && (
+          {!alreadyRated && canVote && (
             <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
               Valorar
             </button>

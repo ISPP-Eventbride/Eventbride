@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventbride.dto.RatingDTO;
-
+import com.eventbride.event.Event;
+import com.eventbride.event.EventService;
 import com.eventbride.venue.Venue;
 
 import org.springframework.data.domain.Page;
@@ -36,6 +37,9 @@ public class RatingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EventService eventService;
 
     public Page<Rating> getRatingsByOtherServiceId(Integer serviceId, int page, int size) {
         return ratingRepository.findByOtherService_Id(serviceId, PageRequest.of(page, size));
@@ -84,6 +88,29 @@ public class RatingService {
 				.orElseThrow(() -> new RuntimeException("No se ha encontrado ningún servicio con esa Id"));
             return ratingRepository.isVotedByUserOtherService(serviceId, userId);
         }
+    }
+
+    @Transactional(readOnly= true)
+    public Boolean canVote(Integer serviceId, Integer userId, Boolean isVenue) throws IllegalArgumentException {
+        if(isVenue == null){
+            throw new IllegalArgumentException("Ha ocurrido un error al identificar el servicio");
+        }
+        List<Event> userEvents = eventService.findEventsByUserId(userId);
+        boolean canVote = false;
+        if (isVenue) {
+            canVote = userEvents.stream().anyMatch(event ->
+                event.getEventProperties().stream().anyMatch(ep ->
+                    ep.getVenue() != null && ep.getVenue().getId().equals(serviceId)
+                )
+            );
+        } else {
+            canVote = userEvents.stream().anyMatch(event ->
+                event.getEventProperties().stream().anyMatch(ep ->
+                    ep.getOtherService() != null && ep.getOtherService().getId().equals(serviceId)
+                )
+            );
+        }
+        return canVote;
     }
 
 
