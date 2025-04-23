@@ -52,7 +52,9 @@ public class SecurityConfig {
                                                                 "/api/invitation",
                                                                 "/api/invitation/{id}",
                                                                 "/api/invitation/**",
-                                                                "/api/other-services/{id}")
+                                                                "/api/other-services/{id}",
+																"/change-password/token/{token}," +
+																"/change-password-request/{email}")
                                                 .permitAll()
 
                                                 // URIS DE ADMIN

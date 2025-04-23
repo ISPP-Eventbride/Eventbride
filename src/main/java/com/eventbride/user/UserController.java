@@ -102,7 +102,7 @@ public class UserController {
     public ResponseEntity<UserChatDTO> getUserByIdChat(@PathVariable Integer id) throws IllegalArgumentException {
         User user = userService.getUserById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        
+
         return ResponseEntity.ok(UserChatDTO.fromEntity(user));
     }
 
@@ -240,20 +240,36 @@ public class UserController {
     @PatchMapping("/change-password/{id}")
     public ResponseEntity<?> changePassword(@PathVariable Integer id, @RequestBody ChangePasswordDTO cpDTO) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    
+
         User existingUser = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-    
+
         String username = auth.getName();
         boolean isAdmin = hasRole("ADMIN");
-    
+
         if (!isAdmin && !existingUser.getUsername().equals(username)) {
             throw new IllegalArgumentException("No puedes modificar la contraseña de otro usuario");
         }
-    
+
         userService.changePassword(id, cpDTO, isAdmin);
-    
+
         return ResponseEntity.ok().body(Map.of("message", "Contraseña actualizada correctamente"));
     }
+
+	@PatchMapping("/change-password/token/{token}")
+	public ResponseEntity<?> changePasswordWithToken(@PathVariable String token, @RequestBody @Valid ChangePasswordDTO cpDTO) {
+		User existingUser = userService.getUserByToken(token)
+			.orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+		userService.changePasswordWithToken(existingUser, cpDTO);
+
+		return ResponseEntity.ok().body(Map.of("message", "Contraseña actualizada correctamente"));
+	}
+
+	@GetMapping("/change-password-request/{email}")
+	public ResponseEntity<?> changePasswordRequest(@PathVariable String email) throws IllegalArgumentException {
+		userService.requestChangePassword(email);
+		return ResponseEntity.ok().build();
+	}
 
 }

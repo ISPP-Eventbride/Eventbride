@@ -57,6 +57,9 @@ public class User extends Person implements UserDetails {
     @Column(name = "receives_emails", nullable = false)
     private Boolean receivesEmails;
 
+	@Column(name = "change_password_token", nullable = true)
+	private String changePasswordToken = null;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
@@ -67,7 +70,7 @@ public class User extends Person implements UserDetails {
         if (dni == null || !dni.matches("\\d{8}[A-Za-z]")) {
             return false;
         }
-    
+
         String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
         try {
             int numero = Integer.parseInt(dni.substring(0, 8));
@@ -78,5 +81,5 @@ public class User extends Person implements UserDetails {
             return false;
         }
     }
-    
+
 }
