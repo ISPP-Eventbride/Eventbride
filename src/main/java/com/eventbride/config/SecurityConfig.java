@@ -80,7 +80,8 @@ public class SecurityConfig {
 
                                                 // URIS DE CLIENT Y SUPPLIER
                                                 .requestMatchers(
-                                                                "/api/event-properties/provider/**")
+                                                                "/api/event-properties/provider/**",
+																"/api/users/")
                                                 .hasAnyAuthority("CLIENT", "SUPPLIER")
 
                                                 // URIS DE CLIENTE

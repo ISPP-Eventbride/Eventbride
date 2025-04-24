@@ -50,6 +50,24 @@ function EditProfile() {
         }));
     };
 
+    const handleDeleteAccount = (e) => {
+        fetch(`/api/users/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        })
+          .then(res => {
+            localStorage.removeItem("jwt")
+            localStorage.removeItem("user")
+            window.location.href = "/login"
+          })
+          .catch(e => {
+            console.warn(e)
+          });
+    }
+
     const getRoleText = (role) => {
         switch (role) {
             case "ADMIN":
@@ -195,6 +213,11 @@ function EditProfile() {
                         <button className="action-button danger-button" onClick={handleLogout}>
                             Cerrar Sesión
                         </button>
+
+                        <button className="action-button danger-button" onClick={handleDeleteAccount}>
+                          Borrar cuenta
+                        </button>
+
                     </div>
                 </div>
                 <div className="profile-info">

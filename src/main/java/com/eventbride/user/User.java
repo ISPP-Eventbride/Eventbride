@@ -25,7 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User extends Person implements UserDetails {
-    @Column(name = "dni", nullable = false, unique = true)
+    @Column(name = "dni", nullable = false, unique = false)
     @NotBlank
     @Size(min = 1, max = 9)
     private String dni;
