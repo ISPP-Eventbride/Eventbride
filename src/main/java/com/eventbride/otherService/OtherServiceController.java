@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.eventbride.dto.OtherServiceDTO;
+import com.eventbride.dto.publics.OtherServicePublicDTO;
 import com.eventbride.event.Event;
 import com.eventbride.event.EventService;
 import com.eventbride.event_properties.EventProperties;
@@ -52,10 +53,10 @@ public class OtherServiceController {
 	private EventService eventService;
 
 	@GetMapping
-	public List<OtherServiceDTO> getAllOtherServices() {
+	public List<OtherServicePublicDTO> getAllOtherServices() {
 		List<OtherService> otherServices = otherServiceService.getAllOtherServices().stream()
 				.filter(s -> s.getAvailable() == true).toList();
-		return OtherServiceDTO.fromEntities(otherServices);
+		return OtherServicePublicDTO.fromEntities(otherServices);
 	}
 
 	@GetMapping("/{id}")

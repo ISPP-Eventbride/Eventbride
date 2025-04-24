@@ -11,6 +11,8 @@ import com.eventbride.dto.EventDTO;
 import com.eventbride.dto.EventPropertiesDTO;
 import com.eventbride.event.Event;
 import com.eventbride.dto.EventPropertiesMapper;
+import com.eventbride.dto.publics.EventPropertiesPublicDTO;
+import com.eventbride.dto.publics.EventPublicDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,20 @@ public class EventMapper {
     }
 
     public List<EventDTO> toDTOList(List<Event> events) {
+        return events.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public EventPublicDTO toPublicDTO(Event event) {
+        List<EventPropertiesPublicDTO> propertiesDTO = event.getEventProperties()
+                .stream()
+                .map(eventPropertiesMapper::toPublicDTOWithoutEvent) 
+                .collect(Collectors.toList());
+        return new EventPublicDTO(event, propertiesDTO);
+    }
+
+    public List<EventDTO> toPublicDTOList(List<Event> events) {
         return events.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
