@@ -125,7 +125,7 @@ public class NotificationService {
             case NEW_REMAINING_PAYMENT:
                 notification.setType(NotificationType.NEW_REMAINING_PAYMENT);
                 notification.setSubject("Nuevo pago final");
-                notification.setMessage("El usuario ha pagado el monto restante para la contratación de tu servicio " +
+                notification.setMessage("El usuario ha pagado el monto restante de: " +
                         (eventProperties.getOtherService() != null ? eventProperties.getOtherService().getName()
                                 : eventProperties.getVenue().getName())
                         + " para el evento " + event.getName()
@@ -141,14 +141,16 @@ public class NotificationService {
             case INVITATION_CONFIRMED:
                 notification.setType(NotificationType.INVITATION_CONFIRMED);
                 notification.setSubject("Confirmación de invitación");
-                notification.setMessage(invitation.getFirstName() + " " + invitation.getLastName() + " ha aceptado tu invitación para el evento " + event.getName() + ".\n" +
+                notification.setMessage(invitation.getFirstName() + " " + invitation.getLastName()
+                        + " ha aceptado tu invitación para el evento " + event.getName() + ".\n" +
                         "Recuerda que puedes ver la lista de invitados en tu perfil.");
                 sendEmailNotification(user, notification.getSubject(), notification.getMessage());
                 break;
             case INVITATION_DELETED:
                 notification.setType(NotificationType.INVITATION_DELETED);
                 notification.setSubject("Eliminación de invitación");
-                notification.setMessage(" Has eliminado la invitación de " + invitation.getFirstName() + " " + invitation.getLastName() + " para el evento " + event.getName() + ".\n" +
+                notification.setMessage(" Has eliminado la invitación de " + invitation.getFirstName() + " "
+                        + invitation.getLastName() + " para el evento " + event.getName() + ".\n" +
                         "Recuerda que puedes ver la lista de invitados en tu perfil.");
                 sendEmailNotification(user, notification.getSubject(), notification.getMessage());
                 break;
@@ -167,8 +169,10 @@ public class NotificationService {
             case EVENTPROPERTIES_DELETED:
                 notification.setType(NotificationType.EVENTPROPERTIES_DELETED);
                 notification.setSubject("Eliminación de servicio");
-                notification.setMessage("Has eliminado el servicio " + (eventProperties.getOtherService() != null ? eventProperties.getOtherService().getName()
-                        : eventProperties.getVenue().getName()) + " para el evento " + event.getName() + ".\n" +
+                notification.setMessage("Has eliminado el servicio "
+                        + (eventProperties.getOtherService() != null ? eventProperties.getOtherService().getName()
+                                : eventProperties.getVenue().getName())
+                        + " para el evento " + event.getName() + ".\n" +
                         "Recuerda que puedes ver la lista de servicios en tu perfil.");
                 sendEmailNotification(user, notification.getSubject(), notification.getMessage());
                 break;
@@ -198,27 +202,30 @@ public class NotificationService {
         // Bodas: 4 meses antes
         LocalDate weddingStart = today.plusMonths(4);
         LocalDate weddingEnd = today.plusMonths(4).plusDays(2);
-        List<Event> weddings = eventRepository.findByTypeAndEventDateBetween(EventType.WEDDING , weddingStart, weddingEnd);
+        List<Event> weddings = eventRepository.findByTypeAndEventDateBetween(EventType.WEDDING, weddingStart,
+                weddingEnd);
         sendRemindersForEvents(weddings);
 
         // Bautizos: 1 mes antes
         LocalDate christeningStart = today.plusMonths(1);
         LocalDate christeningEnd = today.plusMonths(1).plusDays(2);
-        List<Event> christenings = eventRepository.findByTypeAndEventDateBetween(EventType.CHRISTENING, christeningStart,
+        List<Event> christenings = eventRepository.findByTypeAndEventDateBetween(EventType.CHRISTENING,
+                christeningStart,
                 christeningEnd);
         sendRemindersForEvents(christenings);
 
         // Comuniones: 2 meses antes
         LocalDate communionStart = today.plusMonths(2);
         LocalDate communionEnd = today.plusMonths(2).plusDays(2);
-        List<Event> communions = eventRepository.findByTypeAndEventDateBetween(EventType.COMMUNION, communionStart, communionEnd);
+        List<Event> communions = eventRepository.findByTypeAndEventDateBetween(EventType.COMMUNION, communionStart,
+                communionEnd);
         sendRemindersForEvents(communions);
     }
 
     private void sendRemindersForEvents(List<Event> events) {
         for (Event event : events) {
             User user = event.getUser();
-            createNotification(Notification.NotificationType.PAYMENT_REMINDER, user, event, null,null);
+            createNotification(Notification.NotificationType.PAYMENT_REMINDER, user, event, null, null);
         }
     }
 
