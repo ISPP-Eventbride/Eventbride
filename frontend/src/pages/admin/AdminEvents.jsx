@@ -229,11 +229,12 @@ function AdminEvents() {
               <div className="service-info">
                 <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
                   <div className="form-group">
-                    <label>Tipo de Evento:</label>
+                    <label>Tipo de Evento: {editEventId === event.id && <span className="asterisk">*</span>}</label>
                     <select
                       name="eventType"
                       value={eventData[event.id]?.eventType || event.eventType}
                       onChange={handleInputChange}
+                      required={editEventId === event.id}
                       disabled={editEventId !== event.id}
                     >
                       {Object.keys(eventTypeMap).map((type) => (
@@ -243,12 +244,13 @@ function AdminEvents() {
                   </div>
 
                   <div className="form-group">
-                    <label>Invitados:</label>
+                    <label>Invitados:{editEventId === event.id && <span className="asterisk">*</span>}</label>
                     <input
                       type="number"
                       name="guests"
                       min="1"
                       value={eventData[event.id]?.guests || event.guests}
+                      required={editEventId === event.id}
                       onChange={handleInputChange}
                       readOnly={editEventId !== event.id}
                     />

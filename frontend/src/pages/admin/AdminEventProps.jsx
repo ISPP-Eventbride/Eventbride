@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../static/resources/css/AdminUsers.css";
+import { useAlert } from "../../context/AlertContext"
 
 function AdminEventProps() {
   const navigate = useNavigate();
@@ -12,6 +13,9 @@ function AdminEventProps() {
   const [editMode, setEditMode] = useState(true);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
+
+
+  const { showAlert } = useAlert()
 
   useEffect(() => {
     getEventProp();
@@ -63,11 +67,13 @@ function AdminEventProps() {
   
     if (isNaN(start.getTime()) || isNaN(finish.getTime())) {
       setError("Las fechas u horas introducidas no son válidas.");
+      showAlert("Las fechas u horas introducidas no son válidas.")
       return;
     }
   
     if (finish <= start) {
       setError("La hora de finalización debe ser posterior a la hora de inicio.");
+      showAlert("La hora de finalización debe ser posterior a la hora de inicio.")
       return;
     }
 
@@ -102,6 +108,7 @@ function AdminEventProps() {
       })
       .catch(err => {
         console.error("Error actualizando:", err);
+        showAlert(err.message || "Error inesperado")
         setError(err.message || "Error inesperado");
       });
   }
@@ -145,11 +152,12 @@ function AdminEventProps() {
           <div className="service-info" style= {{alignItems: 'center'}}>
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="form-group">
-                        <label>Estado:</label>
+                        <label>Estado: {editMode && <span className="asterisk">*</span>}</label>
                         <select
                         name="status"
                         value={formData.status}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         disabled={!editMode}
                         >
                         {statusOptions.map(opt => (
@@ -159,23 +167,26 @@ function AdminEventProps() {
                     </div>
 
                     <div className="form-group">
-                        <label>Hora de inicio:</label>
+                        <label>Hora de inicio:{editMode && <span className="asterisk">*</span>}</label>
                         <input
                         type="time"
                         name="startTime"
                         value={formData.startTime}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         readOnly={!editMode}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>Hora de finalización:</label>
+                        <label>Hora de finalización:{editMode && <span className="asterisk">*</span>}</label>
                         <input
                         type="time"
                         name="finishTime"
+                        min = {formData.earliestTime}
                         value={formData.finishTime}
                         onChange={handleInputChange}
+                        required={editMode === true}
                         readOnly={!editMode}
                         />
                     </div>
