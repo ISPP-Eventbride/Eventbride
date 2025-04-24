@@ -230,30 +230,68 @@ function AdminUsers() {
                         <h2 className="service-title">Usuario ID: {user.id}</h2>
                         <h2 className="service-title">{user.firstName} {user.lastName}</h2>
                         <div className="service-info">
+
                             <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
                                 <div className="form-group">
-                                    <label>Nombre:</label>
-                                    <input type="text" name="firstName" value={userData.id === user.id ? userData.firstName : user.firstName} onChange={handleInputChange} />
+                                    <label>Nombre: {editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="firstName" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.firstName : user.firstName} 
+                                    onChange={handleInputChange}
+                                    readOnly = {editUserId !== userData.id}  
+
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Apellido:</label>
-                                    <input type="text" name="lastName" value={userData.id === user.id ? userData.lastName : user.lastName} onChange={handleInputChange} />
+                                    <label>Apellido:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="lastName" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.lastName : user.lastName} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Usuario:</label>
-                                    <input type="text" name="username" value={userData.id === user.id ? userData.username : user.username} onChange={handleInputChange} />
+                                    <label>Usuario:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="username" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.username : user.username} 
+                                    onChange={handleInputChange}
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Email:</label>
-                                    <input type="email" name="email" value={userData.id === user.id ? userData.email : user.email} onChange={handleInputChange} />
+                                    <label>Email:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="email" 
+                                    name="email" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.email : user.email} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Teléfono:</label>
-                                    <input type="tel" name="telephone" value={userData.id === user.id ? userData.telephone : user.telephone} onChange={handleInputChange} />
+                                    <label>Teléfono:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="tel" 
+                                    name="telephone" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.telephone : user.telephone} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id}  
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>DNI:</label>
-                                    <input type="text" name="dni" value={userData.id === user.id ? userData.dni : user.dni} onChange={handleInputChange} />
+                                    <label>DNI:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="dni" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.dni : user.dni} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id}  
+                                />
                                 </div>
                                 <div>
                                     <label>Recibe correos:</label>
@@ -268,11 +306,17 @@ function AdminUsers() {
                                                 receivesEmails: checked,
                                             }));
                                         }}
+                                        disabled = {editUserId !== userData.id} 
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Rol:</label>
-                                    <select name="role" value={userData.id === user.id ? userData.role : user.role} onChange={handleInputChange}>
+                                    <label>Rol:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <select name="role" 
+                                        value={userData.id === user.id ? userData.role : user.role} 
+                                        onChange={handleInputChange}
+                                        required = {editUserId === user.id}
+                                        disabled = {editUserId !== userData.id}
+                                    >
                                         {Object.keys(roleMap).map(role => (
                                             <option key={role} value={role}>{roleMap[role]}</option>
                                         ))}

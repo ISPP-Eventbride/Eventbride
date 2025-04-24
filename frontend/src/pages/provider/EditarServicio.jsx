@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
-import { Edit, Check, AlertCircle, Save } from 'lucide-react';
+import { Edit, AlertCircle, Save } from 'lucide-react';
 import apiClient from '../../apiClient';
 import "../../static/resources/css/EditarServicio.css";
+
+const PicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
 
 const EditarServicio = () => {
     const navigate = useNavigate();
@@ -116,6 +118,9 @@ const EditarServicio = () => {
             latestTime: formData.latestTime
         };
 
+        if(serviceType === 'venue' && updatedFormData.earliestTime >= updatedFormData.latestTime) {
+            setError("La hora de cierre debe ser posterior a la de apertura.");
+        }
         // Eliminar propiedades innecesarias o problemáticas
         delete updatedFormData.id;
         delete updatedFormData.new;
@@ -162,7 +167,7 @@ const EditarServicio = () => {
                         <div className="form-group">
 
                             <label htmlFor="name">
-                                Nombre
+                                Nombre <span className="asterisk">*</span>
                             </label>
                             {errors.name && <p className="error-text">{errors.name}</p>}
                             <input
@@ -180,7 +185,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="cityAvailable">
-                                Ciudad Disponible
+                                Ciudad Disponible <span className="asterisk">*</span>
                             </label>
                             {errors.cityAvailable && <p className="error-text">{errors.cityAvailable}</p>}
                             <input
@@ -198,19 +203,31 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="picture">
-                                URL de la Imagen
+                                URL de la Imagen <span className="asterisk">*</span>
                             </label>
                             {errors.picture && <p className="error-text">{errors.picture}</p>}
                             <input
-                                type="text"
+                                type="url"
                                 id="picture"
                                 name="picture"
                                 value={formData.picture}
                                 onChange={handleChange}
+                                pattern={PicturePattern.source}
                                 required
                                 minLength="1"
                                 maxLength="1000"
                                 className="form-input"
+                                onInvalid={e => {
+                                    const val = e.target.value;
+                                    if (!val) {
+                                      e.target.setCustomValidity("La URL es obligatoria");
+                                    } else {
+                                      e.target.setCustomValidity(
+                                        "La URL debe empezar por http(s):// y terminar en .png|.jpg|…"
+                                      );
+                                    }
+                                }}
+                                onInput={e => e.target.setCustomValidity("")}
                             />
                         </div>
 
@@ -230,7 +247,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="description">
-                                Descripción
+                                Descripción <span className="asterisk">*</span>
                             </label>
                             {errors.description && <p className="error-text">{errors.description}</p>}
                             <textarea
@@ -252,7 +269,7 @@ const EditarServicio = () => {
 
                         <div className="form-group">
                             <label htmlFor="limitedBy">
-                                Tipo de Precio
+                                Tipo de Precio <span className="asterisk">*</span>
                             </label>
                             <select
                                 id="limitedBy"
@@ -269,7 +286,7 @@ const EditarServicio = () => {
                         {limitedBy === "perGuest" && (
                             <div className="form-group">
                                 <label htmlFor="servicePricePerGuest">
-                                    Precio por Invitado (€)
+                                    Precio por Invitado (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.servicePricePerGuest && <p className="error-text">{errors.servicePricePerGuest}</p>}
                                 <input
@@ -289,7 +306,7 @@ const EditarServicio = () => {
                         {limitedBy === "perHour" && (
                             <div className="form-group">
                                 <label htmlFor="servicePricePerHour">
-                                    Precio por Hora (€)
+                                    Precio por Hora (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.servicePricePerHour && <p className="error-text">{errors.servicePricePerHour}</p>}
                                 <input
@@ -309,7 +326,7 @@ const EditarServicio = () => {
                         {limitedBy === "fixed" && (
                             <div className="form-group">
                                 <label htmlFor="fixedPrice">
-                                    Precio Fijo (€)
+                                    Precio Fijo (€) <span className="asterisk">*</span>
                                 </label>
                                 {errors.fixedPrice && <p className="error-text">{errors.fixedPrice}</p>}
                                 <input
@@ -333,7 +350,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="postalCode">
-                                    Código Postal
+                                    Código Postal <span className="asterisk">*</span>
                                 </label>
                                 {errors.postalCode && <p className="error-text">{errors.postalCode}</p>}
                                 <input
@@ -351,7 +368,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="coordinates">
-                                    Coordenadas
+                                    Coordenadas <span className="asterisk">*</span>
                                 </label>
                                 {errors.coordinates && <p className="error-text">{errors.coordinates}</p>}
                                 <input
@@ -369,7 +386,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="address">
-                                    Dirección
+                                    Dirección <span className="asterisk">*</span>
                                 </label>
                                 {errors.address && <p className="error-text">{errors.address}</p>}
                                 <input
@@ -388,7 +405,7 @@ const EditarServicio = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label htmlFor="maxGuests">
-                                        Máximo de Invitados
+                                        Máximo de Invitados <span className="asterisk">*</span>
                                     </label>
                                     {errors.maxGuests && <p className="error-text">{errors.maxGuests}</p>}
                                     <input
@@ -405,7 +422,7 @@ const EditarServicio = () => {
 
                                 <div className="form-group">
                                     <label htmlFor="surface">
-                                        Superficie (m²)
+                                        Superficie (m²) <span className="asterisk">*</span>
                                     </label>
                                     {errors.surface && <p className="error-text">{errors.surface}</p>}
                                     <input
@@ -424,7 +441,7 @@ const EditarServicio = () => {
                             <div className="form-row">
                                 <div className="form-group">
                                     <label htmlFor="earliestTime">
-                                        Hora de Apertura
+                                        Hora de Apertura <span className="asterisk">*</span>
                                     </label>
                                     {errors.earliestTime && <p className="error-text">{errors.earliestTime}</p>}
                                     <input
@@ -440,18 +457,32 @@ const EditarServicio = () => {
 
                                 <div className="form-group">
                                     <label htmlFor="latestTime">
-                                        Hora de Cierre
+                                        Hora de Cierre <span className="asterisk">*</span>
                                     </label>
                                     {errors.latestTime && <p className="error-text">{errors.latestTime}</p>}
                                     <input
-                                        type="time"
-                                        id="latestTime"
-                                        name="latestTime"
-                                        value={formData.latestTime}
-                                        onChange={handleChange}
-                                        required
-                                        className="form-input"
-                                    />
+                                            type="time"
+                                            id="latestTime"
+                                            name="latestTime"
+                                            min = {formData.earliestTime}
+                                            value={formData.latestTime}
+                                            onChange={e => {
+                                                handleChange(e);
+                                                const input = e.target;
+                                                // pongo el custom message si es anterior o igual
+                                                if (formData.earliestTime && input.value <= formData.earliestTime) {
+                                                  input.setCustomValidity(
+                                                    "La hora de cierre debe ser posterior a la de apertura"
+                                                  );
+                                                } else {
+                                                  input.setCustomValidity("");
+                                                }
+                                                // fuerzo repintado de la validación en caliente
+                                                input.reportValidity();
+                                              }}
+                                            required
+                                            className="form-input"
+                                        />
                                 </div>
                             </div>
                         </div>
@@ -461,7 +492,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="otherServiceType">
-                                    Tipo de Servicio
+                                    Tipo de Servicio <span className="asterisk">*</span>
                                 </label>
                                 <select
                                     id="otherServiceType"
@@ -479,7 +510,7 @@ const EditarServicio = () => {
 
                             <div className="form-group">
                                 <label htmlFor="extraInformation">
-                                    Información Adicional
+                                    Información Adicional <span className="asterisk">*</span>
                                 </label>
                                 {errors.extraInformation && <p className="error-text">{errors.extraInformation}</p>}
                                 <textarea

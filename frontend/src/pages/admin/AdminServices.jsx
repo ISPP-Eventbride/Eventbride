@@ -86,15 +86,88 @@ function AdminServices() {
     }));
   }
 
-  function validateServiceData(service) {
-    setError("");
+
+ function validateServiceData(service) {
+    setError("");                   
     const data = serviceData[service.id];
-    if (!data.name || !data.cityAvailable || !data.description) {
-      setError("Por favor, complete todos los campos obligatorios (nombre, ciudad, descripción).");
+    const missing = [];
+
+    // 1) Campos comunes
+    if (!data.name?.trim())           missing.push("Nombre");
+    if (!data.cityAvailable?.trim())  missing.push("Ciudad");
+    if (!data.description?.trim())    missing.push("Descripción");
+
+    // 2) Según método de precio
+    switch (data.limitedBy) {
+      case "perGuest":
+        if (data.servicePricePerGuest == null || isNaN(data.servicePricePerGuest) || data.servicePricePerGuest <= 0) {
+          missing.push("Precio por invitado");
+        }
+        break;
+      case "perHour":
+        if (data.servicePricePerHour == null || isNaN(data.servicePricePerHour) || data.servicePricePerHour <= 0) {
+          missing.push("Precio por hora");
+        }
+        break;
+      case "fixed":
+        if (data.fixedPrice == null || isNaN(data.fixedPrice) || data.fixedPrice <= 0) {
+          missing.push("Precio fijo");
+        }
+        break;
+      default:
+        missing.push("Tipo de precio");
+    }
+
+    // 3) Campos extra para venues
+    if (service.type === "venues") {
+
+      if (!data.postalCode?.trim())   
+        missing.push("Código postal");
+
+      if (!data.coordinates?.trim())   
+        missing.push("Coordenadas");
+
+      if (!data.address?.trim())      
+        missing.push("Dirección");
+
+      if (data.maxGuests == null|| isNaN(data.maxGuests)|| data.maxGuests < 1)     
+        missing.push("Máximo de invitados");
+
+      if (data.surface == null || isNaN(data.surface) || data.surface < 1)      
+         missing.push("Superficie");
+
+      if (!data.earliestTime)          
+        missing.push("Hora de apertura");
+
+      if (!data.latestTime)            
+        missing.push("Hora de cierre");
+
+      if(data.earliestTime && data.latestTime && data.earliestTime >= data.latestTime) {
+        missing.push("La hora de apertura debe ser anterior a la hora de cierre");
+      }
+    }
+
+    // 4) Campos extra para other-services
+    if (service.type === "other-services") {
+
+      if (!data.otherServiceType?.trim()) 
+        missing.push("Tipo de servicio");
+
+      if (!data.extraInformation?.trim()) 
+        missing.push("Información adicional");
+    }
+
+    if (missing.length) {
+      setError(
+        "Faltan datos obligatorios: " +
+        missing.join(", ")
+      );
       return false;
     }
     return true;
   }
+
+
 
   function updateService(service) {
     if (!validateServiceData(service)) return;
@@ -269,27 +342,20 @@ function AdminServices() {
                     >
                       {/* Nombre */}
                       <div className="form-group">
-                        <label>Nombre:</label>
+                        <label>Nombre: {isEditing && <span className="asterisk">*</span>}</label>
                         <input
                           name="name"
                           value={data.name || ""}
+                          required={isEditing === true}
                           onChange={(e) => handleInputChange(e, service.id)}
                           readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            padding: "8px",
-                            fontSize: "16px",
-                          }}
+                          className="form-input"
                         />
                       </div>
 
                       <div className="form-group">
                                     <label htmlFor="available" className="form-label">
-                                        Disponibilidad
+                                        Disponibilidad 
                                     </label>
                                     <div className="checkbox-container">
                                         <input
@@ -307,44 +373,27 @@ function AdminServices() {
   
                       {/* Ciudad */}
                       <div className="form-group">
-                        <label>Ciudad Disponible:</label>
+                        <label>Ciudad Disponible:{isEditing && <span className="asterisk">*</span>}</label>
                         <input
                           name="cityAvailable"
                           value={data.cityAvailable || ""}
+                          required={isEditing === true }
                           onChange={(e) => handleInputChange(e, service.id)}
                           readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            padding: "8px",
-                            fontSize: "16px",
-                          }}
+                          className="form-input"
                         />
                       </div>
   
                       {/* Descripción */}
                       <div className="form-group">
-                        <label>Descripción:</label>
+                        <label>Descripción:{isEditing && <span className="asterisk">*</span>}</label>
                         <textarea
                           name="description"
                           value={data.description || ""}
+                          required={isEditing === true }
                           onChange={(e) => handleInputChange(e, service.id)}
                           readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                            padding: "10px",
-                            fontFamily: "inherit",
-                            resize: "none",
-                            overflow: "hidden",
-                          }}
+                          className="form-input"
                           rows={5}
                         />
                       </div>
@@ -352,22 +401,15 @@ function AdminServices() {
                       {/* Selección del tipo de precio (solo en edición) */}
                       {isEditing && (
                         <div className="form-group">
-                          <label>Tipo de Precio:</label>
+                          <label>Tipo de Precio:{isEditing && <span className="asterisk">*</span>}</label>
                           <select
                             name="limitedBy"
                             value={data.limitedBy || ""}
+                            required={isEditing === true }
                             onChange={(e) =>
                               handleLimitedByChange(e, service.id)
                             }
-                            style={{
-                              backgroundColor: "white",
-                              color: "black",
-                              width: "100%",
-                              border: "1px solid #ccc",
-                              borderRadius: "8px",
-                              padding: "8px",
-                              fontSize: "16px",
-                            }}
+                            className="form-input"
                           >
                             <option value="perGuest">Por invitado</option>
                             <option value="perHour">Por hora</option>
@@ -381,67 +423,50 @@ function AdminServices() {
                         <>
                           {data.limitedBy === "perGuest" && (
                             <div className="form-group">
-                              <label>Precio por Invitado (€):</label>
+                              <label>Precio por Invitado (€): {isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="servicePricePerGuest"
                                 value={data.servicePricePerGuest || 0}
+                                min= "1"
+                                required={isEditing === true }
                                 onChange={(e) =>
                                   handleInputChange(e, service.id)
                                 }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
+                                className="form-input"
                               />
                             </div>
                           )}
                           {data.limitedBy === "perHour" && (
                             <div className="form-group">
-                              <label>Precio por Hora (€):</label>
+                              <label>Precio por Hora (€):{isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="servicePricePerHour"
                                 value={data.servicePricePerHour || 0}
+                                min= "1"
+                                required={isEditing === true }
                                 onChange={(e) =>
                                   handleInputChange(e, service.id)
                                 }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
+                                className="form-input"
                               />
                             </div>
                           )}
                           {data.limitedBy === "fixed" && (
                             <div className="form-group">
-                              <label>Precio Fijo (€):</label>
+                              <label>Precio Fijo (€):{isEditing && <span className="asterisk">*</span>}</label>
                               <input
                                 type="number"
                                 name="fixedPrice"
+                               
                                 value={data.fixedPrice || 0}
+                                min= "1"
+                                required={isEditing === true }
                                 onChange={(e) =>
                                   handleInputChange(e, service.id)
                                 }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
+                                className="form-input"
                               />
                             </div>
                           )}
@@ -452,10 +477,7 @@ function AdminServices() {
                             <div className="form-group">
                               <label>Precio por Invitado (€):</label>
                               <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
+                               className="form-input"
                               >
                                 {data.servicePricePerGuest || 0}
                               </span>
@@ -465,10 +487,7 @@ function AdminServices() {
                             <div className="form-group">
                               <label>Precio por Hora (€):</label>
                               <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
+                                className="form-input"
                               >
                                 {data.servicePricePerHour || 0}
                               </span>
@@ -479,10 +498,7 @@ function AdminServices() {
                             <div className="form-group">
                               <label>Precio Fijo (€):</label>
                               <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
+                                className="form-input"
                               >
                                 {data.fixedPrice || 0}
                               </span>
@@ -495,154 +511,105 @@ function AdminServices() {
                       {service.type === "venues" && (
                         <>
                           <div className="form-group">
-                            <label>Código Postal:</label>
+                            <label>Código Postal:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="postalCode"
                               value={data.postalCode || ""}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Coordenadas:</label>
+                            <label>Coordenadas:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="coordinates"
                               value={data.coordinates || ""}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Dirección:</label>
+                            <label>Dirección:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               name="address"
                               value={data.address || ""}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Máximo de Invitados:</label>
+                            <label>Máximo de Invitados:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="number"
                               name="maxGuests"
                               value={data.maxGuests || 0}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                                     
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Superficie (m²):</label>
+                            <label>Superficie (m²):{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="number"
                               name="surface"
                               value={data.surface || 0}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Hora de Apertura:</label>
+                            <label>Hora de Apertura:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="time"
                               name="earliestTime"
                               value={data.earliestTime || ""}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
   
                           <div className="form-group">
-                            <label>Hora de Cierre:</label>
+                            <label>Hora de Cierre:{isEditing && <span className="asterisk">*</span>}</label>
                             <input
                               type="time"
                               name="latestTime"
-                              value={data.latestTime || ""}
+                              min = {data.earliestTime}
+                              value={data.latestTime}
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
+                              required={isEditing === true}
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             />
                           </div>
                         </>
@@ -652,23 +619,16 @@ function AdminServices() {
                       {service.type === "other-services" && (
                         <>
                           <div className="form-group">
-                            <label>Tipo de Servicio:</label>
+                            <label>Tipo de Servicio:{isEditing && <span className="asterisk">*</span>}</label>
                             <select
                               name="otherServiceType"
                               value={data.otherServiceType || "CATERING"}
+                              required={isEditing === true }
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               disabled={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             >
                               <option value="CATERING">Catering</option>
                               <option value="ENTERTAINMENT">
@@ -681,26 +641,16 @@ function AdminServices() {
                           </div>
   
                           <div className="form-group">
-                            <label>Información Adicional:</label>
+                            <label>Información Adicional:{isEditing && <span className="asterisk">*</span>}</label>
                             <textarea
                               name="extraInformation"
                               value={data.extraInformation || ""}
+                              required={isEditing === true}
                               onChange={(e) =>
                                 handleInputChange(e, service.id)
                               }
                               readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                fontSize: "16px",
-                                padding: "10px",
-                                fontFamily: "inherit",
-                                resize: "none",
-                                overflow: "hidden",
-                              }}
+                              className="form-input"
                               rows={5}
                             />
                           </div>
