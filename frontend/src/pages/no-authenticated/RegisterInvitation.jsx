@@ -13,7 +13,6 @@ const Register = () => {
     firstName: "",
     lastName: "",
     numberOfGuests: "",
-    email: "",
     telephone: "",
   });
 
@@ -57,7 +56,6 @@ const Register = () => {
           firstName: form.firstName,
           lastName: form.lastName,
           numberOfGuests: form.numberOfGuests,
-          email: form.email,
           telephone: form.telephone,
         }),
       });
@@ -106,14 +104,6 @@ const Register = () => {
             name="numberOfGuests"
             placeholder={`Nº Acompañantes (Máximo ${invitation?.maxGuests})`}
             value={form.numberOfGuests}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Correo electrónico"
-            value={form.email}
             onChange={handleChange}
             required
           />
