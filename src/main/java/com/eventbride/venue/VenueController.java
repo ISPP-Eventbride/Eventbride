@@ -17,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import com.eventbride.dto.VenueDTO;
+import com.eventbride.dto.publics.VenuePublicDTO;
 import com.eventbride.event.Event;
 import com.eventbride.event.EventService;
 import com.eventbride.event_properties.EventProperties;
@@ -38,12 +39,12 @@ public class VenueController {
 	private EventPropertiesService eventPropertiesService;
 
 	@GetMapping
-	public ResponseEntity<List<VenueDTO>> getAllVenues() {
+	public ResponseEntity<List<VenuePublicDTO>> getAllVenues() {
 		List<Venue> venues = venueService.getAllVenues();
 		if (venues.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
-		return ResponseEntity.ok(VenueDTO.fromEntities(venues));
+		return ResponseEntity.ok(VenuePublicDTO.fromEntities(venues));
 	}
 
 	@GetMapping("/{id}")
