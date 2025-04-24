@@ -64,7 +64,7 @@ function Login({ setUser }) {
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="username">Usuario</label>
+              <label htmlFor="username"> Usuario <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="text"
@@ -79,7 +79,7 @@ function Login({ setUser }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">Contraseña <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="password"

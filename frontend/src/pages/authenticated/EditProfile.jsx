@@ -5,6 +5,11 @@ import { AlertCircle } from "lucide-react" // Importa un icono de alerta (puedes
 import "../../static/resources/css/EditProfile.css"
 import { useAlert } from "../../context/AlertContext"
 
+const dniPattern = /^[0-9]{8}[A-Za-z]$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const telephonePattern = /^[0-9]{9}$/;
+const profilePicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
+
 function EditProfile() {
     const [userData, setUserData] = useState({
         id: "",
@@ -74,33 +79,37 @@ function EditProfile() {
         if (!userData.firstName || userData.firstName.length > 40) {
           showAlert("El nombre no puede estar vacío ni tener más de 40 caracteres.");
           return;
-        }
-      
+        } 
         if (!userData.lastName || userData.lastName.length > 40) {
           showAlert("El apellido no puede estar vacío ni tener más de 40 caracteres.");
           return;
         }
-      
         if (!userData.username || userData.username.length > 50) {
           showAlert("El nombre de usuario no puede estar vacío ni tener más de 50 caracteres.");
           return;
         }
       
-        const dniPattern = /^[0-9]{8}[A-Za-z]$/;
+       
         if (!dniPattern.test(userData.dni)) {
           showAlert("El DNI es incorrecto. Debe tener 8 números seguidos de una letra.");
           return;
         }
       
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
         if (!emailPattern.test(userData.email)) {
           showAlert("El correo electrónico no es válido.");
           return;
         }
       
-        const telephonePattern = /^[0-9]{9}$/;
+        
         if (!telephonePattern.test(userData.telephone)) {
           showAlert("El teléfono debe contener exactamente 9 dígitos.");
+          return;
+        }
+
+        
+        if (userData.profilePicture && !profilePicturePattern.test(userData.profilePicture)) {
+          showAlert("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.");
           return;
         }
       

@@ -116,7 +116,7 @@ function CreateEvents() {
           <div className="form-group">
             <label htmlFor="name">
               <Church size={18} className="input-icon" />
-              Nombre
+              Nombre <span className="asterisk">*</span>
             </label>
             <input
               type="text"
@@ -143,7 +143,7 @@ function CreateEvents() {
           <div className="form-group">
             <label htmlFor="eventType">
               <PartyPopper size={18} className="input-icon" />
-              Tipo de evento
+              Tipo de evento <span className="asterisk">*</span>
             </label>
             <select
               id="eventType"
@@ -166,7 +166,7 @@ function CreateEvents() {
           <div className="form-group">
             <label htmlFor="guests">
               <Users size={18} className="input-icon" />
-              Número de invitados estimado
+              Número de invitados estimado <span className="asterisk">*</span>
             </label>
             <input
               type="number"
@@ -185,7 +185,7 @@ function CreateEvents() {
           <div className="form-group">
             <label htmlFor="eventDate">
               <Calendar size={18} className="input-icon" />
-              Fecha del evento
+              Fecha del evento <span className="asterisk">*</span>
             </label>
             <input
               type="date"

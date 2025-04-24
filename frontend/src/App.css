@@ -240,6 +240,44 @@
     height: 50vh;
   }
 }
+/* ESTILOS PARA MOSTRAR OBLIGATORIEDAD */
+/* Asterisco rojo junto al label */
+.asterisk {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+input:required:invalid {
+  border: 2px solid #dc2626;
+}
+input:required:valid {
+  border: 2px solid #16a34a;
+}
+
+.field-error {
+  display: none;
+  font-size: 0.8rem;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+input:required:invalid + .field-error {
+  display: block;
+}
+
+select:required:invalid {
+  border: 2px solid #dc2626;
+}
+select:required:valid {
+  border: 2px solid #16a34a;
+}
+
+textarea:required:invalid {
+  border: 2px solid #dc2626;
+}
+textarea:required:valid {
+  border: 2px solid #16a34a;
+}
 
 /*Se ha introducido el color-scheme para que detecte que los iconitos y desplegables se usan en un fondo blanco*/
 input[type="time"], input[type="number"] {
