@@ -29,7 +29,11 @@ function EditProfile() {
     const [editing, setEditing] = useState(false)
     const [jwtToken, setJwtToken] = useState("")
     const [originalUsername, setOriginalUsername] = useState("")
-
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+      oldPassword: "",
+      newPassword: "",
+    });
     const { showAlert } = useAlert()
 
     useEffect(() => {
@@ -131,7 +135,7 @@ function EditProfile() {
           const data = await response.json();
       
           if (!response.ok) {
-            const errorMessage = data.message || data.error || "Error al actualizar el perfil.";
+            const errorMessage =  data.telephone || data.dniValido || data.message || data.error || "Error al actualizar el perfil.";
             throw new Error(errorMessage);
           }
       
@@ -168,6 +172,35 @@ function EditProfile() {
             hour12: false,
         })
     }
+    const handleChangePassword = async () => {
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordPattern.test(passwordData.newPassword)) {
+          showAlert("La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+          return;
+        }
+      
+        try {
+          const response = await fetch(`/api/users/change-password/${userData.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwtToken}`,
+            },
+            body: JSON.stringify(passwordData),
+          });
+      
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || result.message || "Error al cambiar la contraseña.");
+          }
+      
+          showAlert("Contraseña actualizada correctamente.");
+          setShowPasswordModal(false);
+          setPasswordData({ oldPassword: "", newPassword: "" });
+        } catch (error) {
+          showAlert(error.message);
+        }
+    };
 
     return (
         <div className="edit-profile-container">
@@ -200,6 +233,12 @@ function EditProfile() {
                                 Ver Planes
                             </button>
                         )}
+                        <button
+                            className="action-button secondary-button"
+                            onClick={() => setShowPasswordModal(true)}
+                            >
+                            Editar Contraseña
+                        </button>
 
                         <button className="action-button danger-button" onClick={handleLogout}>
                             Cerrar Sesión
@@ -381,6 +420,40 @@ function EditProfile() {
                     )}
                 </div>
             </div>
+            {showPasswordModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                    <h3>Cambiar contraseña</h3>
+
+                    <div className="form-group">
+                        <label htmlFor="oldPassword">Contraseña actual</label>
+                        <input
+                        id="oldPassword"
+                        type="password"
+                        placeholder="Introduce tu contraseña actual"
+                        value={passwordData.oldPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="newPassword">Nueva contraseña</label>
+                        <input
+                        id="newPassword"
+                        type="password"
+                        placeholder="Introduce la nueva contraseña"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="modal-actions">
+                        <button onClick={handleChangePassword} className="save-button">Guardar</button>
+                        <button onClick={() => setShowPasswordModal(false)} className="cancel-button">Cancelar</button>
+                    </div>
+                    </div>
+                </div>
+                )}
         </div >
     )
 }

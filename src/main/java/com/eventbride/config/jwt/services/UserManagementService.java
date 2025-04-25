@@ -3,6 +3,8 @@ package com.eventbride.config.jwt.services;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +19,10 @@ import com.eventbride.dto.UserDTO;
 import com.eventbride.user.User;
 import com.eventbride.user.UserRepository;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 @Service
 public class UserManagementService {
@@ -46,22 +51,40 @@ public class UserManagementService {
             user.setTelephone(registrationRequest.getTelephone());
             user.setPaymentPlanDate(null);
             user.setExpirePlanDate(null);
-
+            String plainPassword = registrationRequest.getPassword();
+            if (plainPassword == null || !plainPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+                resp.setStatusCode(400);
+                resp.setError("La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número.");
+                return resp;
+            }
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             user.setDni(registrationRequest.getDni());
-            if (registrationRequest.getProfilePicture() == null || registrationRequest.getProfilePicture() == "") {
-                user.setProfilePicture(
-                        "https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg");
+
+            if (registrationRequest.getProfilePicture() == null || registrationRequest.getProfilePicture().isBlank()) {
+                user.setProfilePicture("https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg");
             }
 
-            if (registrationRequest.getRole().equals("SUPPLIER")) {
+            if ("SUPPLIER".equals(registrationRequest.getRole())) {
                 user.setPlan(User.Plan.BASIC);
             } else {
                 user.setPlan(null);
             }
-            user.setReceivesEmails(registrationRequest.getReceivesEmails());
 
+            user.setReceivesEmails(registrationRequest.getReceivesEmails());
             user.setRole(registrationRequest.getRole());
+
+            Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+            Set<ConstraintViolation<User>> violations = validator.validate(user);
+
+            if (!violations.isEmpty()) {
+                String mensajeError = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .collect(Collectors.joining("; "));
+                resp.setStatusCode(400);
+                resp.setError(mensajeError);
+                return resp;
+            }
+
             User userResult = userRepo.save(user);
             if (userResult.getId() > 0) {
                 resp.setUser(new UserDTO(userResult));
@@ -70,18 +93,13 @@ public class UserManagementService {
             }
 
         } catch (DataIntegrityViolationException e) {
-            // Manejo de excepciones por violaciones de integridad (ej. usuario ya existe)
             resp.setStatusCode(400);
             resp.setError("El usuario con este nombre de usuario, correo electrónico y DNI ya existe.");
-        } catch (ConstraintViolationException e) {
-            // Manejo de errores relacionados con restricciones (ej. campos vacíos)
-            resp.setStatusCode(400);
-            resp.setError("Faltan campos obligatorios o son inválidos.");
         } catch (Exception e) {
-            // Excepción general para otros errores
             resp.setStatusCode(500);
             resp.setError("Ocurrió un error inesperado: " + e.getMessage());
         }
+
         return resp;
     }
 

@@ -111,6 +111,7 @@ function Login({ setUser }) {
 
           <div className="login-footer">
             <p>¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
+            <p>¿Se te ha olvidado la contraseña? <a href="/cambiar-contraseña">Cambiar contraseña</a></p>
           </div>
         </div>
       </div>

@@ -90,11 +90,11 @@ public class InvitationService {
 
 	public Invitation getInvitationById(Integer invitationId) throws IllegalArgumentException {
 		Optional<Invitation> invitationOpt = invitationRepository.findById(invitationId);
-	
+
 		if (!invitationOpt.isPresent()) {
 			throw new IllegalArgumentException("La invitación no existe");
 		}
-	
+
 		Invitation invitation = invitationOpt.get();
 		Event event = invitation.getEvent();
 
