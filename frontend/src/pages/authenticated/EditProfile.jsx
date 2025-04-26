@@ -81,7 +81,6 @@ function EditProfile() {
     const updateUser = async () => {
         // Validación similar a Register.jsx
         if (!userData.firstName || userData.firstName.length > 40) {
-
             showAlert("El nombre no puede estar vacío ni tener más de 40 caracteres.");
             return;
         }
@@ -94,28 +93,24 @@ function EditProfile() {
             return;
         }
 
-
         if (!dniPattern.test(userData.dni)) {
             showAlert("El DNI es incorrecto. Debe tener 8 números seguidos de una letra.");
             return;
         }
-
 
         if (!emailPattern.test(userData.email)) {
             showAlert("El correo electrónico no es válido.");
             return;
         }
 
-
         if (!telephonePattern.test(userData.telephone)) {
             showAlert("El teléfono debe contener exactamente 9 dígitos.");
             return;
         }
-
-
+        
         if (userData.profilePicture && !profilePicturePattern.test(userData.profilePicture)) {
-            showAlert("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.");
-            return;
+          showAlert("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.");
+          return;
         }
 
         try {

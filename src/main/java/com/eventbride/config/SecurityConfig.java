@@ -103,8 +103,8 @@ public class SecurityConfig {
                                                                 "/api/invitation/**",
                                                                 "/api/users/getAdmin",
                                                                 "/api/invitation/create/**",
-                                                                "/api/ratings//other-service/{id}",
-                                                                "/api/ratings//venue/{id}",
+                                                                "/api/ratings/other-service/{id}",
+                                                                "/api/ratings/venue/{id}",
                                                                 "/api/ratings/average/other-service/{id}",
                                                                 "/api/ratings/average/venue/{id}",
                                                                 "/api/ratings/service/{id}/isVoted/{userId}")
