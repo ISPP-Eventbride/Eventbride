@@ -14,19 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eventbride.dto.PaymentDTO;
-import com.eventbride.dto.ServiceDTO;
-import com.eventbride.event_properties.EventPropertiesService;
 import com.eventbride.model.MessageResponse;
-import com.eventbride.service.ServiceService;
+import com.eventbride.payment.Payment.PaymentType;
 import com.eventbride.user.User;
 import com.eventbride.user.UserService;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -41,10 +35,7 @@ public class PaymentController {
     private UserService userService;
 
     @Autowired
-    private ServiceService serviceService;
-
-    @Autowired
-    private EventPropertiesService evebEventPropertiesService;
+    private PayoutService payoutService;
 
     @GetMapping("/{eventId}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsFromEventId(@PathVariable Integer eventId) {
@@ -105,18 +96,41 @@ public class PaymentController {
         }
 
         if (!user.get().getRole().equals("SUPPLIER")) {
-            throw new IllegalArgumentException("El usuario debe ser proovedor para poder realizar esta acción");
+            throw new IllegalArgumentException("El usuario debe ser proveedor para poder realizar esta acción");
         }
 
-        List<Payment> providerPayments = paymentService.getPaymentsForProvider(userId);
+        List<Payment> providerPayments = paymentService.getPaymentsForProvider(userId).stream()
+                .filter(e -> e.getPaymentType() != PaymentType.COMMISSION).toList();
 
         if (providerPayments.isEmpty()) {
-            throw new IllegalArgumentException("El proovedor debe tener payments asociados para realizar esta acción");
+            throw new IllegalArgumentException("El proveedor debe tener payments asociados para realizar esta acción");
         }
 
+        // 1. Sumamos la cantidad total que hay que enviarle
+        Double totalAmount = providerPayments.stream()
+                .mapToDouble(Payment::getAmount)
+                .sum();
+
+        // 2. Obtenemos el email PayPal del proveedor (puede estar guardado en User)
+        String paypalEmail = user.get().getEmail(); // <- necesitarías tener este campo en tu modelo User
+
+        if (paypalEmail == null || paypalEmail.isEmpty()) {
+            throw new IllegalArgumentException("El proveedor no tiene un email de PayPal configurado");
+        }
+
+        // 3. Hacemos el payout a través de PayPal
+        try {
+            payoutService.sendPayout(paypalEmail, totalAmount); // <-- Aquí llamarías al servicio PayPal
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error al enviar el pago: " + e.getMessage()));
+        }
+
+        // 4. Si todo va bien, eliminamos los pagos locales
         paymentService.deletePayments(providerPayments);
 
-        return new ResponseEntity<>(new MessageResponse("Se han retirado correctamente los fondos"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Se han retirado correctamente los fondos y enviado a PayPal"),
+                HttpStatus.OK);
     }
 
 }

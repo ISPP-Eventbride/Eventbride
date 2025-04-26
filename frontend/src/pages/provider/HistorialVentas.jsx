@@ -267,15 +267,33 @@ const HistorialVentas = ({ userId }) => {
             {showConfirmation && (
                 <div className="confirmation-overlay">
                     <div className="confirmation-modal">
-                        <h3>Confirmar retiro de fondos</h3>
-                        <p>¿Estás seguro de que deseas retirar <strong>{totalDisponible.toFixed(2)}€</strong>?</p>
-                        <p className="confirmation-note">Esta acción no se puede deshacer.</p>
+                        <h3>Confirmar Retiro de Fondos</h3>
+                        <p>
+                            Los fondos serán enviados a la cuenta PayPal asociada al correo:{" "}
+                            <strong>{currentUser.email}</strong>
+                        </p>
+                        <br></br>
+                        <p>
+                            ¿Confirma que desea retirar un total de{" "}
+                            <strong>{totalDisponible.toFixed(2)}€</strong>?
+                        </p>
+                        <br></br>
+                        <p className="confirmation-note">
+                            <strong>Importante:</strong> esta acción es irreversible. Por favor, asegúrese de que el correo registrado en nuestra plataforma coincide exactamente con su cuenta PayPal, ya que los fondos se transferirán directamente a dicha dirección.
+                            <br /><br />
+                            En caso de error, PayPal enviará automáticamente un correo electrónico al destinatario con las instrucciones necesarias para reclamar o recuperar el importe enviado.
+                        </p>
                         <div className="confirmation-buttons">
-                            <button className="cancel-button" onClick={cancelWithdraw}>Cancelar</button>
-                            <button className="confirm-button" onClick={confirmWithdraw}>Confirmar retiro</button>
+                            <button className="cancel-button" onClick={cancelWithdraw}>
+                                Cancelar
+                            </button>
+                            <button className="confirm-button" onClick={confirmWithdraw}>
+                                Confirmar Retiro
+                            </button>
                         </div>
                     </div>
                 </div>
+
             )}
         </div>
     );
