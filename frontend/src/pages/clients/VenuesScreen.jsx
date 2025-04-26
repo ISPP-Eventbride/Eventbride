@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -16,7 +17,7 @@ import {
   Calendar,
   ArrowRight,
 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "../../static/resources/css/VenueScreen.css"
 import LeafletMap from "../../components/LeafletMap";
 import { useAlert } from "../../context/AlertContext.jsx"
@@ -29,6 +30,7 @@ const VenuesScreen = () => {
   const [filtersVisible, setFiltersVisible] = useState(false)
   const [jwtToken] = useState(localStorage.getItem("jwt"));
   const [venuesWithCoordinates, setVenuesWithCoordinates] = useState([]);
+  const navigate = useNavigate();
 
   // Modal para ver detalles del venue al hacer click en la card
   const [selectedVenue, setSelectedVenue] = useState(null)
@@ -332,31 +334,19 @@ const VenuesScreen = () => {
           <p>No se encontraron venues con los criterios seleccionados.</p>
         </div>
       ) : (
-        <div className="venues-grid" style={{ marginTop: "2%" }}>
+        <div className="services-grid" style={{ marginTop: "2%" }}>
           {venues.map((venue) => (
-            <div key={venue.id} className="venue-card" onClick={() => handleVenueClick(venue)}>
-              <div className="card-header">
+            <div key={venue.id} className="service-card" >
+              <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
                 <h3 className="card-title">{venue.name}</h3>
               </div>
-              <div className="card-body">
-                <div className="card-info">
-                  {
-                    venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
-                  }
-                </div>
-                <div className="card-info">
-                  <MapPin size={18} className="card-icon" />
-                  <span className="card-text">
-                    {venue.address}, {venue.cityAvailable}
-                  </span>
-                </div>
-                <div className="card-info">
-                  <Users size={18} className="card-icon" />
-                  <span className="card-text">Capacidad: {venue.maxGuests} personas</span>
-                </div>
-                <div className="card-info">
-                  <SquareIcon size={18} className="card-icon" />
-                  <span className="card-text">Superficie: {venue.surface} m²</span>
+              <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                {
+                  venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
+                }
+                <div className="details-section">
+                  <span className="details-label">Descripción:</span>
+                  <p className="details-text">{venue.description}</p>
                 </div>
               </div>
               <div className="card-footer">
@@ -421,10 +411,10 @@ const VenuesScreen = () => {
                 <div className="card-info">
                   <span className="card-text">
                     <img style={{ height: "25%", width: "100%" }}
-                      src={selectedVenue.picture || "https://iili.io/3Ywlapf.png"}
+                      src={selectedVenue.picture || "https://iili.io/3EpzvZx.png"}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://iili.io/3Ywlapf.png";
+                        e.target.src = "https://iili.io/3EpzvZx.png";
                       }}
                       alt="Imagen del servicio"></img>
                   </span>
@@ -444,7 +434,7 @@ const VenuesScreen = () => {
                   <Plus size={16} />
                   Añadir a mi evento
                 </button>}
-              <button  className="secondary-button" onClick={() => setSelectedVenue(null)}>
+              <button className="close-button" onClick={() => setSelectedVenue(null)}>
                 Cerrar
               </button>
             </div>
@@ -531,7 +521,7 @@ const VenuesScreen = () => {
               )}
             </div>
             <div className="modal-footer">
-              <button style={{ width: "10%" }} className="close-button" onClick={() => setAddModalVisible(false)}>
+              <button className="primary-button" onClick={() => setAddModalVisible(false)}>
                 Cerrar
               </button>
             </div>

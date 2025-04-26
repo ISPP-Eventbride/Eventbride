@@ -1,4 +1,5 @@
 "use client"
+import { FaChevronLeft } from "react-icons/fa";
 
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
@@ -363,9 +364,19 @@ function EventDetails() {
       <div className="event-contain">
         <div className="event-details">
           <div className="event-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div className="event-title-container">
-              <span className="event-type-badge">{tipoDeEvento(evento?.eventType)}</span>
-              <h2 style={{ height: "60%" }} className="event-title">Detalles del Evento</h2>
+            <div className="event-title-container" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
+                <span className="event-type-badge">{tipoDeEvento(evento?.eventType)}</span>
+                <Link
+                  to="/events"
+                  title="volver a servicios"
+                  className="btn-primary"
+                  style={{ backgroundColor: "transparent", color: "black", padding: 0, marginBottom: "1.3vh", marginRight: "1vh" }}
+                >
+                  <FaChevronLeft />
+                </Link>
+                <h2 style={{ height: "60%" }} className="event-title">Detalles del Evento</h2>
+              </div>
               <h3 style={{ fontSize: "150%" }}>{evento?.name}</h3>
             </div>
 
@@ -430,13 +441,13 @@ function EventDetails() {
               evento.eventPropertiesDTO.map((prop, i) =>
                 prop.venueDTO ? (
                   <div key={i} className="venue-card">
-                    <div className="card-header" style={{backgroundColor: "#d9be75"}}>
+                    <div className="card-header" style={{ backgroundColor: "#d9be75" }}>
                       <h4 className="venue-name">{decodeText(prop.venueDTO.name)}</h4>
                     </div>
                     <div className="service-image-container">
                       <img
                         className="service-image"
-                        src={prop.venueDTO.picture || "https://iili.io/3Ywlapf.png"}
+                        src={prop.venueDTO.picture || "https://iili.io/3EpzvZx.png"}
                         alt={prop.venueDTO.name}
                         style={{
                           objectFit: "cover",
@@ -527,16 +538,16 @@ function EventDetails() {
               evento.eventPropertiesDTO.map((prop, i) =>
                 prop.otherServiceDTO ? (
                   <div key={i} className="venue-card">
-                    <div className="card-header" style={{backgroundColor: "#d9be75"}}>
+                    <div className="card-header" style={{ backgroundColor: "#d9be75" }}>
                       <h4 className="service-name">{decodeText(prop.otherServiceDTO.name)}</h4>
                     </div>
                     <div className="service-image-container" style={{ objectFit: "cover", maxHeight: "100%" }}>
                       <img
                         className="service-image"
-                        src={prop.otherServiceDTO.picture || "https://iili.io/3Ywlapf.png"}
+                        src={prop.otherServiceDTO.picture || "https://iili.io/3EpzvZx.png"}
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = "https://iili.io/3Ywlapf.png";
+                          e.target.src = "https://iili.io/3EpzvZx.png";
                         }}
                         alt="Imagen del servicio"
                         style={{
