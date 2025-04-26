@@ -1,7 +1,11 @@
 package com.eventbride.payment;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,8 +14,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eventbride.dto.PaymentDTO;
+import com.eventbride.dto.ServiceDTO;
+import com.eventbride.event_properties.EventPropertiesService;
+import com.eventbride.model.MessageResponse;
+import com.eventbride.service.ServiceService;
+import com.eventbride.user.User;
+import com.eventbride.user.UserService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -21,6 +36,15 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ServiceService serviceService;
+
+    @Autowired
+    private EventPropertiesService evebEventPropertiesService;
 
     @GetMapping("/{eventId}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsFromEventId(@PathVariable Integer eventId) {
@@ -69,6 +93,30 @@ public class PaymentController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/withdraw/{userId}")
+    public ResponseEntity<?> withdrawPayments(@PathVariable Integer userId) throws IllegalArgumentException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> user = userService.getUserByUsername(auth.getName());
+
+        if (!user.isPresent()) {
+            throw new IllegalArgumentException("El usuario no existe");
+        }
+
+        if (!user.get().getRole().equals("SUPPLIER")) {
+            throw new IllegalArgumentException("El usuario debe ser proovedor para poder realizar esta acción");
+        }
+
+        List<Payment> providerPayments = paymentService.getPaymentsForProvider(userId);
+
+        if (providerPayments.isEmpty()) {
+            throw new IllegalArgumentException("El proovedor debe tener payments asociados para realizar esta acción");
+        }
+
+        paymentService.deletePayments(providerPayments);
+
+        return new ResponseEntity<>(new MessageResponse("Se han retirado correctamente los fondos"), HttpStatus.OK);
     }
 
 }

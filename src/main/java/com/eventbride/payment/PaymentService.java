@@ -186,4 +186,9 @@ public class PaymentService {
         return payments;
     }
 
+    @Transactional
+    public void deletePayments(List<Payment> payments) {
+        paymentRepository.deleteAll(payments);
+    }
+
 }

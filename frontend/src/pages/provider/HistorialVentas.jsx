@@ -79,7 +79,7 @@ const HistorialVentas = ({ userId }) => {
             })
             .catch(error => {
                 console.error("Error obteniendo pagos:", error);
-                setError("No hay pagos todavía o ha ocurrido un error al cargarlos.");
+                setError("No se han efectuado pagos a favor de sus servicios todavía o ya se han retirado los fondos relativos a estos.");
                 setIsLoading(false);
             });
     }
@@ -121,16 +121,12 @@ const HistorialVentas = ({ userId }) => {
         setShowConfirmation(false);
 
         // Realizar la petición al backend para retirar el dinero
-        fetch('/api/payment/withdraw', {
-            method: 'POST',
+        fetch(`/api/payment/withdraw/${currentUser.id}`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${jwtToken}`,
-            },
-            body: JSON.stringify({
-                providerId: currentUser.id,
-                amount: totalDisponible,
-            }),
+            }
         })
             .then(response => {
                 if (!response.ok) {
@@ -169,11 +165,8 @@ const HistorialVentas = ({ userId }) => {
     if (error) {
         return (
             <div className="error-container">
-                <div className="error-icon">⚠️</div>
+                <div className="success-icon" style={{ marginBottom: "30px", fontSize: "15vh" }}>💵</div>
                 <p>{error}</p>
-                <button className="retry-button" onClick={getPaymentsForProvider}>
-                    Reintentar
-                </button>
             </div>
         );
     }
@@ -224,9 +217,6 @@ const HistorialVentas = ({ userId }) => {
                             </tbody>
                         </table>
                     </div>
-                    <p className="comision-note">
-                        A todos los pagos se le aplica una comisión del 2.5% tal y como indican los términos y condiciones.
-                    </p>
                 </div>
             ) : (
                 <div className="empty-state">
