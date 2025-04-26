@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react"
 import "../../static/resources/css/AdminUsers.css";
+import { useAlert } from "../../context/AlertContext"
 
 function AdminUsers() {
     const [users, setUsers] = useState([]);
@@ -25,7 +26,10 @@ function AdminUsers() {
         expirePlanDate: "",
         receivesEmails: false,
     });
-
+    const { showAlert } = useAlert()
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [passwordData, setPasswordData] = useState({ oldPassword: "", newPassword: "" });
     const jwtToken = localStorage.getItem("jwt");
     const navigate = useNavigate();
 
@@ -38,6 +42,34 @@ function AdminUsers() {
         BASIC: "Básico",
         PREMIUM: "Premium"
     };
+
+    async function handleChangePassword() {
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordPattern.test(passwordData.newPassword)) {
+          showAlert("La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+          return;
+        }
+      
+        try {
+          const response = await fetch(`/api/users/change-password/${selectedUserId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwtToken}`,
+            },
+            body: JSON.stringify(passwordData),
+          });
+      
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || result.message || "Error al cambiar la contraseña.");
+      
+          showAlert("Contraseña actualizada correctamente.");
+          setShowPasswordModal(false);
+          setPasswordData({ oldPassword: "", newPassword: "" });
+        } catch (error) {
+          showAlert(error.message);
+        }
+      }
 
     useEffect(() => {
         getUsers();
@@ -83,28 +115,37 @@ function AdminUsers() {
         setUserData({ ...user });
     }
 
-    function updateUser() {
+    async function updateUser() {
         if (!editUserId || !validateUserData(userData)) return;
-        userData.password = "password";
-
-        fetch(`/api/users/admin/${editUserId}`, {
+      
+        const userDataToUpdate = { ...userData, password: "password" };
+      
+        try {
+          const response = await fetch(`/api/users/admin/${editUserId}`, {
             headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${jwtToken}`,
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwtToken}`,
             },
             method: "PUT",
-            body: JSON.stringify(userData),
-        })
-            .then(response => {
-                if (!response.ok) throw new Error("Error al actualizar usuario");
-                return response.json();
-            })
-            .then(updatedUser => {
-                setUsers(prevUsers => prevUsers.map(u => u.id === updatedUser.id ? updatedUser : u));
-                setEditUserId(null);
-                setError("");
-            })
-            .catch(error => setError(error.message || "Error al actualizar el usuario"));
+            body: JSON.stringify(userDataToUpdate),
+          });
+      
+          const data = await response.json();
+      
+          if (!response.ok) {
+            const errorMessage = data.telephone || data.dniValido || data.message || data.error || "Error al actualizar el perfil.";
+            throw new Error(errorMessage);
+          }
+      
+          setUsers(prevUsers => prevUsers.map(u => u.id === data.id ? data : u));
+          setEditUserId(null);
+          setError("");
+          showAlert("Usuario actualizado con éxito");
+        } catch (error) {
+          console.error("Error:", error);
+          setError(error.message);
+          showAlert(error.message);
+        }
     }
 
     function validateUserData(userData) {
@@ -215,45 +256,82 @@ function AdminUsers() {
                     </button>
                 </div>
             </div>
-
-
+    
             {error && (
                 <div className="error-message" style={{ color: "red", padding: "10px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "5px" }}>
                     <AlertCircle size={18} />
                     <span>{error}</span>
                 </div>
             )}
-
+    
             <div className="user-grid">
                 {(filteredUsers.length > 0 ? filteredUsers : users).map((user, index) => (
                     <div key={index} className="service-container">
                         <h2 className="service-title">Usuario ID: {user.id}</h2>
                         <h2 className="service-title">{user.firstName} {user.lastName}</h2>
                         <div className="service-info">
+
                             <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
                                 <div className="form-group">
-                                    <label>Nombre:</label>
-                                    <input type="text" name="firstName" value={userData.id === user.id ? userData.firstName : user.firstName} onChange={handleInputChange} />
+                                    <label>Nombre: {editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="firstName" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.firstName : user.firstName} 
+                                    onChange={handleInputChange}
+                                    readOnly = {editUserId !== userData.id}  
+
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Apellido:</label>
-                                    <input type="text" name="lastName" value={userData.id === user.id ? userData.lastName : user.lastName} onChange={handleInputChange} />
+                                    <label>Apellido:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="lastName" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.lastName : user.lastName} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Usuario:</label>
-                                    <input type="text" name="username" value={userData.id === user.id ? userData.username : user.username} onChange={handleInputChange} />
+                                    <label>Usuario:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="username" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.username : user.username} 
+                                    onChange={handleInputChange}
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Email:</label>
-                                    <input type="email" name="email" value={userData.id === user.id ? userData.email : user.email} onChange={handleInputChange} />
+                                    <label>Email:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="email" 
+                                    name="email" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.email : user.email} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id} 
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>Teléfono:</label>
-                                    <input type="tel" name="telephone" value={userData.id === user.id ? userData.telephone : user.telephone} onChange={handleInputChange} />
+                                    <label>Teléfono:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="tel" 
+                                    name="telephone" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.telephone : user.telephone} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id}  
+                                />
                                 </div>
                                 <div className="form-group">
-                                    <label>DNI:</label>
-                                    <input type="text" name="dni" value={userData.id === user.id ? userData.dni : user.dni} onChange={handleInputChange} />
+                                    <label>DNI:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <input type="text" 
+                                    name="dni" 
+                                    required = {editUserId === user.id} 
+                                    value={userData.id === user.id ? userData.dni : user.dni} 
+                                    onChange={handleInputChange} 
+                                    readOnly = {editUserId !== userData.id}  
+                                />
                                 </div>
                                 <div>
                                     <label>Recibe correos:</label>
@@ -268,11 +346,17 @@ function AdminUsers() {
                                                 receivesEmails: checked,
                                             }));
                                         }}
+                                        disabled = {editUserId !== userData.id} 
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Rol:</label>
-                                    <select name="role" value={userData.id === user.id ? userData.role : user.role} onChange={handleInputChange}>
+                                    <label>Rol:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                    <select name="role" 
+                                        value={userData.id === user.id ? userData.role : user.role} 
+                                        onChange={handleInputChange}
+                                        required = {editUserId === user.id}
+                                        disabled = {editUserId !== userData.id}
+                                    >
                                         {Object.keys(roleMap).map(role => (
                                             <option key={role} value={role}>{roleMap[role]}</option>
                                         ))}
@@ -284,7 +368,16 @@ function AdminUsers() {
                                 </div>
                                 <div className="button-container">
                                     {editUserId === user.id ? (
-                                        <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={updateUser}>Guardar</button>
+                                        <>
+                                            <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={updateUser}>Guardar</button>
+                                            <button className="edit-btn" style={{ backgroundColor: "#ffc107", marginTop: "10px" }}
+                                                onClick={() => {
+                                                    setSelectedUserId(user.id);
+                                                    setShowPasswordModal(true);
+                                                }}>
+                                                Cambiar Contraseña
+                                            </button>
+                                        </>
                                     ) : (
                                         <button className="edit-btn" onClick={() => startEditing(user)}>Editar</button>
                                     )}
@@ -294,8 +387,32 @@ function AdminUsers() {
                     </div>
                 ))}
             </div>
+    
+            {showPasswordModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h3>Cambiar contraseña</h3>
+                        <div className="form-group">
+                            <label htmlFor="newPassword">Nueva contraseña</label>
+                            <input
+                                id="newPassword"
+                                type="password"
+                                placeholder="Introduce la nueva contraseña"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                            />
+                        </div>
+    
+                        <div className="modal-actions">
+                            <button onClick={handleChangePassword} className="save-button">Guardar</button>
+                            <button onClick={() => setShowPasswordModal(false)} className="cancel-button">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
+    
 }
 
 export default AdminUsers;

@@ -199,6 +199,10 @@ const OtherServiceScreen = () => {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este servicio.")
       return
     }
+    if (times.startTime >= times.endTime) {
+      showAlert("Por favor, ingresa un intervalo horario válido.")
+      return
+    }
 
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
@@ -213,6 +217,7 @@ const OtherServiceScreen = () => {
       setModalVisible(false)
     } catch (error) {
       console.error("Error al añadir el servicio:", error)
+      showAlert(error.response.data.error || "Error al añadir el servicio")
     } finally {
       setIsConfirming(false)
     }
@@ -410,6 +415,7 @@ const OtherServiceScreen = () => {
                           type="time"
                           className="time-input"
                           value={venueTimes[eventObj.id]?.startTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
                         />
                       </div>
@@ -422,7 +428,9 @@ const OtherServiceScreen = () => {
                         <input
                           type="time"
                           className="time-input"
+                          min = {venueTimes[eventObj.id]?.startTime}
                           value={venueTimes[eventObj.id]?.endTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
                         />
                       </div>

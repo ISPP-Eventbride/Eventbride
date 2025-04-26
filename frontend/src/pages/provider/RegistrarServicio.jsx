@@ -19,6 +19,8 @@ import {
 } from "lucide-react"
 import "../../static/resources/css/RegistrarServicio.css"
 
+const PicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
+
 const RegistrarServicio = () => {
     // Obtener datos user desde localStorage
     const currentUser = JSON.parse(localStorage.getItem("user"))
@@ -92,7 +94,11 @@ const RegistrarServicio = () => {
         formData.limitedByPricePerHour = limitedBy === "perHour"
 
         console.log("General error:", generalError)
-
+        if (serviceType === "venues" && (formData.earliestTime >= formData.latestTime || formData.earliestTime == formData.latestTime)) {
+            setGeneralError("La hora de apertura debe ser anterior a la de cierre")
+            scrollToError()
+            return
+        }
         fetch("/api/" + serviceType, {
             headers: {
                 "Content-Type": "application/json",
@@ -158,7 +164,7 @@ const RegistrarServicio = () => {
                             <div className="form-group">
                                 <label htmlFor="name" className="form-label">
                                     <Package size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                    Nombre del servicio
+                                    Nombre del servicio <span className="asterisk">*</span>
                                 </label>
                                 {errors.name && (
                                     <div className="error-message">
@@ -184,7 +190,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="cityAvailable" className="form-label">
                                         <MapPin size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Ciudad disponible
+                                        Ciudad disponible <span className="asterisk">*</span>
                                     </label>
                                     {errors.cityAvailable && (
                                         <div className="error-message">
@@ -227,12 +233,13 @@ const RegistrarServicio = () => {
                             <div className="form-group">
                                 <label htmlFor="limitedBy" className="form-label">
                                     <DollarSign size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                    Tipo de tarifa
+                                    Tipo de tarifa <span className="asterisk">*</span>
                                 </label>
                                 <select
                                     id="limitedBy"
                                     value={limitedBy}
                                     onChange={(e) => setLimitedBy(e.target.value)}
+                                    required
                                     className="form-select"
                                 >
                                     <option value="perGuest">Por invitado</option>
@@ -245,7 +252,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="servicePricePerGuest" className="form-label">
                                         <Users size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Precio por invitado (€)
+                                        Precio por invitado (€) <span className="asterisk">*</span>
                                     </label>
                                     {errors.servicePricePerGuest && (
                                         <div className="error-message">
@@ -272,7 +279,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="servicePricePerHour" className="form-label">
                                         <Clock size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Precio por hora (€)
+                                        Precio por hora (€) <span className="asterisk">*</span>
                                     </label>
                                     {errors.servicePricePerHour && (
                                         <div className="error-message">
@@ -299,7 +306,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="fixedPrice" className="form-label">
                                         <DollarSign size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Precio fijo (€)
+                                        Precio fijo (€) <span className="asterisk">*</span>
                                     </label>
                                     {errors.fixedPrice && (
                                         <div className="error-message">
@@ -325,7 +332,7 @@ const RegistrarServicio = () => {
                             <div className="form-group">
                                 <label htmlFor="picture" className="form-label">
                                     <Image size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                    URL de la imagen
+                                    URL de la imagen <span className="asterisk">*</span>
                                 </label>
                                 {errors.picture && (
                                     <div className="error-message">
@@ -334,23 +341,35 @@ const RegistrarServicio = () => {
                                     </div>
                                 )}
                                 <input
-                                    type="text"
+                                    type="url"
                                     id="picture"
                                     name="picture"
                                     value={formData.picture}
                                     onChange={handleChange}
                                     required
+                                    pattern={PicturePattern.source}
                                     minLength="1"
                                     maxLength="1000"
                                     className="form-input"
                                     placeholder="Ej: https://ejemplo.com/imagen.jpg"
+                                    onInvalid={e => {
+                                        const val = e.target.value;
+                                        if (!val) {
+                                          e.target.setCustomValidity("La URL es obligatoria");
+                                        } else {
+                                          e.target.setCustomValidity(
+                                            "La URL debe empezar por http(s):// y terminar en .png|.jpg|…"
+                                          );
+                                        }
+                                    }}
+                                    onInput={e => e.target.setCustomValidity("")}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label htmlFor="description" className="form-label">
                                     <FileText size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                    Descripción
+                                    Descripción <span className="asterisk">*</span>
                                 </label>
                                 {errors.description && (
                                     <div className="error-message">
@@ -381,7 +400,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="address" className="form-label">
                                             <Home size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Dirección
+                                            Dirección <span className="asterisk">*</span>
                                         </label>
                                         {errors.address && (
                                             <div className="error-message">
@@ -406,7 +425,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="postalCode" className="form-label">
                                             <Mail size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Código postal
+                                            Código postal <span className="asterisk">*</span>
                                         </label>
                                         {errors.postalCode && (
                                             <div className="error-message">
@@ -432,7 +451,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="coordinates" className="form-label">
                                         <MapPin size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Coordenadas
+                                        Coordenadas <span className="asterisk">*</span>
                                     </label>
                                     {errors.coordinates && (
                                         <div className="error-message">
@@ -458,7 +477,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="maxGuests" className="form-label">
                                             <Users size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Máximo de invitados
+                                            Máximo de invitados <span className="asterisk">*</span>
                                         </label>
                                         {errors.maxGuests && (
                                             <div className="error-message">
@@ -482,7 +501,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="surface" className="form-label">
                                             <SquareIcon size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Superficie (m²)
+                                            Superficie (m²) <span className="asterisk">*</span>
                                         </label>
                                         {errors.surface && (
                                             <div className="error-message">
@@ -508,7 +527,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="earliestTime" className="form-label">
                                             <Clock size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Hora de apertura
+                                            Hora de apertura <span className="asterisk">*</span>
                                         </label>
                                         {errors.earliestTime && (
                                             <div className="error-message">
@@ -530,7 +549,7 @@ const RegistrarServicio = () => {
                                     <div className="form-group">
                                         <label htmlFor="latestTime" className="form-label">
                                             <Clock size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                            Hora de cierre
+                                            Hora de cierre <span className="asterisk">*</span>
                                         </label>
                                         {errors.latestTime && (
                                             <div className="error-message">
@@ -542,6 +561,7 @@ const RegistrarServicio = () => {
                                             type="time"
                                             id="latestTime"
                                             name="latestTime"
+                                            min = {formData.earliestTime}
                                             value={formData.latestTime}
                                             onChange={handleChange}
                                             required
@@ -564,7 +584,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="otherServiceType" className="form-label">
                                         <Package size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Tipo de servicio
+                                        Tipo de servicio <span className="asterisk">*</span>
                                     </label>
                                     {errors.otherServiceType && (
                                         <div className="error-message">
@@ -589,7 +609,7 @@ const RegistrarServicio = () => {
                                 <div className="form-group">
                                     <label htmlFor="extraInformation" className="form-label">
                                         <Info size={16} className="inline-block mr-2" style={{ color: "#d9be75" }} />
-                                        Información adicional
+                                        Información adicional <span className="asterisk">*</span>
                                     </label>
                                     {errors.extraInformation && (
                                         <div className="error-message">

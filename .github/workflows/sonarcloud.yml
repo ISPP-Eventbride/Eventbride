@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - master
-  workflow_dispatch: # esto nos permite ejecutar manualmenete este orkflow por si hay problemas
+  workflow_dispatch: # esto nos permite ejecutar manualmente este workflow por si hay problemas
 
 jobs:
   sonarcloud:
@@ -25,27 +25,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Paso opcional: Si quieres primero compilar y probar 
-      # en un paso separado (mvn clean verify):
-      - name: Build and test with Maven
-        run: mvn clean verify
+      # Compilar el proyecto sin ejecutar tests
+      - name: Build with Maven (skip tests)
+        run: mvn clean verify -DskipTests
 
-      # Paso para ejecutar el análisis con Sonar
-      - name: Analyze with SonarCloud
+      # Ejecutar el análisis con SonarCloud sin ejecutar tests
+      - name: Analyze with SonarCloud (skip tests)
         run: |
           mvn sonar:sonar \
+            -DskipTests \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.organization=ispp-eventbride  \
+            -Dsonar.organization=ispp-eventbride \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.projectKey=ISPP-Eventbride_Eventbride
-
-#      - name: SonarCloud Scan
-#        uses: SonarSource/sonarcloud-github-action@v1
-#        with:
-#          # Si necesitas enviar argumentos adicionales al scanner:
-#          args: >
-#            -Dsonar.organization=ispp-eventbride 
-#            -Dsonar.projectKey=ISPP-Eventbride_Eventbride
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

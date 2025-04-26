@@ -17,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import com.eventbride.dto.VenueDTO;
+import com.eventbride.dto.publics.VenuePublicDTO;
 import com.eventbride.event.Event;
 import com.eventbride.event.EventService;
 import com.eventbride.event_properties.EventProperties;
@@ -38,12 +39,12 @@ public class VenueController {
 	private EventPropertiesService eventPropertiesService;
 
 	@GetMapping
-	public ResponseEntity<List<VenueDTO>> getAllVenues() {
+	public ResponseEntity<List<VenuePublicDTO>> getAllVenues() {
 		List<Venue> venues = venueService.getAllVenues();
 		if (venues.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
-		return ResponseEntity.ok(VenueDTO.fromEntities(venues));
+		return ResponseEntity.ok(VenuePublicDTO.fromEntities(venues));
 	}
 
 	@GetMapping("/{id}")
@@ -72,7 +73,9 @@ public class VenueController {
 		if (!roles.contains("SUPPLIER")) {
 			throw new IllegalArgumentException("No tienes permisos para crear este venue.");
 		}
-
+		if (venue.getEarliestTime().isAfter(venue.getLatestTime()) || venue.getEarliestTime().equals(venue.getLatestTime())) {
+			throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
+		}
 		Venue newVenue = venueService.save(venue);
 		return ResponseEntity.ok(new VenueDTO(newVenue));
 	}
@@ -85,6 +88,9 @@ public class VenueController {
 
 		if (!roles.contains("SUPPLIER")) {
 			return new ResponseEntity<>("No tienes permisos para editar este venue.", HttpStatus.FORBIDDEN);
+		}
+		if (venue.getEarliestTime().isAfter(venue.getLatestTime()) || venue.getEarliestTime().equals(venue.getLatestTime())) {
+			throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
 		}
 
 		try {
@@ -165,6 +171,9 @@ public class VenueController {
 		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 		List<String> roles = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 		if (roles.contains("ADMIN")) {
+			if (venueDetails.getEarliestTime().isAfter(venueDetails.getLatestTime()) || venueDetails.getEarliestTime().equals(venueDetails.getLatestTime())) {
+				throw new IllegalArgumentException("La hora de apertura no puede ser posterior o igual a la hora de cierre.");
+			}
 			try {
 				Venue updatedVenue = venueService.updateVenue(id, venueDetails);
 				return new ResponseEntity<>(new VenueDTO(updatedVenue), HttpStatus.OK);

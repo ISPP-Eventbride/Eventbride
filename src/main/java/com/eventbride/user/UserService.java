@@ -4,23 +4,25 @@ import com.eventbride.otherService.OtherService;
 import com.eventbride.otherService.OtherServiceRepository;
 import com.eventbride.venue.Venue;
 import com.eventbride.venue.VenueRepository;
-import com.eventbride.venue.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import com.eventbride.service.Service;
+import com.eventbride.dto.ChangePasswordDTO;
 import com.eventbride.dto.UserDTO;
 import com.eventbride.notification.Notification;
-import com.eventbride.notification.NotificationRepository;
 import com.eventbride.notification.NotificationService;
 import com.eventbride.user.User.Plan;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 @org.springframework.stereotype.Service
 public class UserService {
@@ -35,6 +37,9 @@ public class UserService {
 
 	@Autowired
 	private VenueRepository	venueRepository;
+
+	@Autowired
+	private JavaMailSender mailSender;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -53,6 +58,11 @@ public class UserService {
     public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id);
     }
+
+	@Transactional(readOnly = true)
+	public Optional<User> getUserByToken(String token) {
+		return userRepository.findByChangePasswordToken(token);
+	}
 
     @Transactional
     public Optional<User> getUserByUsername(String username) {
@@ -94,33 +104,28 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Comprueba si el username al que se quiere actualizar ya está en uso
+        // Validaciones de unicidad
         if (!user.getUsername().equals(userDetails.getUsername()) &&
             userRepository.existsByUsername(userDetails.getUsername())) {
             throw new IllegalArgumentException("El nombre de usuario ya está en uso");
         }
 
-        // Comprueba si el email al que se quiere actualizar ya está en uso
         if (!user.getEmail().equals(userDetails.getEmail()) &&
             userRepository.existsByEmail(userDetails.getEmail())) {
             throw new IllegalArgumentException("El correo electrónico ya está en uso");
         }
 
-        // Comprueba si el DNI al que se quiere actualizar ya está en uso
         if (!user.getDni().equals(userDetails.getDni()) &&
             userRepository.existsByDni(userDetails.getDni())) {
             throw new IllegalArgumentException("El DNI ya está registrado");
         }
-        if (user.getProfilePicture()==null || user.getProfilePicture()==""){
-            user.setProfilePicture("https://cdn-icons-png.flaticon.com/512/17/17004.png");
+
+        // Validar formato del teléfono
+        if (!String.valueOf(userDetails.getTelephone()).matches("^[6789]\\d{8}$")) {
+            throw new IllegalArgumentException("El teléfono debe tener 9 dígitos y comenzar por 6, 7, 8 o 9");
         }
 
-        // Validar el formato del telefono
-        if (!String.valueOf(userDetails.getTelephone()).matches("^[0-9]{9}$")) {
-            throw new IllegalArgumentException("El teléfono debe tener 9 números");
-        }
-
-        // Actualizar los campos del usuario
+        // Actualizar campos
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
@@ -131,11 +136,23 @@ public class UserService {
         user.setPlan(userDetails.getPlan());
         user.setPaymentPlanDate(userDetails.getPaymentPlanDate());
         user.setExpirePlanDate(userDetails.getExpirePlanDate());
-        user.setProfilePicture(userDetails.getProfilePicture());
+        user.setProfilePicture(
+            (userDetails.getProfilePicture() == null || userDetails.getProfilePicture().isBlank())
+            ? "https://cdn-icons-png.flaticon.com/512/17/17004.png"
+            : userDetails.getProfilePicture()
+        );
         user.setReceivesEmails(userDetails.getReceivesEmails());
+
+        // Validar restricciones con Bean Validation (@AssertTrue incluida)
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        for (ConstraintViolation<User> v : violations) {
+            throw new IllegalArgumentException(v.getMessage());
+        }
 
         return userRepository.save(user);
     }
+
 
     @Transactional
     public void deleteUser(Integer id) {
@@ -146,6 +163,46 @@ public class UserService {
     public User save(User user) throws DataAccessException {
         return userRepository.save(user);
     }
+
+    @Transactional
+    public void changePassword(Integer id, ChangePasswordDTO cpDTO, Boolean isAdmin) throws IllegalArgumentException {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        if (!isAdmin && !passwordEncoder.matches(cpDTO.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        String newPassword = cpDTO.getNewPassword();
+        if (newPassword == null || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+	@Transactional
+	public void changePasswordWithToken(User user, ChangePasswordDTO cpDTO) throws IllegalArgumentException{
+		String password1 = cpDTO.getNewPassword();
+		String password2 = cpDTO.getNewPassword();
+
+		if (password1 == null || !password1.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+			throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número");
+		}
+
+		if (password2 == null || !password2.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+			throw new IllegalArgumentException("La nueva contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número");
+		}
+
+		if (!password1.equals(password2)) {
+			throw new IllegalArgumentException("Las contraseñas deben de ser iguales.");
+		}
+
+		user.setPassword(passwordEncoder.encode(password2));
+		user.setChangePasswordToken(null);
+		userRepository.save(user);
+	}
 
     @Transactional
     public User downgradeUserPlan(User user)  throws IllegalArgumentException {
@@ -197,5 +254,35 @@ public class UserService {
     public Optional<User> getUserByEmail(String currentEmail) {
         return userRepository.findByEmail(currentEmail);
     }
+
+	@Transactional
+	public void requestChangePassword(String email) throws IllegalArgumentException {
+		Optional<User> userOptional = userRepository.findByEmail(email);
+		if (!userOptional.isPresent()) {
+			throw new IllegalArgumentException("No hay una cuenta asociada a este email.");
+		}
+
+		User user = userOptional.get();
+
+		String uuid = UUID.randomUUID().toString();
+		user.setChangePasswordToken(uuid);
+		userRepository.save(user);
+
+		String link = "http://ispp-2425-03.ew.r.appspot.com/cambiar-contraseña/" + uuid;
+
+		// ENVIAR CORREO
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setFrom("eventbride6@gmail.com");
+		mailMessage.setTo(user.getEmail());
+		mailMessage.setSubject("Cambiar contraseña");
+		mailMessage.setText("Hola " + user.getFirstName() + " " + user.getLastName() +
+			". \nHas solicitado el cambio de contraseña. A continuación le proporcionamos" +
+			"el link para acceder al formulario de modificación de su contraseña" +
+			"\nLink:" + link +
+			". \nMuchas gracias!");
+
+		mailSender.send(mailMessage);
+
+	}
 
 }

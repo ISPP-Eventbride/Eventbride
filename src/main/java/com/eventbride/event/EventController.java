@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eventbride.dto.EventDTO;
 import com.eventbride.dto.EventMapper;
 import com.eventbride.dto.InvitationDTO;
+import com.eventbride.dto.publics.EventPublicDTO;
 import com.eventbride.event_properties.EventProperties;
 import com.eventbride.event_properties.EventPropertiesService;
 import com.eventbride.invitation.Invitation;
@@ -76,7 +77,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventDTO findById(@PathVariable("id") Integer id) throws IllegalArgumentException, DataAccessException {
+    public EventPublicDTO findById(@PathVariable("id") Integer id) throws IllegalArgumentException, DataAccessException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> user = userService.getUserByUsername(auth.getName());
 
@@ -93,7 +94,7 @@ public class EventController {
             throw new IllegalArgumentException("El evento no te pertenece");
         }
 
-        return eventMapper.toDTO(eventService.findById(id));
+        return eventMapper.toPublicDTO(eventService.findById(id));
     }
 
     @PostMapping("/create")
@@ -220,9 +221,9 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("El evento no te pertenece");
         }
 
-        List<EventDTO> eventDTOs = new ArrayList<>();
+        List<EventPublicDTO> eventDTOs = new ArrayList<>();
         for (Event event : events) {
-            eventDTOs.add(eventMapper.toDTO(event));
+            eventDTOs.add(eventMapper.toPublicDTO(event));
         }
         return new ResponseEntity<>(eventDTOs, HttpStatus.OK);
     }
@@ -244,9 +245,9 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("El evento no te pertenece");
         }
 
-        List<EventDTO> eventDTOs = new ArrayList<>();
+        List<EventPublicDTO> eventDTOs = new ArrayList<>();
         for (Event event : events) {
-            eventDTOs.add(eventMapper.toDTO(event));
+            eventDTOs.add(eventMapper.toPublicDTO(event));
         }
         return new ResponseEntity<>(eventDTOs, HttpStatus.OK);
     }
