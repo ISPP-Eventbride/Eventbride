@@ -350,7 +350,7 @@ const VenuesScreen = () => {
         </div>
       ) : (
         <>
-          <div className="services-grid" style={{ marginTop: "2%" }}>
+          <div className="venues-grid" style={{ marginTop: "2%" }}>
             {currentVenues.map((venue) => (
               <div key={venue.id} className="service-card" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
                 <div className="card-header"><h3 className="card-title">{venue.name}</h3></div>
