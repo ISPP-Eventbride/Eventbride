@@ -395,7 +395,7 @@
     transition: var(--transition-normal);
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 90%;
     border: 1px solid var(--border-color);
 }
 

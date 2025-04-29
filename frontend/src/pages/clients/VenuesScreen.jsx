@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { Filter, X, MapPin, Users, SquareIcon, Clock, Plus, ChevronDown, ChevronUp, Info, Calendar, ArrowRight, Search, Loader2, Building2, Star, MessageCircle, ExternalLink } from 'lucide-react'
+import { Filter, X, MapPin, Users, SquareIcon, Clock, Plus, ChevronDown, ChevronUp, Info, Calendar, ArrowRight, Search, Loader2, Star, MessageCircle, ExternalLink } from 'lucide-react'
 import { Link, useNavigate } from "react-router-dom"
 import LeafletMap from "../../components/LeafletMap"
 import { useAlert } from "../../context/AlertContext.jsx"
@@ -177,10 +177,6 @@ const VenuesScreen = () => {
   // ------------------------------------------------------------------------------
   // Manejo de modales
   // ------------------------------------------------------------------------------
-  // Muestra el modal con detalles del venue
-  const handleVenueClick = (venue) => {
-    setSelectedVenue(venue)
-  }
 
   // Al hacer click en "Añadir a mi evento", abre el modal de asignar venue
   const handleAddVenueClick = (e, venue) => {
@@ -390,45 +386,6 @@ const VenuesScreen = () => {
         <LeafletMap venues={venuesWithCoordinates} />
       </div>
 
-      {/* Grid + Paginación */}
-      {loading ? (
-        <div className="empty-state">
-          <div className="loading-spinner"></div>
-          <p>Cargando venues...</p>
-        </div>
-      ) : venues.length === 0 ? (
-        <div className="empty-state">
-          <Info size={40} className="mx-auto mb-4" style={{ color: "#d9be75" }} />
-          <p>No se encontraron venues con los criterios seleccionados.</p>
-        </div>
-      ) : (
-        <>
-          <div className="venues-grid" style={{ marginTop: "2%" }}>
-            {currentVenues.map((venue) => (
-              <div key={venue.id} className="service-card" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                <div className="card-header"><h3 className="card-title">{venue.name}</h3></div>
-                <div className="card-body">
-                  {venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>}
-                  <div className="details-section"><span className="details-label">Descripción:</span><p className="details-text">{venue.description}</p></div>
-                </div>
-                <div className="card-footer">
-                  {venue.available ? (
-                    <><button className="add-button" onClick={(e) => handleAddVenueClick(e, venue)}><Plus size={16} /> Añadir a mi evento</button><Link to={`/chat/${venue.userDTO.id}`} className="chat-button">💬 Chatear</Link></>
-                  ) : (<div className="not-available-banner">No disponible</div>)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {totalPages > 1 && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "24px 0" }}>
-              <button onClick={() => setPage((p) => Math.max(p - 1, 0))} disabled={page === 0} className="btn-primary" style={{ backgroundColor: "#f0f0f0", border: "none", borderRadius: 4, width: 40, height: 40, cursor: page === 0 ? "not-allowed" : "pointer", marginRight: 8, padding: 0 }}><ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} /></button>
-              <span style={{ fontWeight: "bold", margin: "0 12px" }}>Página {page + 1} de {totalPages}</span>
-              <button onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))} disabled={page + 1 >= totalPages} className="btn-primary" style={{ backgroundColor: "#f0f0f0", border: "none", borderRadius: 4, width: 40, height: 40, cursor: page + 1 >= totalPages ? "not-allowed" : "pointer", marginLeft: 8, padding: 0 }}><ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} /></button>
-            </div>
-          )}
-        </>
-      )}
       {/* Venues grid */}
       <div className="venues-content">
         <h2 className="venues-section-title">
@@ -454,102 +411,150 @@ const VenuesScreen = () => {
             </button>
           </div>
         ) : (
-          <div className="venues-grid fade-in">
-            {venues.map((venue) => (
-              <div
-                key={venue.id}
-                className={`venue-card hover-shadow ${!venue.available ? "venue-unavailable" : ""}`}
-              >
-                {/* Imagen del venue */}
-                <div className="venue-image-container" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                  <img
-                    src={venue.picture || "https://iili.io/3EpzvZx.png"}
-                    onError={(e) => {
-                      e.target.onerror = null
-                      e.target.src = "https://iili.io/3EpzvZx.png"
-                    }}
-                    alt={venue.name}
-                    className="venue-image"
-                  />
-                  <div className="venue-image-overlay"></div>
-                  {venue.userDTO?.plan === "PREMIUM" && (
-                    <div className="premium-badge">
-                      <Star className="premium-icon" />
-                      <span>Promocionado</span>
-                    </div>
-                  )}
-                  {!venue.available && (
-                    <div className="unavailable-badge">
-                      <X className="unavailable-icon" />
-                      <span>No disponible</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Cabecera de la tarjeta */}
-                <div className="venue-header" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                  <h3 className="venue-name">{venue.name}</h3>
-                  <div className="venue-location">
-                    <MapPin className="location-icon" />
-                    <span>{venue.cityAvailable}</span>
+          <div>
+            <div className="venues-grid fade-in">
+              {currentVenues.map((venue) => (
+                <div
+                  key={venue.id}
+                  className={`venue-card hover-shadow ${!venue.available ? "venue-unavailable" : ""}`}
+                >
+                  {/* Imagen del venue */}
+                  <div className="venue-image-container" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                    <img
+                      src={venue.picture || "https://iili.io/3EpzvZx.png"}
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = "https://iili.io/3EpzvZx.png"
+                      }}
+                      alt={venue.name}
+                      className="venue-image"
+                    />
+                    <div className="venue-image-overlay"></div>
+                    {venue.userDTO?.plan === "PREMIUM" && (
+                      <div className="premium-badge">
+                        <Star className="premium-icon" />
+                        <span>Promocionado</span>
+                      </div>
+                    )}
+                    {!venue.available && (
+                      <div className="unavailable-badge">
+                        <X className="unavailable-icon" />
+                        <span>No disponible</span>
+                      </div>
+                    )}
                   </div>
-                </div>
 
-                {/* Detalles del venue */}
-                <div className="venue-details" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                  <div className="details-grid">
-                    <div className="detail-item">
-                      <Users className="detail-icon" />
-                      <div className="detail-content">
-                        <p className="detail-label">Capacidad</p>
-                        <p className="detail-value">{venue.maxGuests} personas</p>
+                  {/* Cabecera de la tarjeta */}
+                  <div className="venue-header" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                    <h3 className="venue-name">{venue.name}</h3>
+                    <div className="venue-location">
+                      <MapPin className="location-icon" />
+                      <span>{venue.cityAvailable}</span>
+                    </div>
+                  </div>
+
+                  {/* Detalles del venue */}
+                  <div className="venue-details" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                    <div className="details-grid">
+                      <div className="detail-item">
+                        <Users className="detail-icon" />
+                        <div className="detail-content">
+                          <p className="detail-label">Capacidad</p>
+                          <p className="detail-value">{venue.maxGuests} personas</p>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <SquareIcon className="detail-icon" />
+                        <div className="detail-content">
+                          <p className="detail-label">Superficie</p>
+                          <p className="detail-value">{venue.surface} m²</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="detail-item">
-                      <SquareIcon className="detail-icon" />
-                      <div className="detail-content">
-                        <p className="detail-label">Superficie</p>
-                        <p className="detail-value">{venue.surface} m²</p>
+                    <div className="venue-description">
+                      <p>{venue.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Acciones */}
+                  <div className="venue-actions">
+                    {venue.available ? (
+                      <>
+                        <button className="action-button add-button" onClick={(e) => handleAddVenueClick(e, venue)}>
+                          <Plus className="button-icon" />
+                          <span>Añadir a mi evento</span>
+                        </button>
+                        <Link to={`/chat/${venue.userDTO.id}`} className="action-button chat-button">
+                          <MessageCircle className="button-icon" />
+                          <span>Chatear</span>
+                        </Link>
+                      </>
+                    ) : (
+                      <div className="unavailable-message">
+                        <Info className="info-icon" />
+                        <span>Este recinto no está disponible actualmente</span>
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="venue-description">
-                    <p>{venue.description}</p>
+                  {/* Ver más link */}
+                  <div className="venue-footer">
+                    <button className="view-details-button" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                      <ExternalLink className="button-icon" />
+                      <span>Ver detalles</span>
+                    </button>
                   </div>
                 </div>
-
-                {/* Acciones */}
-                <div className="venue-actions">
-                  {venue.available ? (
-                    <>
-                      <button className="action-button add-button" onClick={(e) => handleAddVenueClick(e, venue)}>
-                        <Plus className="button-icon" />
-                        <span>Añadir a mi evento</span>
-                      </button>
-                      <Link to={`/chat/${venue.userDTO.id}`} className="action-button chat-button">
-                        <MessageCircle className="button-icon" />
-                        <span>Chatear</span>
-                      </Link>
-                    </>
-                  ) : (
-                    <div className="unavailable-message">
-                      <Info className="info-icon" />
-                      <span>Este recinto no está disponible actualmente</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Ver más link */}
-                <div className="venue-footer">
-                  <button className="view-details-button" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                    <ExternalLink className="button-icon" />
-                    <span>Ver detalles</span>
-                  </button>
-                </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "24px 0",
+              }}>
+                <button
+                  onClick={() => setPage(p => Math.max(p - 1, 0))}
+                  disabled={page === 0}
+                  style={{
+                    backgroundColor: "#f0f0f0",
+                    border: "none",
+                    borderRadius: 4,
+                    width: 40,
+                    height: 40,
+                    cursor: page === 0 ? "not-allowed" : "pointer",
+                    marginRight: 8,
+                    padding: 0,
+                  }}
+                >
+                  <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+                </button>
+            
+                <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+                  Página {page + 1} de {totalPages}
+                </span>
+            
+                <button
+                  onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                  disabled={page + 1 >= totalPages}
+                  style={{
+                    backgroundColor: "#f0f0f0",
+                    border: "none",
+                    borderRadius: 4,
+                    width: 40,
+                    height: 40,
+                    cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                    marginLeft: 8,
+                    padding: 0,
+                  }}
+                >
+                  <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+                </button>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>

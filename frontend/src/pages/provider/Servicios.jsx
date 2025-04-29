@@ -12,6 +12,7 @@ import {
     Package,
     Info,
     AlertCircle,
+    ChevronDown,
     EyeOff,
     Eye,
     Loader2,
@@ -82,6 +83,9 @@ const Servicios = () => {
           setPage(Math.max(totalPages - 1, 0));
         }
       }, [totalPages]);
+
+    const startIndex = page * itemsPerPage;
+    const currentServices = services.slice(startIndex, startIndex + itemsPerPage);
 
     // Función para formatear el tipo de servicio
     const formatServiceType = (type, otherServiceType) => {
@@ -212,171 +216,213 @@ const Servicios = () => {
                 </div>
             ) : (
                 <>
-                    <div className="servicios-grid fade-in">
-                        {services.map((service) => (
-                            <div
-                                key={service.id}
-                                className={`servicio-card hover-shadow ${service.overLimit ? "over-limit" : ""} ${!service.available ? "disabled-service" : ""}`}
-                            >
-                                {/* Imagen del servicio */}
-                                <div className="servicio-image-container">
-                                    <img
-                                        src={service.picture || "https://iili.io/3EpzvZx.png"}
-                                        onError={(e) => {
-                                            e.target.onerror = null
-                                            e.target.src = "https://iili.io/3EpzvZx.png"
-                                        }}
-                                        alt={service.name}
-                                        className="servicio-image"
-                                    />
-                                    <div className="servicio-image-overlay"></div>
-                                    {service.overLimit && (
-                                        <div className="over-limit-badge">
-                                            <AlertCircle className="over-limit-icon" />
-                                            <span>Excede límite</span>
-                                        </div>
-                                    )}
-                                    {!service.available && (
-                                        <div className="disabled-badge">
-                                            <EyeOff className="disabled-icon" />
-                                            <span>Deshabilitado</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Cabecera de la tarjeta */}
-                                <div className="servicio-header">
-                                    <div className="servicio-header-content">
-                                        <h3 className="servicio-name">{service.name}</h3>
-                                        <span className={`servicio-badge ${getServiceBadgeColor(service.type, service.otherServiceType)}`}>
-                                            {formatServiceType(service.type, service.otherServiceType)}
-                                        </span>
-                                    </div>
-                                    <div className="servicio-status">
-                                        <span className={`status-indicator ${service.available ? "status-active" : "status-inactive"}`}>
-                                            {service.available ? "Activo" : "Inactivo"}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Detalles del servicio */}
-                                <div className="servicio-details">
-                                    <div className="details-grid">
-                                        <div className="detail-item">
-                                            <MapPin className="detail-icon" />
-                                            <div className="detail-content">
-                                                <p className="detail-label">Ubicación</p>
-                                                <p className="detail-value">{service.cityAvailable}</p>
-                                            </div>
-                                        </div>
-
-                                        {service.limitedByPricePerGuest && (
-                                            <div className="detail-item">
-                                                <Users className="detail-icon" />
-                                                <div className="detail-content">
-                                                    <p className="detail-label">Precio por invitado</p>
-                                                    <p className="detail-value">{service.servicePricePerGuest}€</p>
-                                                </div>
+                    <div>
+                        <div className="servicios-grid fade-in">
+                            {currentServices.map((service) => (
+                                <div
+                                    key={service.id}
+                                    className={`servicio-card hover-shadow ${service.overLimit ? "over-limit" : ""} ${!service.available ? "disabled-service" : ""}`}
+                                >
+                                    {/* Imagen del servicio */}
+                                    <div className="servicio-image-container">
+                                        <img
+                                            src={service.picture || "https://iili.io/3EpzvZx.png"}
+                                            onError={(e) => {
+                                                e.target.onerror = null
+                                                e.target.src = "https://iili.io/3EpzvZx.png"
+                                            }}
+                                            alt={service.name}
+                                            className="servicio-image"
+                                        />
+                                        <div className="servicio-image-overlay"></div>
+                                        {service.overLimit && (
+                                            <div className="over-limit-badge">
+                                                <AlertCircle className="over-limit-icon" />
+                                                <span>Excede límite</span>
                                             </div>
                                         )}
-
-                                        {service.limitedByPricePerHour && (
-                                            <div className="detail-item">
-                                                <Clock className="detail-icon" />
-                                                <div className="detail-content">
-                                                    <p className="detail-label">Precio por hora</p>
-                                                    <p className="detail-value">{service.servicePricePerHour}€</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {!service.limitedByPricePerHour && !service.limitedByPricePerGuest && (
-                                            <div className="detail-item">
-                                                <DollarSign className="detail-icon" />
-                                                <div className="detail-content">
-                                                    <p className="detail-label">Precio fijo</p>
-                                                    <p className="detail-value">{service.fixedPrice}€</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {service.type === "venue" && service.maxGuests && (
-                                            <div className="detail-item">
-                                                <Users className="detail-icon" />
-                                                <div className="detail-content">
-                                                    <p className="detail-label">Capacidad</p>
-                                                    <p className="detail-value">{service.maxGuests} personas</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {service.type === "venue" && service.surface && (
-                                            <div className="detail-item">
-                                                <Package className="detail-icon" />
-                                                <div className="detail-content">
-                                                    <p className="detail-label">Superficie</p>
-                                                    <p className="detail-value">{service.surface} m²</p>
-                                                </div>
+                                        {!service.available && (
+                                            <div className="disabled-badge">
+                                                <EyeOff className="disabled-icon" />
+                                                <span>Deshabilitado</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Descripción */}
-                                    <div className="servicio-description">
-                                        <h4 className="description-title">Descripción</h4>
-                                        <p className="description-text">{service.description}</p>
+                                    {/* Cabecera de la tarjeta */}
+                                    <div className="servicio-header">
+                                        <div className="servicio-header-content">
+                                            <h3 className="servicio-name">{service.name}</h3>
+                                            <span className={`servicio-badge ${getServiceBadgeColor(service.type, service.otherServiceType)}`}>
+                                                {formatServiceType(service.type, service.otherServiceType)}
+                                            </span>
+                                        </div>
+                                        <div className="servicio-status">
+                                            <span className={`status-indicator ${service.available ? "status-active" : "status-inactive"}`}>
+                                                {service.available ? "Activo" : "Inactivo"}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    {/* Información adicional para otros servicios */}
-                                    {service.type === "otherService" && service.extraInformation && (
-                                        <div className="servicio-extra-info">
-                                            <h4 className="extra-info-title">Información adicional</h4>
-                                            <p className="extra-info-text">{service.extraInformation}</p>
-                                        </div>
-                                    )}
-                                </div>
+                                    {/* Detalles del servicio */}
+                                    <div className="servicio-details">
+                                        <div className="details-grid">
+                                            <div className="detail-item">
+                                                <MapPin className="detail-icon" />
+                                                <div className="detail-content">
+                                                    <p className="detail-label">Ubicación</p>
+                                                    <p className="detail-value">{service.cityAvailable}</p>
+                                                </div>
+                                            </div>
 
-                                {/* Acciones */}
-                                <div className="servicio-actions">
-                                    <button
-                                        className={`action-button toggle-button ${service.available ? "disable-button" : "enable-button"}`}
-                                        onClick={() => {
-                                            if (service.type === "otherService") {
-                                                handleOtherServiceDisable(service.id)
-                                            } else {
-                                                handleVenuesDisable(service.id)
+                                            {service.limitedByPricePerGuest && (
+                                                <div className="detail-item">
+                                                    <Users className="detail-icon" />
+                                                    <div className="detail-content">
+                                                        <p className="detail-label">Precio por invitado</p>
+                                                        <p className="detail-value">{service.servicePricePerGuest}€</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {service.limitedByPricePerHour && (
+                                                <div className="detail-item">
+                                                    <Clock className="detail-icon" />
+                                                    <div className="detail-content">
+                                                        <p className="detail-label">Precio por hora</p>
+                                                        <p className="detail-value">{service.servicePricePerHour}€</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {!service.limitedByPricePerHour && !service.limitedByPricePerGuest && (
+                                                <div className="detail-item">
+                                                    <DollarSign className="detail-icon" />
+                                                    <div className="detail-content">
+                                                        <p className="detail-label">Precio fijo</p>
+                                                        <p className="detail-value">{service.fixedPrice}€</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {service.type === "venue" && service.maxGuests && (
+                                                <div className="detail-item">
+                                                    <Users className="detail-icon" />
+                                                    <div className="detail-content">
+                                                        <p className="detail-label">Capacidad</p>
+                                                        <p className="detail-value">{service.maxGuests} personas</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {service.type === "venue" && service.surface && (
+                                                <div className="detail-item">
+                                                    <Package className="detail-icon" />
+                                                    <div className="detail-content">
+                                                        <p className="detail-label">Superficie</p>
+                                                        <p className="detail-value">{service.surface} m²</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Descripción */}
+                                        <div className="servicio-description">
+                                            <h4 className="description-title">Descripción</h4>
+                                            <p className="description-text">{service.description}</p>
+                                        </div>
+
+                                        {/* Información adicional para otros servicios */}
+                                        {service.type === "otherService" && service.extraInformation && (
+                                            <div className="servicio-extra-info">
+                                                <h4 className="extra-info-title">Información adicional</h4>
+                                                <p className="extra-info-text">{service.extraInformation}</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Acciones */}
+                                    <div className="servicio-actions">
+                                        <button
+                                            className={`action-button toggle-button ${service.available ? "disable-button" : "enable-button"}`}
+                                            onClick={() => {
+                                                if (service.type === "otherService") {
+                                                    handleOtherServiceDisable(service.id)
+                                                } else {
+                                                    handleVenuesDisable(service.id)
+                                                }
+                                            }}
+                                            disabled={spinner === service.id}
+                                        >
+                                            {spinner === service.id ? (
+                                                <>
+                                                    <Loader2 className="button-icon spinner" />
+                                                    <span>Procesando...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {service.available ? <EyeOff className="button-icon" /> : <Eye className="button-icon" />}
+                                                    <span>{service.available ? "Deshabilitar" : "Habilitar"}</span>
+                                                </>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            className="action-button edit-button"
+                                            onClick={() =>
+                                                navigate(`/misservicios/editar/${service.type}/${service.id}/`, {
+                                                    id: service.id,
+                                                    serviceType: service.type,
+                                                })
                                             }
-                                        }}
-                                        disabled={spinner === service.id}
-                                    >
-                                        {spinner === service.id ? (
-                                            <>
-                                                <Loader2 className="button-icon spinner" />
-                                                <span>Procesando...</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                {service.available ? <EyeOff className="button-icon" /> : <Eye className="button-icon" />}
-                                                <span>{service.available ? "Deshabilitar" : "Habilitar"}</span>
-                                            </>
-                                        )}
-                                    </button>
-
-                                    <button
-                                        className="action-button edit-button"
-                                        onClick={() =>
-                                            navigate(`/misservicios/editar/${service.type}/${service.id}/`, {
-                                                id: service.id,
-                                                serviceType: service.type,
-                                            })
-                                        }
-                                    >
-                                        <Edit className="button-icon" />
-                                        <span>Editar</span>
-                                    </button>
+                                        >
+                                            <Edit className="button-icon" />
+                                            <span>Editar</span>
+                                        </button>
+                                    </div>
                                 </div>
+                            ))}
+                        </div>
+                        {totalPages > 1 && (
+                            <div style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                margin: "24px 0"
+                            }}>
+                                <button
+                                onClick={() => setPage(p => Math.max(p - 1, 0))}
+                                disabled={page === 0}
+                                style={{
+                                    backgroundColor: "#f0f0f0",
+                                    border: "none",
+                                    borderRadius: 4,
+                                    width: 40, height: 40,
+                                    cursor: page === 0 ? "not-allowed" : "pointer",
+                                    marginRight: 8, padding: 0
+                                }}
+                                >
+                                <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+                                </button>
+                                <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+                                Página {page + 1} de {totalPages}
+                                </span>
+                                <button
+                                onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                                disabled={page + 1 >= totalPages}
+                                style={{
+                                    backgroundColor: "#f0f0f0",
+                                    border: "none",
+                                    borderRadius: 4,
+                                    width: 40, height: 40,
+                                    cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                                    marginLeft: 8, padding: 0
+                                }}
+                                >
+                                <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+                                </button>
                             </div>
-                        ))}
+                        )}
                     </div>
 
                     {currentUser.plan &&
