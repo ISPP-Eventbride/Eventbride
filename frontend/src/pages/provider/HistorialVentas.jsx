@@ -6,6 +6,11 @@ const HistorialVentas = ({ userId }) => {
     const [ventas, setVentas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [withdrawAmount, setWithdrawAmount] = useState(0);
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
+    const [withdrawSuccess, setWithdrawSuccess] = useState(false);
+    const [withdrawError, setWithdrawError] = useState(null);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
     const [jwtToken] = useState(localStorage.getItem("jwt"));
@@ -74,11 +79,10 @@ const HistorialVentas = ({ userId }) => {
             })
             .catch(error => {
                 console.error("Error obteniendo pagos:", error);
-                setError("No hay pagos todavia.");
+                setError("No se han efectuado pagos a favor de sus servicios todavía o ya se han retirado los fondos relativos a estos.");
                 setIsLoading(false);
             });
     }
-
 
     useEffect(() => {
         getPaymentsForProvider();
@@ -89,18 +93,71 @@ const HistorialVentas = ({ userId }) => {
         DEPOSIT: 'Pago reserva',
         PLAN: 'Plan',
         REMAINING: 'Pago restante'
-      };
-      
-      function parseStatus(status) {
+    };
+
+    function parseStatus(status) {
         return statusMap[status] || 'desconocido';
-      }
-      
+    }
+
+    // Filtrar solo los pagos de tipo DEPOSIT y REMAINING
+    const ventasFiltradas = ventas.filter(venta =>
+        venta.paymentType === "DEPOSIT" || venta.paymentType === "REMAINING"
+    );
+
+    // Calcular el total disponible para retirar (suma de DEPOSIT y REMAINING)
+    const totalDisponible = ventasFiltradas.reduce((total, venta) => {
+        // Aplicamos el cálculo sin comisiones (amount/1.05)*0.975
+        return total + venta.amount;
+    }, 0);
+
+    const handleWithdrawRequest = () => {
+        setShowConfirmation(true);
+    };
+
+    const confirmWithdraw = () => {
+        setIsWithdrawing(true);
+        setWithdrawError(null);
+        setWithdrawSuccess(false);
+        setShowConfirmation(false);
+
+        // Realizar la petición al backend para retirar el dinero
+        fetch(`/api/payment/withdraw/${currentUser.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwtToken}`,
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al procesar la solicitud de retiro');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setWithdrawSuccess(true);
+                setWithdrawAmount(totalDisponible);
+                // Actualizar la lista de pagos después de un retiro exitoso
+                getPaymentsForProvider();
+            })
+            .catch(error => {
+                console.error('Error en el retiro:', error);
+                setWithdrawError(error.message || 'Ha ocurrido un error al procesar tu solicitud de retiro');
+            })
+            .finally(() => {
+                setIsWithdrawing(false);
+            });
+    };
+
+    const cancelWithdraw = () => {
+        setShowConfirmation(false);
+    };
 
     if (isLoading) {
         return (
             <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p>Cargando ventas...</p>
+                <p>Cargando tus ventas...</p>
             </div>
         );
     }
@@ -108,50 +165,136 @@ const HistorialVentas = ({ userId }) => {
     if (error) {
         return (
             <div className="error-container">
+                <div className="success-icon" style={{ marginBottom: "30px", fontSize: "15vh" }}>💵</div>
                 <p>{error}</p>
-                <button style={{width:"25%"}} className="retry-button" onClick={getPaymentsForProvider}>
-                    Reintentar
-                </button>
             </div>
         );
     }
 
     return (
         <div className="ventas-container">
-            <h2 className="ventas-title"><span className="resaltado">Mis</span> Ventas</h2>
-            <div className="tabla-scroll">
-                <table className="ventas-tabla">
-                    <thead>
-                        <tr>
-                            <th>Servicio</th>
-                            <th>Cantidad</th>
-                            <th>Sin comisones</th>
-                            <th>Fecha del pago</th>
-                            <th>Tipo de pago</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ventas.map((venta, index) => (
-                            <tr key={index}>
-                                <td>
-                                    {venta.eventPropertiesDTO?.venueDTO
-                                        ? venta.eventPropertiesDTO.venueDTO.name
-                                        : venta.eventPropertiesDTO?.otherServiceDTO
-                                            ? venta.eventPropertiesDTO.otherServiceDTO.name
-                                            : 'Sin nombre'}
-                                </td>
-                                <td>{(venta.amount / 1.05).toFixed(2)}€</td>
-                                <td>{((venta.amount / 1.05) * 0.975).toFixed(2)}€</td>
-                                <td>{new Date(venta.dateTime).toLocaleDateString()}</td>
-                                <td>{parseStatus(venta.paymentType)}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <p style={{ marginTop: "1.1%" }}>
-                    A todos los pagos se le aplicará una comisión del 2.5% tal y como indican los términos y condiciones.
-                </p>
+            <div className="ventas-header">
+                <h2 className="ventas-title">Mis Ventas</h2>
+                <div className="ventas-summary">
+                    <div className="summary-item">
+                        <span className="summary-label">Total disponible:</span>
+                        <span className="summary-value">{totalDisponible.toFixed(2)}€</span>
+                    </div>
+                </div>
             </div>
+
+            {ventasFiltradas.length > 0 ? (
+                <div className="tabla-container">
+                    <div className="tabla-scroll">
+                        <table className="ventas-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Cantidad</th>
+                                    <th>Fecha del pago</th>
+                                    <th>Tipo de pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ventasFiltradas.map((venta, index) => (
+                                    <tr key={index} className={index % 2 === 0 ? 'row-even' : 'row-odd'}>
+                                        <td>
+                                            {venta.eventPropertiesDTO?.venueDTO
+                                                ? venta.eventPropertiesDTO.venueDTO.name
+                                                : venta.eventPropertiesDTO?.otherServiceDTO
+                                                    ? venta.eventPropertiesDTO.otherServiceDTO.name
+                                                    : 'Sin nombre'}
+                                        </td>
+                                        <td>{venta.amount}€</td>
+                                        <td>{new Date(venta.dateTime).toLocaleDateString()}</td>
+                                        <td>
+                                            <span className={`payment-type ${venta.paymentType.toLowerCase()}`}>
+                                                {parseStatus(venta.paymentType)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            ) : (
+                <div className="empty-state">
+                    <div className="empty-icon">📊</div>
+                    <p>No tienes pagos de reserva o restantes en este momento.</p>
+                </div>
+            )}
+
+            <div className="withdraw-section">
+                <h3 className="withdraw-title">Retirar fondos</h3>
+                <div className="withdraw-content">
+                    <div className="withdraw-info">
+                        <p>Puedes retirar el total acumulado de tus pagos de reserva y restantes.</p>
+                        <div className="withdraw-amount">
+                            <span className="amount-label">Cantidad disponible:</span>
+                            <span className="amount-value">{totalDisponible.toFixed(2)}€</span>
+                        </div>
+                    </div>
+
+                    {totalDisponible > 0 ? (
+                        <button
+                            className="withdraw-button"
+                            onClick={handleWithdrawRequest}
+                            disabled={isWithdrawing || totalDisponible <= 0}
+                        >
+                            {isWithdrawing ? 'Procesando...' : 'Retirar fondos'}
+                        </button>
+                    ) : (
+                        <p className="no-funds-message">No tienes fondos disponibles para retirar.</p>
+                    )}
+
+                    {withdrawSuccess && (
+                        <div className="success-message">
+                            <div className="success-icon">✓</div>
+                            <p>Tu solicitud de retiro por {withdrawAmount.toFixed(2)}€ ha sido procesada correctamente.</p>
+                        </div>
+                    )}
+
+                    {withdrawError && (
+                        <div className="error-message">
+                            <div className="error-icon">⚠️</div>
+                            <p>{withdrawError}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {showConfirmation && (
+                <div className="confirmation-overlay">
+                    <div className="confirmation-modal">
+                        <h3>Confirmar Retiro de Fondos</h3>
+                        <p>
+                            Los fondos serán enviados a la cuenta PayPal asociada al correo:{" "}
+                            <strong>{currentUser.email}</strong>
+                        </p>
+                        <br></br>
+                        <p>
+                            ¿Confirma que desea retirar un total de{" "}
+                            <strong>{totalDisponible.toFixed(2)}€</strong>?
+                        </p>
+                        <br></br>
+                        <p className="confirmation-note">
+                            <strong>Importante:</strong> esta acción es irreversible. Por favor, asegúrese de que el correo registrado en nuestra plataforma coincide exactamente con su cuenta PayPal, ya que los fondos se transferirán directamente a dicha dirección.
+                            <br /><br />
+                            En caso de error, PayPal enviará automáticamente un correo electrónico al destinatario con las instrucciones necesarias para reclamar o recuperar el importe enviado.
+                        </p>
+                        <div className="confirmation-buttons">
+                            <button className="cancel-button" onClick={cancelWithdraw}>
+                                Cancelar
+                            </button>
+                            <button className="confirm-button" onClick={confirmWithdraw}>
+                                Confirmar Retiro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            )}
         </div>
     );
 };
