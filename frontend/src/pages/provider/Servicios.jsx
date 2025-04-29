@@ -185,7 +185,7 @@ const Servicios = () => {
                         {currentServices.map((service) => (
                             <div key={service.id} className={`service-item ${service.overLimit ? "over-limit" : ""}`}>
                                 <div className="service-header">
-                                    <h3 className="service-title">{service.name}</h3>
+                                    <h3 className="services-title">{service.name}</h3>
                                     <span className="service-badge">
                                         {formatServiceType(service.type, service.otherServiceType)}
                                     </span>

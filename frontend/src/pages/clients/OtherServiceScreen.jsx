@@ -355,7 +355,7 @@ const OtherServiceScreen = () => {
             return (
               <div key={service.id} className="service-card" >
                 <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                  <h3 className="service-title">{service.name}</h3>
+                  <h3 className="services-title">{service.name}</h3>
                 </div>
                 <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
                   {
