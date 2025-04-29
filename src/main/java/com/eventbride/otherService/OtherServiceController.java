@@ -70,7 +70,8 @@ public class OtherServiceController {
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) OtherServiceType type) {
-		List<OtherService> otherServices = otherServiceService.getFilteredOtherServices(name, city, type);
+		List<OtherService> otherServices = otherServiceService.getFilteredOtherServices(name, city, type).stream()
+		.filter(s -> s.getAvailable() == true).toList();
 		return OtherServicePublicDTO.fromEntities(otherServices);
 	}
 
