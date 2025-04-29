@@ -106,7 +106,7 @@ function Navbar({ user }) {
               )}
             </li>
             <li><Link to="/dashboard" className="nav-link">Contrataciones</Link></li>
-            <li><Link to="/misVentas" className="nav-link">Historial ventas</Link></li>
+            <li><Link to="/misVentas" className="nav-link">Retirar fondos</Link></li>
             <li><Link to="/support" className="nav-link">Soporte Técnico</Link></li>
           </ul>
         );
