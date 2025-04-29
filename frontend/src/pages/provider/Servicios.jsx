@@ -28,6 +28,10 @@ const Servicios = () => {
     const { showAlert } = useAlert()
     const [spinner, setSpinner] = useState(null)
 
+    const [page, setPage] = useState(0);
+    const itemsPerPage = 3;
+    const totalPages = Math.ceil(services.length / itemsPerPage);
+
     const fetchServices = useCallback(async () => {
         try {
             setLoading(true)
@@ -72,6 +76,12 @@ const Servicios = () => {
     useEffect(() => {
         fetchServices()
     }, [fetchServices])
+
+    useEffect(() => {
+        if (page > totalPages - 1) {
+          setPage(Math.max(totalPages - 1, 0));
+        }
+      }, [totalPages]);
 
     // Función para formatear el tipo de servicio
     const formatServiceType = (type, otherServiceType) => {
