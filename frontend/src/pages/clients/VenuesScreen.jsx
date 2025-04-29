@@ -45,6 +45,21 @@ const VenuesScreen = () => {
 
   const { showAlert } = useAlert()
 
+  // ** Estados y lógica de paginación **
+  const [page, setPage] = useState(0)
+  const itemsPerPage = 3
+  const totalPages = Math.ceil(venues.length / itemsPerPage)
+
+  // Ajustar página si cambia totalPages
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0))
+    }
+  }, [totalPages])
+
+  const startIndex = page * itemsPerPage
+  const currentVenues = venues.slice(startIndex, startIndex + itemsPerPage)
+
   // ------------------------------------------------------------------------------
   // Obtiene venues con o sin filtros
   // ------------------------------------------------------------------------------
@@ -322,7 +337,7 @@ const VenuesScreen = () => {
 
       <LeafletMap venues={venuesWithCoordinates} />
 
-      {/* Venues grid */}
+      {/* Grid + Paginación */}
       {loading ? (
         <div className="empty-state">
           <div className="loading-spinner"></div>
@@ -334,39 +349,32 @@ const VenuesScreen = () => {
           <p>No se encontraron venues con los criterios seleccionados.</p>
         </div>
       ) : (
-        <div className="services-grid" style={{ marginTop: "2%" }}>
-          {venues.map((venue) => (
-            <div key={venue.id} className="service-card" >
-              <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                <h3 className="card-title">{venue.name}</h3>
-              </div>
-              <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
-                {
-                  venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
-                }
-                <div className="details-section">
-                  <span className="details-label">Descripción:</span>
-                  <p className="details-text">{venue.description}</p>
+        <>
+          <div className="venues-grid" style={{ marginTop: "2%" }}>
+            {currentVenues.map((venue) => (
+              <div key={venue.id} className="service-card" onClick={() => navigate(`/detallesVenues/${venue.id}`)}>
+                <div className="card-header"><h3 className="card-title">{venue.name}</h3></div>
+                <div className="card-body">
+                  {venue.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>}
+                  <div className="details-section"><span className="details-label">Descripción:</span><p className="details-text">{venue.description}</p></div>
+                </div>
+                <div className="card-footer">
+                  {venue.available ? (
+                    <><button className="add-button" onClick={(e) => handleAddVenueClick(e, venue)}><Plus size={16} /> Añadir a mi evento</button><Link to={`/chat/${venue.userDTO.id}`} className="chat-button">💬 Chatear</Link></>
+                  ) : (<div className="not-available-banner">No disponible</div>)}
                 </div>
               </div>
-              <div className="card-footer">
-                {venue.available ? (
-                  <>
-                    <button className="add-button" onClick={(e) => handleAddVenueClick(e, venue)}>
-                      <Plus size={16} />
-                      Añadir a mi evento
-                    </button>
-                    <Link to={`/chat/${venue.userDTO.id}`} className="chat-button">
-                      💬 Chatear
-                    </Link>
-                  </>
-                ) : (
-                  <div className="not-available-banner">No disponible</div>
-                )}
-              </div>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "24px 0" }}>
+              <button onClick={() => setPage((p) => Math.max(p - 1, 0))} disabled={page === 0} className="btn-primary" style={{ backgroundColor: "#f0f0f0", border: "none", borderRadius: 4, width: 40, height: 40, cursor: page === 0 ? "not-allowed" : "pointer", marginRight: 8, padding: 0 }}><ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} /></button>
+              <span style={{ fontWeight: "bold", margin: "0 12px" }}>Página {page + 1} de {totalPages}</span>
+              <button onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))} disabled={page + 1 >= totalPages} className="btn-primary" style={{ backgroundColor: "#f0f0f0", border: "none", borderRadius: 4, width: 40, height: 40, cursor: page + 1 >= totalPages ? "not-allowed" : "pointer", marginLeft: 8, padding: 0 }}><ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} /></button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* Venue details modal */}

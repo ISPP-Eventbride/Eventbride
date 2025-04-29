@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../../static/resources/css/AdminUsers.css";
 
@@ -11,6 +11,11 @@ function AdminEvents() {
   const [error, setError] = useState("");
   const [searchId, setSearchId] = useState("");
   const [filteredEvents, setFilteredEvents] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const listToShow = filteredEvents.length > 0 ? filteredEvents : events;
+  const totalPages = Math.ceil(listToShow.length / itemsPerPage);
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const [jwtToken] = useState(localStorage.getItem("jwt"));
@@ -24,6 +29,12 @@ function AdminEvents() {
   useEffect(() => {
     getEvents();
   }, []);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);
 
   function getEvents() {
     fetch("/api/v1/events/DTO", {
@@ -166,6 +177,8 @@ function AdminEvents() {
     }
   }
 
+  const startIndex = page * itemsPerPage;
+  const currentEvents = listToShow.slice(startIndex, startIndex + itemsPerPage);
   return (
     <>
       <div style={{ display: "flex", justifyContent: "center", marginTop: "6%", marginBottom: "20px", gap: "10px" }}>
@@ -217,113 +230,163 @@ function AdminEvents() {
       )}
 
       {currentUser?.role === "ADMIN" ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          {(filteredEvents.length > 0 ? filteredEvents : events).map((event, index) => (
+        <div>
+          {totalPages > 1 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "24px 0",
+              }}
+            >
+              <button
+                onClick={() => setPage(p => Math.max(p - 1, 0))}
+                disabled={page === 0}
+                style={{
+                  backgroundColor: "#f0f0f0",
+                  border: "none",
+                  borderRadius: 4,
+                  width: 40,
+                  height: 40,
+                  cursor: page === 0 ? "not-allowed" : "pointer",
+                  marginRight: 8,
+                  padding: 0,
+                }}
+              >
+                <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+              </button>
 
-            /* SI NO OS GUSTA EL QUE SE PUEDA HACER SCROLL, ELIMINADLE EL STYLE*/
-            <div key={index} className="service-container" style={{ height: "90%" }}>
-              <h2 className="service-title">Nombre: {event.name}</h2>
-              <p className="service-title">ID: {event.id}</p>
-              <p className="service-title">De {event.userEmail}</p>
+              <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+                Página {page + 1} de {totalPages}
+              </span>
 
-              <div className="service-info">
-                <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
-                  <div className="form-group">
-                    <label>Tipo de Evento: {editEventId === event.id && <span className="asterisk">*</span>}</label>
-                    <select
-                      name="eventType"
-                      value={eventData[event.id]?.eventType || event.eventType}
-                      onChange={handleInputChange}
-                      required={editEventId === event.id}
-                      disabled={editEventId !== event.id}
-                    >
-                      {Object.keys(eventTypeMap).map((type) => (
-                        <option key={type} value={type}>{eventTypeMap[type]}</option>
-                      ))}
-                    </select>
-                  </div>
+              <button
+                onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                disabled={page + 1 >= totalPages}
+                style={{
+                  backgroundColor: "#f0f0f0",
+                  border: "none",
+                  borderRadius: 4,
+                  width: 40,
+                  height: 40,
+                  cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                  marginLeft: 8,
+                  padding: 0,
+                }}
+              >
+                <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+              </button>
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            {currentEvents.map((event, index) => (
 
-                  <div className="form-group">
-                    <label>Invitados:{editEventId === event.id && <span className="asterisk">*</span>}</label>
-                    <input
-                      type="number"
-                      name="guests"
-                      min="1"
-                      value={eventData[event.id]?.guests || event.guests}
-                      required={editEventId === event.id}
-                      onChange={handleInputChange}
-                      readOnly={editEventId !== event.id}
-                    />
-                  </div>
+              /* SI NO OS GUSTA EL QUE SE PUEDA HACER SCROLL, ELIMINADLE EL STYLE*/
+              <div key={index} className="service-container" style={{ height: "90%" }}>
+                <h2 className="service-title">Nombre: {event.name}</h2>
+                <p className="service-title">ID: {event.id}</p>
+                <p className="service-title">De {event.userEmail}</p>
 
-                  <div className="form-group">
-                    <label>Fecha del Evento:</label>
-                    <input
-                      type="date"
-                      name="eventDate"
-                      value={eventData[event.id]?.eventDate || (event.eventDate ? event.eventDate.split("T")[0] : "")}
-                      onChange={handleInputChange}
-                      readOnly={!(editEventId === event.id && (event.eventPropertiesDTO?.length <= 0 || event.eventProperties?.length <= 0))}
-                    />
-                  </div>
+                <div className="service-info">
+                  <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
+                    <div className="form-group">
+                      <label>Tipo de Evento: {editEventId === event.id && <span className="asterisk">*</span>}</label>
+                      <select
+                        name="eventType"
+                        value={eventData[event.id]?.eventType || event.eventType}
+                        onChange={handleInputChange}
+                        required={editEventId === event.id}
+                        disabled={editEventId !== event.id}
+                      >
+                        {Object.keys(eventTypeMap).map((type) => (
+                          <option key={type} value={type}>{eventTypeMap[type]}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                  {(event.eventPropertiesDTO?.length > 0 || event.eventProperties?.length > 0) && (
-                    
-                    /* SI NO OS GUSTA EL QUE SE PUEDA HACER SCROLL, ELIMINADLE EL STYLE*/
-                    <div className="event-services-box" style={{ height: "300px", overflowY: "auto" }}>
-                      <h3>Servicios del Evento</h3>
+                    <div className="form-group">
+                      <label>Invitados:{editEventId === event.id && <span className="asterisk">*</span>}</label>
+                      <input
+                        type="number"
+                        name="guests"
+                        min="1"
+                        value={eventData[event.id]?.guests || event.guests}
+                        required={editEventId === event.id}
+                        onChange={handleInputChange}
+                        readOnly={editEventId !== event.id}
+                      />
+                    </div>
 
-                      {(event.eventPropertiesDTO || []).some(prop => prop.venueDTO) && (
-                        <div className="service-subsection">
-                          <h4>Locales</h4>
-                          {(event.eventPropertiesDTO || []).filter(prop => prop.venueDTO).map((prop, idx) => (
-                            <div key={idx} className="service-card">
-                              <p><strong>Nombre:</strong> {prop.venueDTO.name}</p>
-                              <p><strong>Ciudad:</strong> {prop.venueDTO.cityAvailable}</p>
-                              <p><strong>Aprobado:</strong> {prop.status=== "APPROVED"? "Sí" : "No"}</p>
-                              <p><strong>Fecha solicitud:</strong> {new Date(prop.requestDate).toLocaleDateString("es-ES")}</p>
-                              <button type="button" className="cancel-button" onClick={() => navigate(`/admin/event/${event.id}/event-prop/${prop.id}`)}>
-                                  Editar recinto asociado
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                    <div className="form-group">
+                      <label>Fecha del Evento:</label>
+                      <input
+                        type="date"
+                        name="eventDate"
+                        value={eventData[event.id]?.eventDate || (event.eventDate ? event.eventDate.split("T")[0] : "")}
+                        onChange={handleInputChange}
+                        readOnly={!(editEventId === event.id && (event.eventPropertiesDTO?.length <= 0 || event.eventProperties?.length <= 0))}
+                      />
+                    </div>
 
-                      {(event.eventPropertiesDTO || []).some(prop => prop.otherServiceDTO) && (
-                        <div className="service-subsection">
-                          <h4>Servicios adicionales</h4>
-                          {(event.eventPropertiesDTO || []).filter(prop => prop.otherServiceDTO).map((prop, idx) => (
-                            <div key={idx} className="service-card">
-                              <p><strong>Servicio:</strong> {prop.otherServiceDTO.name}</p>
-                              <p><strong>Ciudad:</strong> {prop.otherServiceDTO.cityAvailable}</p>
-                              <p><strong>Aprobado:</strong> {prop.approved ? "Sí" : "No"}</p>
-                              <p><strong>Fecha solicitud:</strong> {new Date(prop.requestDate).toLocaleDateString("es-ES")}</p>
-                              <button type="button" className="cancel-button" onClick={() => navigate(`/admin/event/${event.id}/event-prop/${prop.id}`)}>
-                                  Editar servicio asociado
-                              </button>
-                            </div>
-                          ))}
-                        </div>
+                    {(event.eventPropertiesDTO?.length > 0 || event.eventProperties?.length > 0) && (
+                      
+                      /* SI NO OS GUSTA EL QUE SE PUEDA HACER SCROLL, ELIMINADLE EL STYLE*/
+                      <div className="event-services-box" style={{ height: "300px", overflowY: "auto" }}>
+                        <h3>Servicios del Evento</h3>
+
+                        {(event.eventPropertiesDTO || []).some(prop => prop.venueDTO) && (
+                          <div className="service-subsection">
+                            <h4>Locales</h4>
+                            {(event.eventPropertiesDTO || []).filter(prop => prop.venueDTO).map((prop, idx) => (
+                              <div key={idx} className="service-card">
+                                <p><strong>Nombre:</strong> {prop.venueDTO.name}</p>
+                                <p><strong>Ciudad:</strong> {prop.venueDTO.cityAvailable}</p>
+                                <p><strong>Aprobado:</strong> {prop.status=== "APPROVED"? "Sí" : "No"}</p>
+                                <p><strong>Fecha solicitud:</strong> {new Date(prop.requestDate).toLocaleDateString("es-ES")}</p>
+                                <button type="button" className="cancel-button" onClick={() => navigate(`/admin/event/${event.id}/event-prop/${prop.id}`)}>
+                                    Editar recinto asociado
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {(event.eventPropertiesDTO || []).some(prop => prop.otherServiceDTO) && (
+                          <div className="service-subsection">
+                            <h4>Servicios adicionales</h4>
+                            {(event.eventPropertiesDTO || []).filter(prop => prop.otherServiceDTO).map((prop, idx) => (
+                              <div key={idx} className="service-card">
+                                <p><strong>Servicio:</strong> {prop.otherServiceDTO.name}</p>
+                                <p><strong>Ciudad:</strong> {prop.otherServiceDTO.cityAvailable}</p>
+                                <p><strong>Aprobado:</strong> {prop.approved ? "Sí" : "No"}</p>
+                                <p><strong>Fecha solicitud:</strong> {new Date(prop.requestDate).toLocaleDateString("es-ES")}</p>
+                                <button type="button" className="cancel-button" onClick={() => navigate(`/admin/event/${event.id}/event-prop/${prop.id}`)}>
+                                    Editar servicio asociado
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="button-container">
+                      {editEventId === event.id ? (
+                        <>
+                          <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={() => updateEvent(event)}>Guardar</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="edit-btn" onClick={() => startEditing(event)}>Editar</button>
+                        </>
                       )}
                     </div>
-                  )}
-
-                  <div className="button-container">
-                    {editEventId === event.id ? (
-                      <>
-                        <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={() => updateEvent(event)}>Guardar</button>
-                      </>
-                    ) : (
-                      <>
-                        <button className="edit-btn" onClick={() => startEditing(event)}>Editar</button>
-                      </>
-                    )}
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       ) : (
         <p>No tienes permisos para ver esta sección.</p>

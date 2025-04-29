@@ -41,6 +41,16 @@ const OtherServiceScreen = () => {
   const [isConfirming, setIsConfirming] = useState(false)
   const navigate = useNavigate();
 
+  // Estados de paginación
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(otherServices.length / itemsPerPage);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);  
 
   const currentUser = JSON.parse(localStorage.getItem("user"))
   const [jwtToken] = useState(localStorage.getItem("jwt"));
@@ -235,6 +245,10 @@ const OtherServiceScreen = () => {
     }
   }, [type])
 
+  const startIndex = page * itemsPerPage;
+  const currentServices = otherServices.slice(startIndex, startIndex + itemsPerPage);
+
+
   return (
     <div className="services-container">
       <div className="services-header">
@@ -336,12 +350,12 @@ const OtherServiceScreen = () => {
         </div>
       ) : (
         <div className="services-grid">
-          {otherServices.map((service) => {
+          {currentServices.map((service) => {
 
             return (
               <div key={service.id} className="service-card" >
                 <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                  <h3 className="service-title">{service.name}</h3>
+                  <h3 className="services-title">{service.name}</h3>
                 </div>
                 <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
                   {
@@ -373,6 +387,54 @@ const OtherServiceScreen = () => {
           })}
         </div>
       )}
+
+      {totalPages > 1 && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "24px 0",
+        }}>
+          <button
+            onClick={() => setPage(p => Math.max(p - 1, 0))}
+            disabled={page === 0}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page === 0 ? "not-allowed" : "pointer",
+              marginRight: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+          </button>
+
+          <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+            Página {page + 1} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+            disabled={page + 1 >= totalPages}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+              marginLeft: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+          </button>
+        </div>
+      )}
+
 
       {/* Modal para seleccionar evento */}
       {modalVisible && (
