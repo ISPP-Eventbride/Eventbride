@@ -120,7 +120,7 @@ public class VenueService {
 	@Transactional
 	public Venue updateVenue(Integer id, Venue updatedVenue) {
 		Venue existingVenue = venueRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("No se ha encontrado ningún Venue con esa Id"));
+				.orElseThrow(() -> new RuntimeException("No se ha encontrado ningún recinto con esa Id"));
 
 		// Evita sobrescribir el ID ni el usuario original directamente
 		BeanUtils.copyProperties(updatedVenue, existingVenue, "id", "user");

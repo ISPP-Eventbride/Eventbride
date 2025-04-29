@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/*
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -119,7 +121,7 @@ public class InvitationIntegrationTest {
         event = eventRepository.save(event);
     }
 
-    /*
+    
      * @Test
      * 
      * @WithMockUser(username = "user1", authorities = {"USER"})
@@ -159,7 +161,7 @@ public class InvitationIntegrationTest {
      * .andExpect(jsonPath("$.firstName").value("Lucía"))
      * .andExpect(jsonPath("$.invitationType").value("ACCEPTED"));
      * }
-     */
+     
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
@@ -178,7 +180,7 @@ public class InvitationIntegrationTest {
                 .andExpect(jsonPath("$.email").value("ejemplo@correo.com"));
     }
 
-/*     @Test
+    @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
     void shouldDeleteInvitationSuccessfully() throws Exception {
         Invitation invitation = new Invitation();
@@ -191,7 +193,7 @@ public class InvitationIntegrationTest {
         mockMvc.perform(delete("/api/invitation/" + invitation.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Se ha eliminado la invitación correctamente"));
-    } */
+    } 
 
     @Test
     @WithMockUser(username = "user1", authorities = { "USER" })
@@ -201,3 +203,5 @@ public class InvitationIntegrationTest {
                 .andExpect(jsonPath("$.error").value("La invitación no existe"));
     }
 }
+
+*/

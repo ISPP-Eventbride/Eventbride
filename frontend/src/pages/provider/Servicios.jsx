@@ -269,10 +269,10 @@ const Servicios = () => {
                                 <div style={{ marginTop: "5%" }} className="card-info">
                                     <span className="card-text">
                                         <img style={{ height: "25%", width: "100%" }}
-                                            src={service.picture || "https://iili.io/3Ywlapf.png"}
+                                            src={service.picture || "https://iili.io/3EpzvZx.png"}
                                             onError={(e) => {
                                                 e.target.onerror = null;
-                                                e.target.src = "https://iili.io/3Ywlapf.png";
+                                                e.target.src = "https://iili.io/3EpzvZx.png";
                                             }}
                                             alt="Imagen del servicio"></img>
                                     </span>

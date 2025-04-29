@@ -7,6 +7,13 @@ import "../../static/resources/css/Register.css"
 import TermsModal from "./TermsModal"
 
 
+
+const dniPattern = /^[0-9]{8}[A-Za-z]$/
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const telephonePattern = /^[0-9]{9}$/
+const profilePicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
+                             
+
 const Register = () => {
   const [form, setForm] = useState({
     firstName: "",
@@ -53,28 +60,34 @@ const Register = () => {
       return
     }
 
-    const dniPattern = /^[0-9]{8}[A-Za-z]$/
+    
     if (!dniPattern.test(form.dni)) {
       setError("El DNI es incorrecto.")
       return
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailPattern.test(form.email)) {
       setError("El correo electrónico no es válido")
       return
     }
 
-    const telephonePattern = /^[0-9]{9}$/
     if (!telephonePattern.test(form.telephone)) {
       setError("El teléfono debe tener 9 numeros.")
       return
     }
 
+    if (form.profilePicture && !profilePicturePattern.test(form.profilePicture)) {
+      setError("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.");
+      return;
+    }
+
+
+
     if (!acceptedTerms) {
       setError("Debes aceptar los términos y condiciones para continuar.")
       return
     }
+
 
     setIsLoading(true)
 
@@ -126,7 +139,7 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">Nombre</label>
+                <label htmlFor="firstName">Nombre <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -141,7 +154,7 @@ const Register = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="lastName">Apellido</label>
+                <label htmlFor="lastName">Apellido <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -157,7 +170,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="username">Nombre de usuario</label>
+              <label htmlFor="username">Nombre de usuario <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="text"
@@ -172,7 +185,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="profilePicture">URL de foto de perfil (Opcional)</label>
+              <label htmlFor="profilePicture">URL de foto de perfil</label>
               <div className="input-wrapper">
                 <input
                   type="url"
@@ -181,12 +194,13 @@ const Register = () => {
                   placeholder="https://foto.de/perfil"
                   value={form.profilePicture}
                   onChange={handleChange}
+                  pattern={profilePicturePattern.source}
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Correo electrónico</label>
+              <label htmlFor="email">Correo electrónico <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="email"
@@ -195,6 +209,7 @@ const Register = () => {
                   placeholder="tu@email.com"
                   value={form.email}
                   onChange={handleChange}
+                  pattern={emailPattern.source}
                   required
                 />
               </div>
@@ -202,7 +217,7 @@ const Register = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="telephone">Teléfono</label>
+                <label htmlFor="telephone">Teléfono <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="tel"
@@ -211,13 +226,14 @@ const Register = () => {
                     placeholder="Tu número de teléfono"
                     value={form.telephone}
                     onChange={handleChange}
+                    pattern={telephonePattern.source}
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label htmlFor="dni">DNI</label>
+                <label htmlFor="dni">DNI <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
                   <input
                     type="text"
@@ -226,6 +242,7 @@ const Register = () => {
                     placeholder="Tu DNI"
                     value={form.dni}
                     onChange={handleChange}
+                    pattern={dniPattern.source}
                     required
                   />
                 </div>
@@ -233,7 +250,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">Contraseña <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
                 <input
                   type="password"
@@ -248,7 +265,7 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="role">Tipo de usuario</label>
+              <label htmlFor="role">Tipo de usuario <span className="asterisk">*</span> </label>
               <div className="select-wrapper">
                 <select id="role" name="role" value={form.role} onChange={handleChange} required>
                   <option value="">Selecciona tu rol</option>
