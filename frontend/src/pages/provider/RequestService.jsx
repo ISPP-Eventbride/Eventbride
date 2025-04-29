@@ -110,6 +110,7 @@ export default function RequestService() {
             console.error("Error al aceptar la solicitud:", error)
         } finally {
             setProcessingId(null)
+            window.location.href = '/solicitudes'
             // Opcional: redirigir o mostrar notificación
         }
     }
