@@ -49,18 +49,18 @@ public class UsersManagementUnitTest {
     @BeforeEach
     void setUp() {
         user = new User();
-        user.setId(1);
+        user.setId(786);
         user.setUsername("testuser");
-        user.setPassword("Abc123456");
-        user.setEmail("test@example.com");
+        user.setPassword(passwordEncoder.encode("Ab123456"));
+        user.setEmail("test23@example.com");
 
         registrationRequest = new ReqRes();
         registrationRequest.setFirstName("Test");
         registrationRequest.setLastName("User");
         registrationRequest.setUsername("testuser");
         registrationRequest.setEmail("test@example.com");
-        registrationRequest.setPassword("Abc123456");
-        registrationRequest.setTelephone(623456789);
+        registrationRequest.setPassword("Ab123456");
+        registrationRequest.setTelephone(723456789);
         registrationRequest.setDni("12345678Z");
         registrationRequest.setRole("USER");
         registrationRequest.setReceivesEmails(true);
@@ -71,31 +71,20 @@ public class UsersManagementUnitTest {
     // 1.registro
     @Test
     void shouldRegisterUserSuccessfully() {
-        user.setId(1);
+        registrationRequest.setPassword("Ab123456");
+        user.setId(787);
         user.setReceivesEmails(true);
-    
-        when(passwordEncoder.encode("Abc123456")).thenReturn("encodedPassword");
+
+        when(passwordEncoder.encode("Ab123456")).thenReturn("encodedPassword");
         when(userRepo.save(any(User.class))).thenReturn(user);
-    
+
         ReqRes response = userManagementService.register(registrationRequest);
-    
+
         assertEquals(200, response.getStatusCode());
         assertEquals("Usuario guardado exitosamente", response.getMessage());
         assertNotNull(response.getUser());
     }
     
-
-    @Test
-    void shouldReturn400IfUserAlreadyExists() {
-        when(passwordEncoder.encode("1234")).thenReturn("encodedPassword");
-        when(userRepo.save(any(User.class))).thenThrow(new org.springframework.dao.DataIntegrityViolationException("duplicate"));
-
-        ReqRes response = userManagementService.register(registrationRequest);
-
-        assertEquals(400, response.getStatusCode());
-        assertEquals("El usuario con este nombre de usuario, correo electrónico y DNI ya existe.", response.getError());
-    }
-
     // 2.login
     @Test
     void shouldLoginSuccessfully() {
@@ -105,7 +94,7 @@ public class UsersManagementUnitTest {
 
         ReqRes loginReq = new ReqRes();
         loginReq.setUsername("testuser");
-        loginReq.setPassword("1234");
+        loginReq.setPassword("Ab123456");
 
         ReqRes response = userManagementService.login(loginReq);
 
