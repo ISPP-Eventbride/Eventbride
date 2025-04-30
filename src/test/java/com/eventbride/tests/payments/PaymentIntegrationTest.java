@@ -144,7 +144,7 @@ public class PaymentIntegrationTest {
         event.setEventType(EventType.WEDDING);
         event.setGuests(100);
         event.setEventDate(LocalDate.of(2025, 12, 20));
-        event.setPaymentDate(event.getPaymentDate());
+        event.setPaymentDate(LocalDate.now());
 
         eventProperties = new EventProperties();
         eventProperties.setOtherService(otherService);
