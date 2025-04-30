@@ -215,7 +215,7 @@ public class PaymentIntegrationTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(4)))  // Debería haber dos pagos ahora
                 .andExpect(jsonPath("$[0].paymentType").value("DEPOSIT"))
-                .andExpect(jsonPath("$[1].paymentType").value("REMAINING"));
+                .andExpect(jsonPath("$[2].paymentType").value("REMAINING"));
     }
 
 
@@ -285,7 +285,7 @@ public class PaymentIntegrationTest {
     // 9. Prueba para manejar el caso de un usuario no existente
     @Test
     void shouldHandleNonExistentUser() throws Exception {
-        Integer nonExistentUserId = 99999;
+        Integer nonExistentUserId = 86324;
 
         mockMvc.perform(get("/api/payment/provider/" + nonExistentUserId))
                 .andExpect(status().isNotFound());

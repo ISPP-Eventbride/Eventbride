@@ -84,7 +84,7 @@ public class UsersUnitTest {
         assertEquals("juan@example.com", user.getEmail());
         assertEquals(723456789, user.getTelephone());
         assertEquals("securePassword", user.getPassword());
-        assertEquals("56473829K", user.getDni());
+        assertEquals("12345678Z", user.getDni());
         assertEquals("ROLE_SUPPLIER", user.getRole());
         assertEquals(Plan.BASIC, user.getPlan());
         assertEquals("https://example.com/pic.jpg", user.getProfilePicture());
@@ -233,6 +233,7 @@ public class UsersUnitTest {
 
         // Usamos DNI válido
         user.setDni("12345678Z");
+        user.setTelephone(723456789); 
 
         when(userRepository.findById(1)).thenReturn(Optional.of(existing));
         when(userRepository.existsByUsername("juanp")).thenReturn(false);

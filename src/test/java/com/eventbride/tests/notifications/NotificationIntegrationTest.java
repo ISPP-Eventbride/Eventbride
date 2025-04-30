@@ -18,7 +18,7 @@ class NotificationIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-     @Test
+    @Test
     @WithMockUser(username = "alice123")
     void testGetAllNotificationsForUser() throws Exception {
         mockMvc.perform(get("/api/notifications"))

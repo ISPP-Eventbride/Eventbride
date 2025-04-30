@@ -135,7 +135,7 @@ public class UsersIntegrationTest {
         clientUser.setUsername("cliente1");
         clientUser.setPassword("client123");
         clientUser.setEmail("client@example.com");
-        clientUser.setDni("22222222J");
+        clientUser.setDni("22222232T");
         clientUser.setTelephone(622222222);
         clientUser.setRole("CLIENT");
         clientUser.setReceivesEmails(true);
