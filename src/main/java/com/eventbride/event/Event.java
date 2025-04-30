@@ -1,11 +1,9 @@
 package com.eventbride.event;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import com.eventbride.event_properties.EventProperties;
-import com.eventbride.invitation.Invitation;
 import com.eventbride.model.BaseEntity;
 import com.eventbride.user.User;
 
@@ -19,8 +17,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -59,9 +55,10 @@ public class Event extends BaseEntity {
     @JoinColumn(name = "event_id")
     private List<EventProperties> eventProperties;
 
-    @Column(name = "payment_date", nullable = false)
+    @Column(name = "payment_date", nullable = true)
     private LocalDate paymentDate;
 
+/*
     public LocalDate getPaymentDate() {
         if (eventType == EventType.WEDDING) {
             return eventDate.minusMonths(3);
@@ -71,7 +68,7 @@ public class Event extends BaseEntity {
             return eventDate.minusMonths(2);
         }
     }
-
+*/
     @Column(name = "confirmed_guests", nullable = true)
     private Integer confirmedGuests;
 

@@ -126,7 +126,7 @@ public class UserController {
     /**
      * Eliminar un usuario por ID.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public void deleteUser(@PathVariable("id") Integer id) throws IllegalArgumentException {
         if (!hasRole("ADMIN")) {
             throw new IllegalArgumentException("No tienes permiso para realizar esta acción");
@@ -158,7 +158,7 @@ public class UserController {
 	/**
 	 * Eliminar tu usuario
 	 */
-	@DeleteMapping("/")
+	@DeleteMapping("/myUser")
 	public ResponseEntity<?> deleteMyUser() throws IllegalArgumentException {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -184,11 +184,9 @@ public class UserController {
 			otherServiceService.saveAll(otherServices);
 			String uuid = UUID.randomUUID().toString();
 
-			user.setDni("AAAAAAAAY");
 			user.setEmail(uuid + "@anonymous.com");
 			user.setFirstName("Anonymous");
 			user.setLastName("Anonymous");
-			user.setTelephone(123123123);
 			user.setUsername(uuid);
 			user.setPaymentPlanDate(null);
 			user.setExpirePlanDate(null);

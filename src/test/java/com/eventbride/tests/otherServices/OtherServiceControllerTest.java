@@ -57,7 +57,7 @@ class OtherServiceControllerTest {
         user.setId(1);
         user.setUsername("proveedor");
         user.setEmail("proveedor@example.com");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("OWNER");
         user.setPlan(User.Plan.PREMIUM);
         user.setReceivesEmails(true);
@@ -108,7 +108,7 @@ class OtherServiceControllerTest {
         user.setId(1);
         user.setUsername("proveedor");
         user.setEmail("proveedor@example.com");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("OWNER");
         user.setPlan(User.Plan.PREMIUM);
         user.setReceivesEmails(true);
@@ -146,7 +146,7 @@ class OtherServiceControllerTest {
         user.setId(1);
         user.setUsername("proveedor");
         user.setEmail("proveedor@example.com");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("OWNER");
         user.setPlan(User.Plan.PREMIUM);
         user.setReceivesEmails(true);
@@ -209,7 +209,7 @@ class OtherServiceControllerTest {
         user.setId(1);
         user.setUsername("proveedor");
         user.setEmail("proveedor@example.com");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("OWNER");
         user.setPlan(User.Plan.PREMIUM);
         user.setReceivesEmails(true);

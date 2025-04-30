@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -60,7 +61,7 @@ function EditProfile() {
     };
 
     const handleDeleteAccount = (e) => {
-        fetch(`/api/users/`, {
+        fetch(`/api/users/myUser`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

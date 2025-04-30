@@ -81,9 +81,9 @@ public class EventIntegrationTest {
         adminUser.setLastName("Pérez");
         adminUser.setUsername("juanp");
         adminUser.setEmail("juan@example.com");
-        adminUser.setTelephone(123456789);
+        adminUser.setTelephone(623456789);
         adminUser.setPassword("securePassword");
-        adminUser.setDni("12345678A");
+        adminUser.setDni("12345678Z");
         adminUser.setRole("ADMIN");
         adminUser.setPlan(Plan.PREMIUM);
         adminUser.setPaymentPlanDate(LocalDate.now());
@@ -100,7 +100,7 @@ public class EventIntegrationTest {
         clientUser.setEmail("ana@gmail.com");
         clientUser.setTelephone(987654321);
         clientUser.setPassword("securePassword");
-        clientUser.setDni("87654321B");
+        clientUser.setDni("87654321X");
         clientUser.setRole("CLIENT");
         clientUser.setPlan(Plan.PREMIUM);
         clientUser.setPaymentPlanDate(LocalDate.now());
@@ -115,9 +115,9 @@ public class EventIntegrationTest {
         clientUserEvent.setLastName("López");
         clientUserEvent.setUsername("pedrol");
         clientUserEvent.setEmail("pedro@gmail.com");
-        clientUserEvent.setTelephone(456789123);
+        clientUserEvent.setTelephone(756789123);
         clientUserEvent.setPassword("securePassword");
-        clientUserEvent.setDni("45678912C");
+        clientUserEvent.setDni("45678912S");
         clientUserEvent.setRole("CLIENT");
         clientUserEvent.setPlan(Plan.PREMIUM);
         clientUserEvent.setPaymentPlanDate(LocalDate.now());
@@ -135,7 +135,7 @@ public class EventIntegrationTest {
         event.setConfirmedGuests(66);
         event.setPaid(false);
         event.setName("Boda de Pedro");
-        event.setPaymentDate(event.getEventDate().minusMonths(5));
+        event.setPaymentDate(LocalDate.now().plusMonths(3));
         event = eventRepository.save(event);
 
         // #endregion
