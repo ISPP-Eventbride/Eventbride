@@ -82,8 +82,8 @@ public class UsersIntegrationTest {
         adminUser.setUsername("admintest");
         adminUser.setPassword("1234");
         adminUser.setEmail("admintest@example.com");
-        adminUser.setDni("12345678X");
-        adminUser.setTelephone(123456789);
+        adminUser.setDni("12345678Z");
+        adminUser.setTelephone(723456789);
         adminUser.setRole("ADMIN");
         adminUser.setReceivesEmails(true);
         adminUser.setPlan(null);
@@ -98,7 +98,7 @@ public class UsersIntegrationTest {
         normalUser.setUsername("juanp");
         normalUser.setPassword("abcd");
         normalUser.setEmail("juan@example.com");
-        normalUser.setDni("11111111H");
+        normalUser.setDni("87654321X");
         normalUser.setTelephone(987654321);
         normalUser.setRole("USER");
         normalUser.setReceivesEmails(true);
@@ -114,8 +114,8 @@ public class UsersIntegrationTest {
         supplierUser.setUsername("proveedor1");
         supplierUser.setPassword("supply123");
         supplierUser.setEmail("supplier@example.com");
-        supplierUser.setDni("22222222X");
-        supplierUser.setTelephone(111111111);
+        supplierUser.setDni("11111111H");
+        supplierUser.setTelephone(611111111);
         supplierUser.setRole("SUPPLIER");
         supplierUser.setReceivesEmails(true);
         supplierUser.setPlan(User.Plan.PREMIUM);
@@ -130,8 +130,8 @@ public class UsersIntegrationTest {
         clientUser.setUsername("cliente1");
         clientUser.setPassword("client123");
         clientUser.setEmail("client@example.com");
-        clientUser.setDni("33333333Y");
-        clientUser.setTelephone(222222222);
+        clientUser.setDni("22222222J");
+        clientUser.setTelephone(622222222);
         clientUser.setRole("CLIENT");
         clientUser.setReceivesEmails(true);
         clientUser.setPlan(null);
@@ -225,7 +225,7 @@ public class UsersIntegrationTest {
     void shouldUpdateUserAsAdmin() throws Exception {
         String updatedUserJson = "{" +
                 "\"firstName\":\"Nuevo\",\"lastName\":\"Nombre\",\"username\":\"juanp\"," +
-                "\"email\":\"nuevo@example.com\",\"telephone\":123456789,\"dni\":\"87654321X\"," +
+                "\"email\":\"nuevo@example.com\",\"telephone\":723456789,\"dni\":\"77824121X\"," +
                 "\"role\":\"USER\",\"receivesEmails\":true," +
                 "\"password\":\"abcd\"}"; // necesario por @NotBlank
     
@@ -281,7 +281,7 @@ public class UsersIntegrationTest {
     void shouldUpdateOwnProfile() throws Exception {
         String updatedUserJson = "{" +
         "\"firstName\":\"Yo\",\"lastName\":\"Mismo\",\"username\":\"admin\"," +
-        "\"email\":\"yo@example.com\",\"telephone\":123456789,\"dni\":\"11111111X\"," +
+        "\"email\":\"yo@example.com\",\"telephone\":623456789,\"dni\":\"77824121X\"," +
         "\"role\":\"ADMIN\",\"receivesEmails\":true," +
         "\"password\":\"1234\"}";
     
@@ -297,7 +297,7 @@ public class UsersIntegrationTest {
     void clientShouldUpdateOwnProfile() throws Exception {
         String updatedUserJson = "{" +
             "\"firstName\":\"ClienteActualizado\",\"lastName\":\"Nuevo\",\"username\":\"cliente1\"," +
-            "\"email\":\"cliente@nuevo.com\",\"telephone\":222222222,\"dni\":\"33333333Y\"," +
+            "\"email\":\"cliente@nuevo.com\",\"telephone\":622222222,\"dni\":\"77824121X\"," +
             "\"role\":\"CLIENT\",\"receivesEmails\":true,\"password\":\"client123\"}";
 
         mockMvc.perform(put("/api/users/" + clientUser.getId())
@@ -312,7 +312,7 @@ public class UsersIntegrationTest {
     void supplierShouldUpdateOwnProfile() throws Exception {
         String updatedUserJson = "{" +
             "\"firstName\":\"ProveedorActualizado\",\"lastName\":\"Nuevo\",\"username\":\"proveedor1\"," +
-            "\"email\":\"nuevo@supplier.com\",\"telephone\":123456789,\"dni\":\"22222222X\"," +
+            "\"email\":\"nuevo@supplier.com\",\"telephone\":623456789,\"dni\":\"77824121X\"," +
             "\"role\":\"SUPPLIER\",\"receivesEmails\":true,\"password\":\"supply123\"}";
 
         mockMvc.perform(put("/api/users/" + supplierUser.getId())
