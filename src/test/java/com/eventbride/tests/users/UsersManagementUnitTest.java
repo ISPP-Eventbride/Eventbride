@@ -21,6 +21,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -50,7 +51,7 @@ public class UsersManagementUnitTest {
         user = new User();
         user.setId(1);
         user.setUsername("testuser");
-        user.setPassword("1234");
+        user.setPassword("Abc123456");
         user.setEmail("test@example.com");
 
         registrationRequest = new ReqRes();
@@ -58,9 +59,9 @@ public class UsersManagementUnitTest {
         registrationRequest.setLastName("User");
         registrationRequest.setUsername("testuser");
         registrationRequest.setEmail("test@example.com");
-        registrationRequest.setPassword("1234");
-        registrationRequest.setTelephone(123456789);
-        registrationRequest.setDni("12345678X");
+        registrationRequest.setPassword("Abc123456");
+        registrationRequest.setTelephone(623456789);
+        registrationRequest.setDni("12345678Z");
         registrationRequest.setRole("USER");
         registrationRequest.setReceivesEmails(true);
     }
@@ -71,9 +72,9 @@ public class UsersManagementUnitTest {
     @Test
     void shouldRegisterUserSuccessfully() {
         user.setId(1);
-        user.setReceivesEmails(true); // ← SOLUCIÓN
+        user.setReceivesEmails(true);
     
-        when(passwordEncoder.encode("1234")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("Abc123456")).thenReturn("encodedPassword");
         when(userRepo.save(any(User.class))).thenReturn(user);
     
         ReqRes response = userManagementService.register(registrationRequest);
@@ -82,7 +83,6 @@ public class UsersManagementUnitTest {
         assertEquals("Usuario guardado exitosamente", response.getMessage());
         assertNotNull(response.getUser());
     }
-    
     
 
     @Test

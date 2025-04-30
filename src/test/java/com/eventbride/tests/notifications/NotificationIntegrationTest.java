@@ -23,7 +23,6 @@ class NotificationIntegrationTest {
     void testGetAllNotificationsForUser() throws Exception {
         mockMvc.perform(get("/api/notifications"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", is(not(empty()))))
                 .andExpect(jsonPath("$[0].subject", is(notNullValue())))
                 .andExpect(jsonPath("$[0].message", is(notNullValue())));
     }

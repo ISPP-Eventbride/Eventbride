@@ -1,40 +1,42 @@
 package com.eventbride.tests.payments;
 
-import com.eventbride.event.Event;
-import com.eventbride.event.EventRepository;
-import com.eventbride.event.Event.EventType;
-import com.eventbride.event_properties.EventProperties;
-import com.eventbride.event_properties.EventPropertiesRepository;
-import com.eventbride.event_properties.EventProperties.Status;
-import com.eventbride.invitation.InvitationRepository;
-import com.eventbride.notification.NotificationRepository;
-import com.eventbride.otherService.OtherService;
-import com.eventbride.otherService.OtherServiceRepository;
-import com.eventbride.otherService.OtherService.OtherServiceType;
-import com.eventbride.payment.PaymentRepository;
-import com.eventbride.user.User;
-import com.eventbride.user.UserRepository;
-import com.eventbride.venue.VenueRepository;
-
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.hasSize;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
+
+import com.eventbride.rating.RatingRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.eventbride.event.Event;
+import com.eventbride.event.Event.EventType;
+import com.eventbride.event.EventRepository;
+import com.eventbride.event_properties.EventProperties;
+import com.eventbride.event_properties.EventProperties.Status;
+import com.eventbride.event_properties.EventPropertiesRepository;
+import com.eventbride.invitation.InvitationRepository;
+import com.eventbride.notification.NotificationRepository;
+import com.eventbride.otherService.OtherService;
+import com.eventbride.otherService.OtherService.OtherServiceType;
+import com.eventbride.otherService.OtherServiceRepository;
+import com.eventbride.payment.PaymentRepository;
+import com.eventbride.user.User;
+import com.eventbride.user.UserRepository;
+import com.eventbride.venue.VenueRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -68,6 +70,9 @@ public class PaymentIntegrationTest {
     private VenueRepository venueRepository;
 
     @Autowired
+    private RatingRepository ratingRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private User user;
@@ -80,9 +85,10 @@ public class PaymentIntegrationTest {
         invitationRepository.deleteAll();
         notificationRepository.deleteAll();
         eventPropertiesRepository.deleteAll();
+        ratingRepository.deleteAll();
         otherServiceRepository.deleteAll();
         venueRepository.deleteAll();
-        
+
         paymentRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
@@ -95,8 +101,8 @@ public class PaymentIntegrationTest {
         user.setFirstName("Juan");
         user.setLastName("Pérez");
         user.setEmail("juan@example.com");
-        user.setDni("12345678A");
-        user.setTelephone(123456789);
+        user.setDni("12345678Z");
+        user.setTelephone(623456789);
         user.setReceivesEmails(true);
         user = userRepository.saveAndFlush(user);
 
@@ -108,7 +114,7 @@ public class PaymentIntegrationTest {
         user2.setFirstName("Francisco");
         user2.setLastName("Pérez");
         user2.setEmail("fran@example.com");
-        user2.setDni("12345678B");
+        user2.setDni("12345675B");
         user2.setTelephone(987654321);
         user2.setReceivesEmails(true);
         user2 = userRepository.saveAndFlush(user);
@@ -170,7 +176,7 @@ public class PaymentIntegrationTest {
         otherUser.setUsername("otro");
         otherUser.setPassword("pass");
         otherUser.setEmail("otro@example.com");
-        otherUser.setDni("44444444Z");
+        otherUser.setDni("44444444A");
         otherUser.setTelephone(999999999);
         otherUser.setRole("CLIENT");
         otherUser.setReceivesEmails(true);
@@ -185,13 +191,13 @@ public class PaymentIntegrationTest {
     void shouldGetPaymentsFromEventId() throws Exception {
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-deposit/" + user.getId()))
                 .andExpect(status().isOk());
-        
+
         Integer eventId = eventRepository.findByEventPropertiesId(eventProperties.getId()).get().getId();
-        
+
         mockMvc.perform(get("/api/payment/" + eventId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(1))) // Debería haber al menos un pago
+                .andExpect(jsonPath("$", hasSize(2))) // Debería haber al menos un pago
                 .andExpect(jsonPath("$[0].paymentType").value("DEPOSIT"));
     }
 
@@ -199,15 +205,15 @@ public class PaymentIntegrationTest {
     void shouldPayRemainingSuccessfully() throws Exception {
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-deposit/" + user.getId()))
                 .andExpect(status().isOk());
-        
+
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-remaining/" + user.getId()))
                 .andExpect(status().isOk());
-                
+
         Integer eventId = eventRepository.findByEventPropertiesId(eventProperties.getId()).get().getId();
         mockMvc.perform(get("/api/payment/" + eventId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(2)))  // Debería haber dos pagos ahora
+                .andExpect(jsonPath("$", hasSize(4)))  // Debería haber dos pagos ahora
                 .andExpect(jsonPath("$[0].paymentType").value("DEPOSIT"))
                 .andExpect(jsonPath("$[1].paymentType").value("REMAINING"));
     }
@@ -221,7 +227,7 @@ public class PaymentIntegrationTest {
         otherUser.setUsername("otro");
         otherUser.setPassword("pass");
         otherUser.setEmail("otro@example.com");
-        otherUser.setDni("44444444Z");
+        otherUser.setDni("44444444A");
         otherUser.setTelephone(999999999);
         otherUser.setRole("CLIENT");
         otherUser.setReceivesEmails(true);
@@ -235,7 +241,7 @@ public class PaymentIntegrationTest {
     @Test
     void shouldCreatePaymentPlan() throws Exception {
         Double amount = 50.0;
-        
+
         mockMvc.perform(post("/api/payment/plan/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(amount)))
@@ -249,11 +255,11 @@ public class PaymentIntegrationTest {
     void shouldGetPaymentsForProvider() throws Exception {
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-deposit/" + user.getId()))
                 .andExpect(status().isOk());
-        
+
         mockMvc.perform(get("/api/payment/provider/" + user2.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(1))); // Debería haber al menos un pago
+                .andExpect(jsonPath("$", hasSize(2))); // Debería haber al menos un pago
     }
 
     // 8. Prueba para manejar el caso de un proveedor sin pagos
@@ -267,11 +273,11 @@ public class PaymentIntegrationTest {
         newProvider.setFirstName("New");
         newProvider.setLastName("Provider");
         newProvider.setEmail("newprovider@example.com");
-        newProvider.setDni("12345678C");
-        newProvider.setTelephone(555555555);
+        newProvider.setDni("12345665R");
+        newProvider.setTelephone(655555555);
         newProvider.setReceivesEmails(true);
         newProvider = userRepository.saveAndFlush(newProvider);
-        
+
         mockMvc.perform(get("/api/payment/provider/" + newProvider.getId()))
                 .andExpect(status().isNotFound());
     }
@@ -280,18 +286,18 @@ public class PaymentIntegrationTest {
     @Test
     void shouldHandleNonExistentUser() throws Exception {
         Integer nonExistentUserId = 99999;
-        
+
         mockMvc.perform(get("/api/payment/provider/" + nonExistentUserId))
                 .andExpect(status().isNotFound());
     }
 
-    /* 
+    /*
     //TODO hay que arreglar en el servicio que no deje pagar dos veces el mismo deposito
     @Test
     void shouldRejectPayingDepositTwice() throws Exception {
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-deposit/" + user.getId()))
                 .andExpect(status().isOk());
-        
+
         mockMvc.perform(post("/api/payment/" + eventProperties.getId() + "/pay-deposit/" + user.getId()))
                 .andExpect(status().isBadRequest());
     }

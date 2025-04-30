@@ -57,9 +57,9 @@ public class UsersUnitTest {
         user.setLastName("Pérez");
         user.setUsername("juanp");
         user.setEmail("juan@example.com");
-        user.setTelephone(123456789);
+        user.setTelephone(623456789);
         user.setPassword("securePassword");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("ROLE_SUPPLIER");
         user.setPlan(Plan.BASIC);
         user.setPaymentPlanDate(LocalDate.now());
@@ -83,7 +83,7 @@ public class UsersUnitTest {
         assertEquals("Pérez", user.getLastName());
         assertEquals("juanp", user.getUsername());
         assertEquals("juan@example.com", user.getEmail());
-        assertEquals(123456789, user.getTelephone());
+        assertEquals(623456789, user.getTelephone());
         assertEquals("securePassword", user.getPassword());
         assertEquals("12345678A", user.getDni());
         assertEquals("ROLE_SUPPLIER", user.getRole());
@@ -219,16 +219,16 @@ public class UsersUnitTest {
         existing.setId(1);
         existing.setUsername("oldUsername");
         existing.setEmail("old@example.com");
-        existing.setDni("00000000X");
+        existing.setDni("00000000T");
     
         user.setUsername("juanp");
         user.setEmail("juan@example.com");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
     
         when(userRepository.findById(1)).thenReturn(Optional.of(existing));
         when(userRepository.existsByUsername("juanp")).thenReturn(false);
         when(userRepository.existsByEmail("juan@example.com")).thenReturn(false);
-        when(userRepository.existsByDni("12345678A")).thenReturn(false);
+        when(userRepository.existsByDni("12345678Z")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
     
         User result = userService.updateUser(1, user);
@@ -242,7 +242,7 @@ public class UsersUnitTest {
         User existing = new User();
         existing.setUsername("anterior");
         existing.setEmail("anterior@example.com");
-        existing.setDni("11111111B");
+        existing.setDni("11111111H");
 
         when(userRepository.findById(1)).thenReturn(Optional.of(existing));
 

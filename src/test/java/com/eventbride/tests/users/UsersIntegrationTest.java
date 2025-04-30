@@ -6,6 +6,7 @@ import com.eventbride.invitation.InvitationRepository;
 import com.eventbride.notification.NotificationRepository;
 import com.eventbride.notification.NotificationService;
 import com.eventbride.otherService.OtherServiceRepository;
+import com.eventbride.rating.RatingRepository;
 import com.eventbride.user.User;
 import com.eventbride.user.UserRepository;
 import com.eventbride.venue.VenueRepository;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class UsersIntegrationTest {
 
-//#region Autowired 
+//#region Autowired
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,6 +56,9 @@ public class UsersIntegrationTest {
     @Autowired
     private ChatRepository chatMessageRepository;
 
+	@Autowired
+	private RatingRepository ratingRepository;
+
     @Autowired
     private NotificationRepository notificationRepository;
 
@@ -68,8 +72,9 @@ public class UsersIntegrationTest {
     @BeforeEach
     void setup() {
         chatMessageRepository.deleteAll();
-        notificationRepository.deleteAll();    
+        notificationRepository.deleteAll();
         invitationRepository.deleteAll();
+		ratingRepository.deleteAll();
         eventRepository.deleteAll();
         venueRepository.deleteAll();
         otherServiceRepository.deleteAll();
@@ -82,8 +87,8 @@ public class UsersIntegrationTest {
         adminUser.setUsername("admintest");
         adminUser.setPassword("1234");
         adminUser.setEmail("admintest@example.com");
-        adminUser.setDni("12345678X");
-        adminUser.setTelephone(123456789);
+        adminUser.setDni("12345678Z");
+        adminUser.setTelephone(623456789);
         adminUser.setRole("ADMIN");
         adminUser.setReceivesEmails(true);
         adminUser.setPlan(null);
@@ -114,13 +119,13 @@ public class UsersIntegrationTest {
         supplierUser.setUsername("proveedor1");
         supplierUser.setPassword("supply123");
         supplierUser.setEmail("supplier@example.com");
-        supplierUser.setDni("22222222X");
-        supplierUser.setTelephone(111111111);
+        supplierUser.setDni("22222222J");
+        supplierUser.setTelephone(711111111);
         supplierUser.setRole("SUPPLIER");
         supplierUser.setReceivesEmails(true);
         supplierUser.setPlan(User.Plan.PREMIUM);
-        supplierUser.setExpirePlanDate(LocalDate.now().minusDays(1)); 
-        supplierUser.setPaymentPlanDate(LocalDate.now().minusMonths(1)); 
+        supplierUser.setExpirePlanDate(LocalDate.now().minusDays(1));
+        supplierUser.setPaymentPlanDate(LocalDate.now().minusMonths(1));
         supplierUser = userRepository.saveAndFlush(supplierUser);
 
         // client user
@@ -130,8 +135,8 @@ public class UsersIntegrationTest {
         clientUser.setUsername("cliente1");
         clientUser.setPassword("client123");
         clientUser.setEmail("client@example.com");
-        clientUser.setDni("33333333Y");
-        clientUser.setTelephone(222222222);
+        clientUser.setDni("33333333P");
+        clientUser.setTelephone(622222222);
         clientUser.setRole("CLIENT");
         clientUser.setReceivesEmails(true);
         clientUser.setPlan(null);
@@ -146,7 +151,7 @@ public class UsersIntegrationTest {
     @WithMockUser(username = "admintest", authorities = {"ADMIN"})
     void shouldReturnAllUsersAsAdmin() throws Exception {
         mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk()) 
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
@@ -228,7 +233,7 @@ public class UsersIntegrationTest {
                 "\"email\":\"nuevo@example.com\",\"telephone\":123456789,\"dni\":\"87654321X\"," +
                 "\"role\":\"USER\",\"receivesEmails\":true," +
                 "\"password\":\"abcd\"}"; // necesario por @NotBlank
-    
+
         mockMvc.perform(put("/api/users/admin/" + normalUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUserJson))
@@ -273,7 +278,7 @@ public class UsersIntegrationTest {
     void shouldDowngradePlan() throws Exception {
         mockMvc.perform(get("/api/users/planExpired"))
                 .andExpect(status().isOk());
-    } 
+    }
 
     // 8. PUT /api/users/{id} (updateOwnProfile)
     @Test
@@ -284,7 +289,7 @@ public class UsersIntegrationTest {
         "\"email\":\"yo@example.com\",\"telephone\":123456789,\"dni\":\"11111111X\"," +
         "\"role\":\"ADMIN\",\"receivesEmails\":true," +
         "\"password\":\"1234\"}";
-    
+
         mockMvc.perform(put("/api/users/" + adminUser.getId())  // ← ID correcto
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUserJson))
@@ -321,8 +326,8 @@ public class UsersIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("nuevo@supplier.com"));
     }
-      
-    
+
+
     // 9. PUT /api/users/premium/{id}
     @Test
     @WithMockUser(username = "admintest", authorities = {"ADMIN"})
