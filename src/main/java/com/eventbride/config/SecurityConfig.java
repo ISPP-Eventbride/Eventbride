@@ -53,8 +53,8 @@ public class SecurityConfig {
                                                                 "/api/invitation/{id}",
                                                                 "/api/invitation/**",
                                                                 "/api/other-services/{id}",
-																"/change-password/token/{token}," +
-																"/change-password-request/{email}")
+                                                                "/change-password/token/{token}," +
+                                                                                "/change-password-request/{email}")
                                                 .permitAll()
 
                                                 // URIS DE ADMIN
@@ -83,9 +83,11 @@ public class SecurityConfig {
 
                                                 // URIS DE CLIENT Y SUPPLIER
                                                 .requestMatchers(
-                                                        "/api/users/change-password/{id}",
-                                                                "/api/event-properties/provider/**")
-                                                .hasAnyAuthority("CLIENT", "SUPPLIER", "ADMIN") // Admin también puede acceder
+                                                                "/api/users/change-password/{id}",
+                                                                "/api/event-properties/provider/**",
+                                                                "/api/users/myUser")
+                                                .hasAnyAuthority("CLIENT", "SUPPLIER", "ADMIN") // Admin también puede
+                                                                                                // acceder
 
                                                 // URIS DE CLIENTE
                                                 .requestMatchers(
