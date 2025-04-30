@@ -711,6 +711,7 @@
 .event-header {
   padding: 16px 20px 8px;
   cursor: pointer;
+  justify-content: center;
 }
 
 .event-name {
@@ -730,7 +731,9 @@
 
 .details-grid {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  row-gap: 12px;
+  padding: 0.5rem 0;;
 }
 
 .detail-item {
