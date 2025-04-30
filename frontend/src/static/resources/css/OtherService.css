@@ -198,6 +198,7 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     margin-bottom: 2rem;
+    min-height: 800px;
 }
 
 .service-card {
@@ -579,6 +580,7 @@
   
   .chat-button:hover {
     background-color: #45a049;
+    color: white;
   }
   
 .not-available-text {

@@ -36,6 +36,10 @@ import ProviderDashboard from "./pages/provider/ProviderDashboard.jsx"
 import Support from "./pages/authenticated/Support.jsx"
 import VentasProveedor from "./pages/provider/HistorialVentas"
 import { AlertProvider } from "./context/AlertContext.jsx"
+import DetallesOtherService from "./pages/clients/DetallesOtherService.jsx"
+import DetallesVenues from "./pages/clients/DetallesVenues.jsx"
+import ChangePasswordRegistration from "./pages/no-authenticated/ChangePasswordRegistration.jsx";
+import ChangePassword from "./pages/no-authenticated/ChangePassword.jsx";
 
 function App() {
   const { currentUser, loading, setCurrentUser } = useCurrentUser(null)
@@ -63,6 +67,8 @@ function App() {
                   <Route path="/invitaciones" element={<Invitations />} />
                   <Route path="/invitaciones/:currentEventId" element={<EventInvitations />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/detallesOtherServices/:id" element={<DetallesOtherService />} />
+                  <Route path="/detallesVenues/:id" element={<DetallesVenues />} />
                 </>
               )}
               {/*Rutas de Supplier*/}
@@ -100,6 +106,8 @@ function App() {
               <Route path="/" element={currentUser ? <Home user={currentUser} /> : <Navigate to="/login" />} />
               <Route path="/login" element={<Login setUser={setCurrentUser} />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/cambiar-contraseña" element={<ChangePasswordRegistration />} />
+              <Route path="/cambiar-contraseña/:token" element={<ChangePassword />} />
               <Route path="/terminos-y-condiciones" element={<Terms />} />
               <Route path="/faqs" element={<FAQ />} />
               <Route path="/invitaciones/registro/:invitationId" element={<RegisterInvitation />} />

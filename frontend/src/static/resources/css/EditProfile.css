@@ -331,3 +331,108 @@
         grid-template-columns: 1fr;
     }
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  
+  .modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    max-height:330px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10%;
+    margin-left: 38%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+}
+  
+  .modal .form-group {
+    display: flex;
+    flex-direction: column;
+    max-height: 50px;
+  }
+  
+  .modal h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .modal input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+  
+  .modal input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  .modal-actions button {
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .modal-actions .save-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .modal-actions .save-button:hover {
+    background-color: #218838;
+  }
+  
+  .modal-actions .cancel-button {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #ced4da;
+  }
+  
+  .modal-actions .cancel-button:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* Animación opcional */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #495057;
+    display: block;
+  }

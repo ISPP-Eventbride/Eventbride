@@ -2,7 +2,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
+  max-width: 800px;
   width: 100%;
   margin: 2rem auto;
   padding: 2rem;
@@ -15,6 +15,7 @@
   color: #1f2937;
   text-align: center;
   margin-bottom: 1.5rem;
+  width: 800px;
 }
 
 .service-info {
@@ -26,7 +27,7 @@
 
 .form-group {
   width: 100%;
-  max-width: 500px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
 }
@@ -172,4 +173,215 @@ input[type="date"]::-moz-focus-inner {
 
 input[type="date"] {
   color-scheme: light;
+}
+
+/* Container del buscador */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin: 6% 0 20px;
+  gap: 10px;
+}
+
+.search-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 40%;
+  width: 100%;
+}
+
+/* Inputs y selects (tanto del formulario como del buscador) */
+.form-input,
+.select-input,
+.search-input {
+  background-color: white;
+  color: black;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Textareas */
+textarea.form-input {
+  resize: none;
+  overflow-y: auto;
+}
+
+/* Scrollbar para navegadores basados en WebKit (Chrome, Safari, Edge Chromium...) */
+.form-input::-webkit-scrollbar, .description-text::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-input::-webkit-scrollbar-track, .description-text::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.form-input::-webkit-scrollbar-thumb, .description-text::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+.form-input::-webkit-scrollbar-thumb:hover, .description-text::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Botones generales */
+.btn {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  transition: background-color .2s ease;
+}
+
+/* Botones de buscador */
+.btn-search {
+  padding: 10px 16px;
+  background-color: #007BFF;
+  color: white;
+  max-width: 20%;
+}
+
+.btn-clear {
+  padding: 10px 16px;
+  background-color: #ccc;
+  color: black;
+  max-width: 20%;
+}
+
+/* Contenedor de cuadrícula de servicios */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Mensaje de error */
+.error-message {
+  color: red;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Reajuste de .button-container para form */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 450px;
+  max-height: 370px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin-top: 10%;
+  margin-left: 38%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+
+}
+
+.modal .form-group {
+  display: flex;
+  flex-direction: column;
+  max-height: 50px;
+}
+
+.modal h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.modal input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.modal-actions .save-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-actions .save-button:hover {
+  background-color: #218838;
+}
+
+.modal-actions .cancel-button {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.modal-actions .cancel-button:hover {
+  background-color: #e9ecef;
+}
+
+/* Animación opcional */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #495057;
+  display: block;
 }

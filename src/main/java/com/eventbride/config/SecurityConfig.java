@@ -52,7 +52,9 @@ public class SecurityConfig {
                                                                 "/api/invitation",
                                                                 "/api/invitation/{id}",
                                                                 "/api/invitation/**",
-                                                                "/api/other-services/{id}")
+                                                                "/api/other-services/{id}",
+																"/change-password/token/{token}," +
+																"/change-password-request/{email}")
                                                 .permitAll()
 
                                                 // URIS DE ADMIN
@@ -74,15 +76,16 @@ public class SecurityConfig {
                                                                 "/api/users/plan",
                                                                 "/api/users/getAdmin",
                                                                 "/api/payment/provider/**",
+                                                                "/api/payment/withdraw/**",
                                                                 "/api/event-properties/provider/**",
                                                                 "/api/users/planExpired")
                                                 .hasAnyAuthority("SUPPLIER", "ADMIN") // Admin también puede acceder
 
                                                 // URIS DE CLIENT Y SUPPLIER
                                                 .requestMatchers(
-                                                                "/api/event-properties/provider/**",
-																"/api/users/")
-                                                .hasAnyAuthority("CLIENT", "SUPPLIER")
+                                                        "/api/users/change-password/{id}",
+                                                                "/api/event-properties/provider/**")
+                                                .hasAnyAuthority("CLIENT", "SUPPLIER", "ADMIN") // Admin también puede acceder
 
                                                 // URIS DE CLIENTE
                                                 .requestMatchers(
@@ -100,7 +103,12 @@ public class SecurityConfig {
                                                                 "/api/invitation/eventInvitations/{eventId}",
                                                                 "/api/invitation/**",
                                                                 "/api/users/getAdmin",
-                                                                "/api/invitation/create/**")
+                                                                "/api/invitation/create/**",
+                                                                "/api/ratings/other-service/{id}",
+                                                                "/api/ratings/venue/{id}",
+                                                                "/api/ratings/average/other-service/{id}",
+                                                                "/api/ratings/average/venue/{id}",
+                                                                "/api/ratings/service/{id}/isVoted/{userId}")
                                                 .hasAnyAuthority("CLIENT", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(manager -> manager

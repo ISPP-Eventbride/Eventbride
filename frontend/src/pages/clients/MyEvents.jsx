@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../static/resources/css/MyEvents.css";
+import {ChevronDown} from "lucide-react"
 
 function MyEvents() {
   const [eventos, setEventos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(eventos.length / itemsPerPage);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const [jwtToken] = useState(localStorage.getItem("jwt"));
@@ -50,6 +54,12 @@ function MyEvents() {
   useEffect(() => {
     getEvents();
   }, []);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);
 
   // Convertir tipo de evento a español
   const tipoDeEvento = (type) => {
@@ -116,6 +126,9 @@ function MyEvents() {
     );
   }
 
+  const startIndex = page * itemsPerPage;
+  const currentEvents = eventos.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="events-page">
       <div className="events-header">
@@ -126,85 +139,132 @@ function MyEvents() {
       </div>
 
       {eventos.length > 0 ? (
+        <div>
+          <div className="events-grid" style={{minHeight: '800px'}}>
+            {currentEvents.map((evento, index) => {
+              const diasRestantes = calcularDiasRestantes(evento.eventDate);
 
-        <div className="events-grid">
-          {eventos.map((evento, index) => {
-            const diasRestantes = calcularDiasRestantes(evento.eventDate);
+              const calcularCosteEvento = () => {
+                if (!evento || !evento.eventPropertiesDTO) return 0;
 
-            const calcularCosteEvento = () => {
-              if (!evento || !evento.eventPropertiesDTO) return 0;
+                let total = 0;
+                for (let i = 0; i < evento.eventPropertiesDTO.length; i++) {
+                  const prop = evento.eventPropertiesDTO[i];
+                  total += (prop.setPricePerService || 0);
+                }
+                return total;
+              };
 
-              let total = 0;
-              for (let i = 0; i < evento.eventPropertiesDTO.length; i++) {
-                const prop = evento.eventPropertiesDTO[i];
-                total += (prop.setPricePerService || 0);
-              }
-              return total;
-            };
+              return (
+                <div
+                  key={index}
+                  className="event-card"
 
-            return (
-              <div
-                key={index}
-                className="event-card"
-
-              >
-                <div className="event-image-container">
-                  <img
-                    src={getEventImage(evento.eventType) || "/placeholder.svg"}
-                    onClick={() => navigate(`/event/${evento.id}`)}
-                    alt={tipoDeEvento(evento.eventType)}
-                    className="event-image"
-                    style={{ cursor: "pointer" }}
-                  />
-                  <div className="event-type-badge" style={{ color: "black", backgroundColor: "#FFFFFF85", fontSize: "1.2rem" }}>
-                    {tipoDeEvento(evento.eventType)}
+                >
+                  <div className="event-image-container">
+                    <img
+                      src={getEventImage(evento.eventType) || "/placeholder.svg"}
+                      onClick={() => navigate(`/event/${evento.id}`)}
+                      alt={tipoDeEvento(evento.eventType)}
+                      className="event-image"
+                      style={{ cursor: "pointer" }}
+                    />
+                    <div className="event-type-badge" style={{ color: "black", backgroundColor: "#FFFFFF85", fontSize: "1.2rem" }}>
+                      {tipoDeEvento(evento.eventType)}
+                    </div>
+                    {diasRestantes > 0 && (
+                      <div className="days-remaining">
+                        <span className="days-number">{diasRestantes}</span>
+                        <span className="days-text">días</span>
+                      </div>
+                    )}
                   </div>
-                  {diasRestantes > 0 && (
-                    <div className="days-remaining">
-                      <span className="days-number">{diasRestantes}</span>
-                      <span className="days-text">días</span>
+
+                  <div className="event-content">
+                    <p className="event-title" style={{ fontSize: "1.5rem" }}>{evento.name}</p>
+
+                    <div className="event-details">
+                      <div className="detail-item">
+                        <span className="detail-icon">📅</span>
+                        <span className="detail-text">{formatearFecha(evento.eventDate)}</span>
+                      </div>
+
+                      <div className="detail-item">
+                        <span className="detail-icon">👥</span>
+                        <span className="detail-text">{evento.guests} invitados</span>
+                      </div>
+
+                      <div className="detail-item">
+                        <span className="detail-icon">💰</span>
+                        <span className="detail-text">
+                          Coste acumulado: {calcularCosteEvento().toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                <div className="event-content">
-                  <p className="event-title" style={{ fontSize: "1.5rem" }}>{evento.name}</p>
-
-                  <div className="event-details">
-                    <div className="detail-item">
-                      <span className="detail-icon">📅</span>
-                      <span className="detail-text">{formatearFecha(evento.eventDate)}</span>
-                    </div>
-
-                    <div className="detail-item">
-                      <span className="detail-icon">👥</span>
-                      <span className="detail-text">{evento.guests} invitados</span>
-                    </div>
-
-                    <div className="detail-item">
-                      <span className="detail-icon">💰</span>
-                      <span className="detail-text">
-                        Coste acumulado: {calcularCosteEvento().toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
+                    <div className="event-footer">
+                      <button
+                        className="boton-editar"
+                        onClick={() => navigate(`/event/${evento.id}`)}
+                      >
+                        Ver detalles
+                      </button>
+                      <span className="view-details"
+                        onClick={() => navigate(`/invitaciones/${evento.id}`)}
+                        style={{ cursor: "pointer"}}>
+                        Ver Invitaciones
                       </span>
                     </div>
                   </div>
-                  <div className="event-footer">
-                    <button
-                      className="boton-editar"
-                      onClick={() => navigate(`/event/${evento.id}`)}
-                    >
-                      Ver detalles
-                    </button>
-                    <span className="view-details"
-                      onClick={() => navigate(`/invitaciones/${evento.id}`)}
-                      style={{ cursor: "pointer"}}>
-                      Ver Invitaciones
-                    </span>
-                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '24px 0'
+            }}>
+              <button
+                onClick={() => setPage(p => Math.max(p - 1, 0))}
+                disabled={page === 0}
+                style={{
+                  backgroundColor: '#f0f0f0',
+                  border: 'none',
+                  borderRadius: 4,
+                  width: 40,
+                  height: 40,
+                  cursor: page === 0 ? 'not-allowed' : 'pointer',
+                  marginRight: 8,
+                  padding: 0
+                }}
+              >
+                <ChevronDown size={20} color="black" style={{ transform: 'rotate(90deg)' }} />
+              </button>
+
+              <span style={{ fontWeight: 'bold', margin: '0 12px' }}>
+                Página {page + 1} de {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                disabled={page + 1 >= totalPages}
+                style={{
+                  backgroundColor: '#f0f0f0',
+                  border: 'none',
+                  borderRadius: 4,
+                  width: 40,
+                  height: 40,
+                  cursor: page + 1 >= totalPages ? 'not-allowed' : 'pointer',
+                  marginLeft: 8,
+                  padding: 0
+                }}
+              >
+                <ChevronDown size={20} color="black" style={{ transform: 'rotate(-90deg)' }} />
+              </button>
+            </div>
+          )}
         </div>
 
       ) : (
