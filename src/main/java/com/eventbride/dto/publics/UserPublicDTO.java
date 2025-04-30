@@ -20,6 +20,7 @@ public class UserPublicDTO {
     private String email;
     private Integer telephone;
     private String profilePicture;
+    private User.Plan plan;
 
     // Constructor que toma la entidad User y la convierte a DTO
     public UserPublicDTO(User user) {
@@ -30,6 +31,7 @@ public class UserPublicDTO {
         this.email = user.getEmail();
         this.telephone = user.getTelephone();
         this.profilePicture = user.getProfilePicture();
+        this.plan = user.getPlan();
     }
 
     // Método estático para convertir una lista de usuarios en una lista de DTOs

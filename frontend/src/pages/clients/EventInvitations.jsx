@@ -9,6 +9,7 @@ function EventInvitations() {
   const { currentEventId } = useParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [maxGuests, setMaxGuests] = useState("");
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [eventData, setEventData] = useState(null); // Para guardar info del evento
   const [jwtToken] = useState(localStorage.getItem("jwt"));
 
@@ -80,21 +81,29 @@ function EventInvitations() {
       return;
     }
 
+    // Generar el confirmationLink basado en la URL base
+    const confirmationLink = `${window.location.origin}/invitaciones/registro`;
+
     fetch(`/api/invitation/create/${currentEventId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,
       },
       method: "POST",
-      body: JSON.stringify(max),
+      body: JSON.stringify({
+        maxGuests: max,
+        guestEmail: confirmationEmail,
+        confirmationLink: confirmationLink,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
           const id = data.id;
-          copyLink(`${window.location.origin}/invitaciones/registro/${id}`);
+          const fullConfirmationLink = `${confirmationLink}/${id}`;
+          copyLink(fullConfirmationLink);
           showAlert("Link a la invitación copiado al portapapeles");
-          setInvitaciones(prev => [...prev, data])
+          setInvitaciones((prev) => [...prev, data]);
         }
       })
       .catch((error) =>
@@ -103,6 +112,7 @@ function EventInvitations() {
 
     setModalOpen(false);
     setMaxGuests("");
+    setConfirmationEmail("");
   };
 
   const handleRemove = (id) => {
@@ -150,12 +160,19 @@ function EventInvitations() {
       {modalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Ingresa el número máximo de invitados por invitación</h3>
+            <h3>Ingresa los detalles de la invitación</h3>
             <input
               type="number"
               value={maxGuests}
               onChange={(e) => setMaxGuests(e.target.value)}
               placeholder="Número máximo de invitados"
+            />
+            <input
+              type="email"
+              value={confirmationEmail}
+              onChange={(e) => setConfirmationEmail(e.target.value)}
+              placeholder="Correo del invitado"
+              style={{ marginTop: "10px" }}
             />
             <button onClick={handleModalSubmit}>Enviar</button>
             <button onClick={() => setModalOpen(false)}>Cancelar</button>

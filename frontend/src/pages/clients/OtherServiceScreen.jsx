@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useNavigate } from 'react-router-dom';
 import axios from "axios"
 import {
   Filter,
@@ -38,7 +39,18 @@ const OtherServiceScreen = () => {
   const [venueTimes, setVenueTimes] = useState({})
   const [loading, setLoading] = useState(true)
   const [isConfirming, setIsConfirming] = useState(false)
+  const navigate = useNavigate();
 
+  // Estados de paginación
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(otherServices.length / itemsPerPage);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);  
 
   const currentUser = JSON.parse(localStorage.getItem("user"))
   const [jwtToken] = useState(localStorage.getItem("jwt"));
@@ -197,6 +209,10 @@ const OtherServiceScreen = () => {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este servicio.")
       return
     }
+    if (times.startTime >= times.endTime) {
+      showAlert("Por favor, ingresa un intervalo horario válido.")
+      return
+    }
 
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
@@ -211,6 +227,7 @@ const OtherServiceScreen = () => {
       setModalVisible(false)
     } catch (error) {
       console.error("Error al añadir el servicio:", error)
+      showAlert(error.response.data.error || "Error al añadir el servicio")
     } finally {
       setIsConfirming(false)
     }
@@ -227,6 +244,10 @@ const OtherServiceScreen = () => {
       getAllOtherServices()
     }
   }, [type])
+
+  const startIndex = page * itemsPerPage;
+  const currentServices = otherServices.slice(startIndex, startIndex + itemsPerPage);
+
 
   return (
     <div className="services-container">
@@ -329,33 +350,21 @@ const OtherServiceScreen = () => {
         </div>
       ) : (
         <div className="services-grid">
-          {otherServices.map((service) => {
+          {currentServices.map((service) => {
 
             return (
-              <div key={service.id} className="service-card" onClick={() => handleServiceClick(service.id)}>
-                <div className="card-header">
-                  <h3 className="service-title">{service.name}</h3>
+              <div key={service.id} className="service-card" >
+                <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
+                  <h3 className="services-title">{service.name}</h3>
                 </div>
-                <div className="card-body">
+                <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
                   {
                     service.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
                   }
                   <span className="service-badge">{formatServiceType(service.otherServiceType)}</span>
-
-                  <div className="service-info">
-                    <MapPin size={18} className="info-icon" />
-                    <span className="info-text">{service.cityAvailable}</span>
-                  </div>
-
-                  <div className="service-info">
-                    <DollarSign size={18} className="info-icon" />
-                    <span className="info-text">
-                      {service.limitedByPricePerGuest
-                        ? `${service.servicePricePerGuest}€ por invitado`
-                        : service.limitedByPricePerHour
-                          ? `${service.servicePricePerHour}€ por hora`
-                          : `${service.fixedPrice}€ precio fijo`}
-                    </span>
+                  <div className="details-section">
+                    <span className="details-label">Descripción:</span>
+                    <p className="details-text">{service.description}</p>
                   </div>
                 </div>
                 <div className="card-footer">
@@ -378,6 +387,54 @@ const OtherServiceScreen = () => {
           })}
         </div>
       )}
+
+      {totalPages > 1 && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "24px 0",
+        }}>
+          <button
+            onClick={() => setPage(p => Math.max(p - 1, 0))}
+            disabled={page === 0}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page === 0 ? "not-allowed" : "pointer",
+              marginRight: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+          </button>
+
+          <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+            Página {page + 1} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+            disabled={page + 1 >= totalPages}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+              marginLeft: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+          </button>
+        </div>
+      )}
+
 
       {/* Modal para seleccionar evento */}
       {modalVisible && (
@@ -420,6 +477,7 @@ const OtherServiceScreen = () => {
                           type="time"
                           className="time-input"
                           value={venueTimes[eventObj.id]?.startTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
                         />
                       </div>
@@ -432,7 +490,9 @@ const OtherServiceScreen = () => {
                         <input
                           type="time"
                           className="time-input"
+                          min = {venueTimes[eventObj.id]?.startTime}
                           value={venueTimes[eventObj.id]?.endTime || ""}
+                          required
                           onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
                         />
                       </div>
@@ -506,10 +566,10 @@ const OtherServiceScreen = () => {
                 <div className="card-info">
                   <span className="card-text">
                     <img style={{ height: "25%", width: "100%" }}
-                      src={serviceDetails.picture || "https://iili.io/3Ywlapf.png"}
+                      src={serviceDetails.picture || "https://iili.io/3EpzvZx.png"}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://iili.io/3Ywlapf.png";
+                        e.target.src = "https://iili.io/3EpzvZx.png";
                       }}
                       alt="Imagen del servicio"></img>
                   </span>

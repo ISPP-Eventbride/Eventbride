@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, ChevronDown } from "lucide-react"
 import "../../static/resources/css/AdminUsers.css";
 import { useAlert } from "../../context/AlertContext"
 
@@ -32,6 +32,11 @@ function AdminUsers() {
     const [passwordData, setPasswordData] = useState({ oldPassword: "", newPassword: "" });
     const jwtToken = localStorage.getItem("jwt");
     const navigate = useNavigate();
+
+    const [page, setPage] = useState(0);
+    const itemsPerPage = 3;
+    const listToShow = filteredUsers.length > 0 ? filteredUsers : users;
+    const totalPages = Math.ceil(listToShow.length / itemsPerPage);
 
     const roleMap = {
         CLIENT: "Cliente",
@@ -74,6 +79,12 @@ function AdminUsers() {
     useEffect(() => {
         getUsers();
     }, []);
+
+    useEffect(() => {
+        if (page > totalPages - 1) {
+          setPage(Math.max(totalPages - 1, 0));
+        }
+      }, [totalPages]);
 
     function getUsers() {
         fetch("api/users/DTO", {
@@ -201,6 +212,9 @@ function AdminUsers() {
         }
     }
 
+    const startIndex = page * itemsPerPage;
+    const currentUsers = listToShow.slice(startIndex, startIndex + itemsPerPage);
+
     return (
         <>
             <div style={{ display: "flex", justifyContent: "center", marginTop: "6%", marginBottom: "20px", gap: "10px" }}>
@@ -263,85 +277,177 @@ function AdminUsers() {
                     <span>{error}</span>
                 </div>
             )}
-    
-            <div className="user-grid">
-                {(filteredUsers.length > 0 ? filteredUsers : users).map((user, index) => (
-                    <div key={index} className="service-container">
-                        <h2 className="service-title">Usuario ID: {user.id}</h2>
-                        <h2 className="service-title">{user.firstName} {user.lastName}</h2>
-                        <div className="service-info">
-                            <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
-                                <div className="form-group">
-                                    <label>Nombre:</label>
-                                    <input type="text" name="firstName" value={userData.id === user.id ? userData.firstName : user.firstName} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Apellido:</label>
-                                    <input type="text" name="lastName" value={userData.id === user.id ? userData.lastName : user.lastName} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Usuario:</label>
-                                    <input type="text" name="username" value={userData.id === user.id ? userData.username : user.username} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Email:</label>
-                                    <input type="email" name="email" value={userData.id === user.id ? userData.email : user.email} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Teléfono:</label>
-                                    <input type="tel" name="telephone" value={userData.id === user.id ? userData.telephone : user.telephone} onChange={handleInputChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>DNI:</label>
-                                    <input type="text" name="dni" value={userData.id === user.id ? userData.dni : user.dni} onChange={handleInputChange} />
-                                </div>
-                                <div>
-                                    <label>Recibe correos:</label>
-                                    <input
-                                        type="checkbox"
-                                        name="receiveEmails"
-                                        checked={userData.id === user.id ? userData.receivesEmails : user.receivesEmails}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            setUserData((prevData) => ({
-                                                ...prevData,
-                                                receivesEmails: checked,
-                                            }));
-                                        }}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Rol:</label>
-                                    <select name="role" value={userData.id === user.id ? userData.role : user.role} onChange={handleInputChange}>
-                                        {Object.keys(roleMap).map(role => (
-                                            <option key={role} value={role}>{roleMap[role]}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Foto de perfil:</label>
-                                    <img src={user.profilePicture} alt="Foto" className="service-image" />
-                                </div>
-                                <div className="button-container">
-                                    {editUserId === user.id ? (
-                                        <>
-                                            <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={updateUser}>Guardar</button>
-                                            <button className="edit-btn" style={{ backgroundColor: "#ffc107", marginTop: "10px" }}
-                                                onClick={() => {
-                                                    setSelectedUserId(user.id);
-                                                    setShowPasswordModal(true);
-                                                }}>
-                                                Cambiar Contraseña
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <button className="edit-btn" onClick={() => startEditing(user)}>Editar</button>
-                                    )}
-                                </div>
-                            </form>
-                        </div>
+
+            <div>
+                {totalPages > 1 && (
+                    <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "24px 0"
+                    }}>
+                        <button
+                        onClick={() => setPage(p => Math.max(p - 1, 0))}
+                        disabled={page === 0}
+                        style={{
+                            backgroundColor: "#f0f0f0",
+                            border: "none",
+                            borderRadius: 4,
+                            width: 40,
+                            height: 40,
+                            cursor: page === 0 ? "not-allowed" : "pointer",
+                            marginRight: 8,
+                            padding: 0,
+                        }}
+                        >
+                        <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+                        </button>
+
+                        <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+                        Página {page + 1} de {totalPages}
+                        </span>
+
+                        <button
+                        onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+                        disabled={page + 1 >= totalPages}
+                        style={{
+                            backgroundColor: "#f0f0f0",
+                            border: "none",
+                            borderRadius: 4,
+                            width: 40,
+                            height: 40,
+                            cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                            marginLeft: 8,
+                            padding: 0,
+                        }}
+                        >
+                        <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+                        </button>
                     </div>
-                ))}
+                )}
+                <div className="user-grid">
+                    {currentUsers.map((user, index) => (
+                        <div key={index} className="service-container">
+                            <h2 className="service-title">Usuario ID: {user.id}</h2>
+                            <h2 className="service-title">{user.firstName} {user.lastName}</h2>
+                            <div className="service-info">
+
+                                <form style={{ width: "100%" }} onSubmit={(e) => e.preventDefault()}>
+                                    <div className="form-group">
+                                        <label>Nombre: {editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="text" 
+                                        name="firstName" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.firstName : user.firstName} 
+                                        onChange={handleInputChange}
+                                        readOnly = {editUserId !== userData.id}  
+
+                                    />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Apellido:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="text" 
+                                        name="lastName" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.lastName : user.lastName} 
+                                        onChange={handleInputChange} 
+                                        readOnly = {editUserId !== userData.id} 
+                                    />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Usuario:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="text" 
+                                        name="username" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.username : user.username} 
+                                        onChange={handleInputChange}
+                                        readOnly = {editUserId !== userData.id} 
+                                    />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Email:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="email" 
+                                        name="email" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.email : user.email} 
+                                        onChange={handleInputChange} 
+                                        readOnly = {editUserId !== userData.id} 
+                                    />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Teléfono:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="tel" 
+                                        name="telephone" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.telephone : user.telephone} 
+                                        onChange={handleInputChange} 
+                                        readOnly = {editUserId !== userData.id}  
+                                    />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>DNI:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <input type="text" 
+                                        name="dni" 
+                                        required = {editUserId === user.id} 
+                                        value={userData.id === user.id ? userData.dni : user.dni} 
+                                        onChange={handleInputChange} 
+                                        readOnly = {editUserId !== userData.id}  
+                                    />
+                                    </div>
+                                    <div>
+                                        <label>Recibe correos:</label>
+                                        <input
+                                            type="checkbox"
+                                            name="receiveEmails"
+                                            checked={userData.id === user.id ? userData.receivesEmails : user.receivesEmails}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setUserData((prevData) => ({
+                                                    ...prevData,
+                                                    receivesEmails: checked,
+                                                }));
+                                            }}
+                                            disabled = {editUserId !== userData.id} 
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Rol:{editUserId === user.id && <span className="asterisk">*</span>}</label>
+                                        <select name="role" 
+                                            value={userData.id === user.id ? userData.role : user.role} 
+                                            onChange={handleInputChange}
+                                            required = {editUserId === user.id}
+                                            disabled = {editUserId !== userData.id}
+                                        >
+                                            {Object.keys(roleMap).map(role => (
+                                                <option key={role} value={role}>{roleMap[role]}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Foto de perfil:</label>
+                                        <img src={user.profilePicture} alt="Foto" className="service-image" />
+                                    </div>
+                                    <div className="button-container">
+                                        {editUserId === user.id ? (
+                                            <>
+                                                <button className="save-btn" style={{ backgroundColor: "#4CAF50" }} onClick={updateUser}>Guardar</button>
+                                                <button className="edit-btn" style={{ backgroundColor: "#ffc107", marginTop: "10px" }}
+                                                    onClick={() => {
+                                                        setSelectedUserId(user.id);
+                                                        setShowPasswordModal(true);
+                                                    }}>
+                                                    Cambiar Contraseña
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button className="edit-btn" onClick={() => startEditing(user)}>Editar</button>
+                                        )}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
     
             {showPasswordModal && (

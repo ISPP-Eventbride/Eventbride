@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 import "../../static/resources/css/AdminUsers.css";
 
 function AdminServices() {
@@ -10,12 +10,25 @@ function AdminServices() {
   const [searchId, setSearchId] = useState("");
   const [filteredServices, setFilteredServices] = useState([]);
 
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(
+  (filteredServices.length > 0 ? filteredServices : services).length
+  / itemsPerPage
+  );
+
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const jwtToken = localStorage.getItem("jwt");
 
   useEffect(() => {
     getServices();
   }, []);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);
 
   function getServices() {
     fetch("/api/services/admin", {
@@ -86,15 +99,88 @@ function AdminServices() {
     }));
   }
 
-  function validateServiceData(service) {
-    setError("");
+
+ function validateServiceData(service) {
+    setError("");                   
     const data = serviceData[service.id];
-    if (!data.name || !data.cityAvailable || !data.description) {
-      setError("Por favor, complete todos los campos obligatorios (nombre, ciudad, descripción).");
+    const missing = [];
+
+    // 1) Campos comunes
+    if (!data.name?.trim())           missing.push("Nombre");
+    if (!data.cityAvailable?.trim())  missing.push("Ciudad");
+    if (!data.description?.trim())    missing.push("Descripción");
+
+    // 2) Según método de precio
+    switch (data.limitedBy) {
+      case "perGuest":
+        if (data.servicePricePerGuest == null || isNaN(data.servicePricePerGuest) || data.servicePricePerGuest <= 0) {
+          missing.push("Precio por invitado");
+        }
+        break;
+      case "perHour":
+        if (data.servicePricePerHour == null || isNaN(data.servicePricePerHour) || data.servicePricePerHour <= 0) {
+          missing.push("Precio por hora");
+        }
+        break;
+      case "fixed":
+        if (data.fixedPrice == null || isNaN(data.fixedPrice) || data.fixedPrice <= 0) {
+          missing.push("Precio fijo");
+        }
+        break;
+      default:
+        missing.push("Tipo de precio");
+    }
+
+    // 3) Campos extra para venues
+    if (service.type === "venues") {
+
+      if (!data.postalCode?.trim())   
+        missing.push("Código postal");
+
+      if (!data.coordinates?.trim())   
+        missing.push("Coordenadas");
+
+      if (!data.address?.trim())      
+        missing.push("Dirección");
+
+      if (data.maxGuests == null|| isNaN(data.maxGuests)|| data.maxGuests < 1)     
+        missing.push("Máximo de invitados");
+
+      if (data.surface == null || isNaN(data.surface) || data.surface < 1)      
+         missing.push("Superficie");
+
+      if (!data.earliestTime)          
+        missing.push("Hora de apertura");
+
+      if (!data.latestTime)            
+        missing.push("Hora de cierre");
+
+      if(data.earliestTime && data.latestTime && data.earliestTime >= data.latestTime) {
+        missing.push("La hora de apertura debe ser anterior a la hora de cierre");
+      }
+    }
+
+    // 4) Campos extra para other-services
+    if (service.type === "other-services") {
+
+      if (!data.otherServiceType?.trim()) 
+        missing.push("Tipo de servicio");
+
+      if (!data.extraInformation?.trim()) 
+        missing.push("Información adicional");
+    }
+
+    if (missing.length) {
+      setError(
+        "Faltan datos obligatorios: " +
+        missing.join(", ")
+      );
       return false;
     }
     return true;
   }
+
+
 
   function updateService(service) {
     if (!validateServiceData(service)) return;
@@ -150,6 +236,10 @@ function AdminServices() {
       setError("No se encontró ningún servicio con ese ID.");
     }
   }
+
+  const listToShow = filteredServices.length > 0 ? filteredServices : services;
+  const startIndex = page * itemsPerPage;
+  const currentServices = listToShow.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <>
@@ -244,500 +334,421 @@ function AdminServices() {
   
       {/* Listado de servicios (solo si eres ADMIN) */}
       {currentUser?.role === "ADMIN" ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "20px",
-          }}
-        >
-          {(filteredServices.length > 0 ? filteredServices : services).map(
-            (service, index) => {
-              const isEditing = editServiceId === service.id;
-              const data = serviceData[service.id] || service;
-  
-              return (
-                <div key={index} className="service-container">
-                  <h2 className="service-title">Servicio ID: {service.id}</h2>
-                  <h3 className="service-title">{data.name}</h3>
-                  <h2 className="service-title">De {data.userDTO.email}</h2>
-  
-                  <div className="service-info">
-                    <form
-                      style={{ width: "100%" }}
-                      onSubmit={(e) => e.preventDefault()}
-                    >
-                      {/* Nombre */}
-                      <div className="form-group">
-                        <label>Nombre:</label>
-                        <input
-                          name="name"
-                          value={data.name || ""}
-                          onChange={(e) => handleInputChange(e, service.id)}
-                          readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            padding: "8px",
-                            fontSize: "16px",
-                          }}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                                    <label htmlFor="available" className="form-label">
-                                        Disponibilidad
-                                    </label>
-                                    <div className="checkbox-container">
-                                        <input
-                                            type="checkbox"
-                                            id="available"
-                                            name="available"
-                                            checked={data.available}
-                                            onChange={(e) => handleInputChange(e, service.id)}
-                                            className="form-checkbox"
-                                            disabled={!isEditing}
-                                        />
-                                        <span>Servicio disponible para reservas</span>
-                                    </div>
-                                </div>
-  
-                      {/* Ciudad */}
-                      <div className="form-group">
-                        <label>Ciudad Disponible:</label>
-                        <input
-                          name="cityAvailable"
-                          value={data.cityAvailable || ""}
-                          onChange={(e) => handleInputChange(e, service.id)}
-                          readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            padding: "8px",
-                            fontSize: "16px",
-                          }}
-                        />
-                      </div>
-  
-                      {/* Descripción */}
-                      <div className="form-group">
-                        <label>Descripción:</label>
-                        <textarea
-                          name="description"
-                          value={data.description || ""}
-                          onChange={(e) => handleInputChange(e, service.id)}
-                          readOnly={!isEditing}
-                          style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            width: "100%",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                            padding: "10px",
-                            fontFamily: "inherit",
-                            resize: "none",
-                            overflow: "hidden",
-                          }}
-                          rows={5}
-                        />
-                      </div>
-  
-                      {/* Selección del tipo de precio (solo en edición) */}
-                      {isEditing && (
+        <div> 
+          {totalPages > 1 && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "24px 0"
+          }}>
+            <button
+              onClick={() => setPage(p => Math.max(p - 1, 0))}
+              disabled={page === 0}
+              style={{
+                backgroundColor: "#f0f0f0",
+                border: "none",
+                borderRadius: 4,
+                width: 40, height: 40,
+                cursor: page === 0 ? "not-allowed" : "pointer",
+                marginRight: 8, padding: 0
+              }}
+            >
+              <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+            </button>
+        
+            <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+              Página {page + 1} de {totalPages}
+            </span>
+        
+            <button
+              onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+              disabled={page + 1 >= totalPages}
+              style={{
+                backgroundColor: "#f0f0f0",
+                border: "none",
+                borderRadius: 4,
+                width: 40, height: 40,
+                cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+                marginLeft: 8, padding: 0
+              }}
+            >
+              <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+            </button>
+          </div>
+          )}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "20px",
+            }}
+          >
+            {currentServices.map(
+              (service, index) => {
+                const isEditing = editServiceId === service.id;
+                const data = serviceData[service.id] || service;
+    
+                return (
+                  <div key={index} className="service-container">
+                    <h2 className="service-title">Servicio ID: {service.id}</h2>
+                    <h3 className="service-title">{data.name}</h3>
+                    <h2 className="service-title">De {data.userDTO.email}</h2>
+    
+                    <div className="service-info">
+                      <form
+                        style={{ width: "100%" }}
+                        onSubmit={(e) => e.preventDefault()}
+                      >
+                        {/* Nombre */}
                         <div className="form-group">
-                          <label>Tipo de Precio:</label>
-                          <select
-                            name="limitedBy"
-                            value={data.limitedBy || ""}
-                            onChange={(e) =>
-                              handleLimitedByChange(e, service.id)
-                            }
-                            style={{
-                              backgroundColor: "white",
-                              color: "black",
-                              width: "100%",
-                              border: "1px solid #ccc",
-                              borderRadius: "8px",
-                              padding: "8px",
-                              fontSize: "16px",
-                            }}
-                          >
-                            <option value="perGuest">Por invitado</option>
-                            <option value="perHour">Por hora</option>
-                            <option value="fixed">Precio fijo</option>
-                          </select>
+                          <label>Nombre: {isEditing && <span className="asterisk">*</span>}</label>
+                          <input
+                            name="name"
+                            value={data.name || ""}
+                            required={isEditing === true}
+                            onChange={(e) => handleInputChange(e, service.id)}
+                            readOnly={!isEditing}
+                            className="form-input"
+                          />
                         </div>
-                      )}
-  
-                      {/* Sección de Precios */}
-                      {isEditing ? (
-                        <>
-                          {data.limitedBy === "perGuest" && (
-                            <div className="form-group">
-                              <label>Precio por Invitado (€):</label>
-                              <input
-                                type="number"
-                                name="servicePricePerGuest"
-                                value={data.servicePricePerGuest || 0}
-                                onChange={(e) =>
-                                  handleInputChange(e, service.id)
-                                }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
-                              />
-                            </div>
-                          )}
-                          {data.limitedBy === "perHour" && (
-                            <div className="form-group">
-                              <label>Precio por Hora (€):</label>
-                              <input
-                                type="number"
-                                name="servicePricePerHour"
-                                value={data.servicePricePerHour || 0}
-                                onChange={(e) =>
-                                  handleInputChange(e, service.id)
-                                }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
-                              />
-                            </div>
-                          )}
-                          {data.limitedBy === "fixed" && (
-                            <div className="form-group">
-                              <label>Precio Fijo (€):</label>
-                              <input
-                                type="number"
-                                name="fixedPrice"
-                                value={data.fixedPrice || 0}
-                                onChange={(e) =>
-                                  handleInputChange(e, service.id)
-                                }
-                                style={{
-                                  backgroundColor: "white",
-                                  color: "black",
-                                  width: "100%",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "8px",
-                                  padding: "8px",
-                                  fontSize: "16px",
-                                }}
-                              />
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          {service.limitedByPricePerGuest && (
-                            <div className="form-group">
-                              <label>Precio por Invitado (€):</label>
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
-                              >
-                                {data.servicePricePerGuest || 0}
-                              </span>
-                            </div>
-                          )}
-                          {service.limitedByPricePerHour && (
-                            <div className="form-group">
-                              <label>Precio por Hora (€):</label>
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
-                              >
-                                {data.servicePricePerHour || 0}
-                              </span>
-                            </div>
-                          )}
-                          {(!service.limitedByPricePerGuest &&
-                            !service.limitedByPricePerHour) && (
-                            <div className="form-group">
-                              <label>Precio Fijo (€):</label>
-                              <span
-                                style={{
-                                  fontSize: "16px",
-                                  padding: "8px",
-                                }}
-                              >
-                                {data.fixedPrice || 0}
-                              </span>
-                            </div>
-                          )}
-                        </>
-                      )}
-  
-                      {/* Si es venue, pintamos campos de recinto */}
-                      {service.type === "venues" && (
-                        <>
+
+                        <div className="form-group">
+                                      <label htmlFor="available" className="form-label">
+                                          Disponibilidad 
+                                      </label>
+                                      <div className="checkbox-container">
+                                          <input
+                                              type="checkbox"
+                                              id="available"
+                                              name="available"
+                                              checked={data.available}
+                                              onChange={(e) => handleInputChange(e, service.id)}
+                                              className="form-checkbox"
+                                              disabled={!isEditing}
+                                          />
+                                          <span>Servicio disponible para reservas</span>
+                                      </div>
+                                  </div>
+    
+                        {/* Ciudad */}
+                        <div className="form-group">
+                          <label>Ciudad Disponible:{isEditing && <span className="asterisk">*</span>}</label>
+                          <input
+                            name="cityAvailable"
+                            value={data.cityAvailable || ""}
+                            required={isEditing === true }
+                            onChange={(e) => handleInputChange(e, service.id)}
+                            readOnly={!isEditing}
+                            className="form-input"
+                          />
+                        </div>
+    
+                        {/* Descripción */}
+                        <div className="form-group">
+                          <label>Descripción:{isEditing && <span className="asterisk">*</span>}</label>
+                          <textarea
+                            name="description"
+                            value={data.description || ""}
+                            required={isEditing === true }
+                            onChange={(e) => handleInputChange(e, service.id)}
+                            readOnly={!isEditing}
+                            className="form-input"
+                            rows={5}
+                          />
+                        </div>
+    
+                        {/* Selección del tipo de precio (solo en edición) */}
+                        {isEditing && (
                           <div className="form-group">
-                            <label>Código Postal:</label>
-                            <input
-                              name="postalCode"
-                              value={data.postalCode || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Coordenadas:</label>
-                            <input
-                              name="coordinates"
-                              value={data.coordinates || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Dirección:</label>
-                            <input
-                              name="address"
-                              value={data.address || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Máximo de Invitados:</label>
-                            <input
-                              type="number"
-                              name="maxGuests"
-                              value={data.maxGuests || 0}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                                     
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Superficie (m²):</label>
-                            <input
-                              type="number"
-                              name="surface"
-                              value={data.surface || 0}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Hora de Apertura:</label>
-                            <input
-                              type="time"
-                              name="earliestTime"
-                              value={data.earliestTime || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-  
-                          <div className="form-group">
-                            <label>Hora de Cierre:</label>
-                            <input
-                              type="time"
-                              name="latestTime"
-                              value={data.latestTime || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
-                            />
-                          </div>
-                        </>
-                      )}
-  
-                      {/* Si es otro servicio, pintamos los campos extra */}
-                      {service.type === "other-services" && (
-                        <>
-                          <div className="form-group">
-                            <label>Tipo de Servicio:</label>
+                            <label>Tipo de Precio:{isEditing && <span className="asterisk">*</span>}</label>
                             <select
-                              name="otherServiceType"
-                              value={data.otherServiceType || "CATERING"}
+                              name="limitedBy"
+                              value={data.limitedBy || ""}
+                              required={isEditing === true }
                               onChange={(e) =>
-                                handleInputChange(e, service.id)
+                                handleLimitedByChange(e, service.id)
                               }
-                              disabled={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "8px",
-                                fontSize: "16px",
-                              }}
+                              className="form-input"
                             >
-                              <option value="CATERING">Catering</option>
-                              <option value="ENTERTAINMENT">
-                                Entretenimiento
-                              </option>
-                              <option value="DECORATION">
-                                Decoración
-                              </option>
+                              <option value="perGuest">Por invitado</option>
+                              <option value="perHour">Por hora</option>
+                              <option value="fixed">Precio fijo</option>
                             </select>
                           </div>
-  
-                          <div className="form-group">
-                            <label>Información Adicional:</label>
-                            <textarea
-                              name="extraInformation"
-                              value={data.extraInformation || ""}
-                              onChange={(e) =>
-                                handleInputChange(e, service.id)
-                              }
-                              readOnly={!isEditing}
-                              style={{
-                                backgroundColor: "white",
-                                color: "black",
-                                width: "100%",
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                fontSize: "16px",
-                                padding: "10px",
-                                fontFamily: "inherit",
-                                resize: "none",
-                                overflow: "hidden",
-                              }}
-                              rows={5}
-                            />
-                          </div>
-                        </>
-                      )}
-  
-                      {/* Botones de editar/guardar */}
-                      <div className="button-container" style={{ marginTop: "10px" }}>
-                        {isEditing ? (
-                          <button
-                            className="save-btn"
-                            style={{
-                              backgroundColor: "#4CAF50",
-                              color: "#fff",
-                              padding: "8px 16px",
-                              border: "none",
-                              borderRadius: "8px",
-                            }}
-                            onClick={() => updateService(service)}
-                          >
-                            Guardar
-                          </button>
-                        ) : (
-                          <button
-                            className="edit-btn"
-                            onClick={() => startEditing(service)}
-                          >
-                            Editar
-                          </button>
                         )}
-                      </div>
-                    </form>
+    
+                        {/* Sección de Precios */}
+                        {isEditing ? (
+                          <>
+                            {data.limitedBy === "perGuest" && (
+                              <div className="form-group">
+                                <label>Precio por Invitado (€): {isEditing && <span className="asterisk">*</span>}</label>
+                                <input
+                                  type="number"
+                                  name="servicePricePerGuest"
+                                  value={data.servicePricePerGuest || 0}
+                                  min= "1"
+                                  required={isEditing === true }
+                                  onChange={(e) =>
+                                    handleInputChange(e, service.id)
+                                  }
+                                  className="form-input"
+                                />
+                              </div>
+                            )}
+                            {data.limitedBy === "perHour" && (
+                              <div className="form-group">
+                                <label>Precio por Hora (€):{isEditing && <span className="asterisk">*</span>}</label>
+                                <input
+                                  type="number"
+                                  name="servicePricePerHour"
+                                  value={data.servicePricePerHour || 0}
+                                  min= "1"
+                                  required={isEditing === true }
+                                  onChange={(e) =>
+                                    handleInputChange(e, service.id)
+                                  }
+                                  className="form-input"
+                                />
+                              </div>
+                            )}
+                            {data.limitedBy === "fixed" && (
+                              <div className="form-group">
+                                <label>Precio Fijo (€):{isEditing && <span className="asterisk">*</span>}</label>
+                                <input
+                                  type="number"
+                                  name="fixedPrice"
+                                
+                                  value={data.fixedPrice || 0}
+                                  min= "1"
+                                  required={isEditing === true }
+                                  onChange={(e) =>
+                                    handleInputChange(e, service.id)
+                                  }
+                                  className="form-input"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {service.limitedByPricePerGuest && (
+                              <div className="form-group">
+                                <label>Precio por Invitado (€):</label>
+                                <span
+                                className="form-input"
+                                >
+                                  {data.servicePricePerGuest || 0}
+                                </span>
+                              </div>
+                            )}
+                            {service.limitedByPricePerHour && (
+                              <div className="form-group">
+                                <label>Precio por Hora (€):</label>
+                                <span
+                                  className="form-input"
+                                >
+                                  {data.servicePricePerHour || 0}
+                                </span>
+                              </div>
+                            )}
+                            {(!service.limitedByPricePerGuest &&
+                              !service.limitedByPricePerHour) && (
+                              <div className="form-group">
+                                <label>Precio Fijo (€):</label>
+                                <span
+                                  className="form-input"
+                                >
+                                  {data.fixedPrice || 0}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )}
+    
+                        {/* Si es venue, pintamos campos de recinto */}
+                        {service.type === "venues" && (
+                          <>
+                            <div className="form-group">
+                              <label>Código Postal:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                name="postalCode"
+                                value={data.postalCode || ""}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Coordenadas:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                name="coordinates"
+                                value={data.coordinates || ""}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Dirección:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                name="address"
+                                value={data.address || ""}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Máximo de Invitados:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                type="number"
+                                name="maxGuests"
+                                value={data.maxGuests || 0}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Superficie (m²):{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                type="number"
+                                name="surface"
+                                value={data.surface || 0}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Hora de Apertura:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                type="time"
+                                name="earliestTime"
+                                value={data.earliestTime || ""}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Hora de Cierre:{isEditing && <span className="asterisk">*</span>}</label>
+                              <input
+                                type="time"
+                                name="latestTime"
+                                min = {data.earliestTime}
+                                value={data.latestTime}
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                required={isEditing === true}
+                                readOnly={!isEditing}
+                                className="form-input"
+                              />
+                            </div>
+                          </>
+                        )}
+    
+                        {/* Si es otro servicio, pintamos los campos extra */}
+                        {service.type === "other-services" && (
+                          <>
+                            <div className="form-group">
+                              <label>Tipo de Servicio:{isEditing && <span className="asterisk">*</span>}</label>
+                              <select
+                                name="otherServiceType"
+                                value={data.otherServiceType || "CATERING"}
+                                required={isEditing === true }
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                disabled={!isEditing}
+                                className="form-input"
+                              >
+                                <option value="CATERING">Catering</option>
+                                <option value="ENTERTAINMENT">
+                                  Entretenimiento
+                                </option>
+                                <option value="DECORATION">
+                                  Decoración
+                                </option>
+                              </select>
+                            </div>
+    
+                            <div className="form-group">
+                              <label>Información Adicional:{isEditing && <span className="asterisk">*</span>}</label>
+                              <textarea
+                                name="extraInformation"
+                                value={data.extraInformation || ""}
+                                required={isEditing === true}
+                                onChange={(e) =>
+                                  handleInputChange(e, service.id)
+                                }
+                                readOnly={!isEditing}
+                                className="form-input"
+                                rows={5}
+                              />
+                            </div>
+                          </>
+                        )}
+    
+                        {/* Botones de editar/guardar */}
+                        <div className="button-container" style={{ marginTop: "10px" }}>
+                          {isEditing ? (
+                            <button
+                              className="save-btn"
+                              style={{
+                                backgroundColor: "#4CAF50",
+                                color: "#fff",
+                                padding: "8px 16px",
+                                border: "none",
+                                borderRadius: "8px",
+                              }}
+                              onClick={() => updateService(service)}
+                            >
+                              Guardar
+                            </button>
+                          ) : (
+                            <button
+                              className="edit-btn"
+                              onClick={() => startEditing(service)}
+                            >
+                              Editar
+                            </button>
+                          )}
+                        </div>
+                      </form>
+                    </div>
                   </div>
-                </div>
-              );
-            }
-          )}
+                );
+              }
+            )}
+          </div>
         </div>
       ) : (
         <p>No tienes permisos para ver esta sección.</p>

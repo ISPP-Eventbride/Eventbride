@@ -35,7 +35,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
         this.eventPropertiesRepository = eventPropertiesRepository;
         this.userRepository = userRepository;
-        this.notificationService = notificationService;	
+        this.notificationService = notificationService;
         this.eventRepository = eventRepository;
     }
 
@@ -44,18 +44,18 @@ public class PaymentService {
         if (user == null) {
             return false;
         }
-        
+
         if ("ADMIN".equals(user.getRole())) {
             return true;
         }
-        
+
         Optional<Event> eventOpt = eventRepository.findByEventPropertiesId(eventPropertiesId);
         if (!eventOpt.isPresent()) {
             return false;
         }
-        
+
         Event event = eventOpt.get();
-        
+
         return event.getUser() != null && event.getUser().getId().equals(userId);
     }
 
@@ -67,6 +67,7 @@ public class PaymentService {
 
         EventProperties e = eventPropertiesRepository.findById(eventPropertiesId).orElse(null);
         Payment p;
+        Payment c;
 
         if (e != null) {
             e.setStatus(Status.DEPOSIT_PAID);
@@ -74,20 +75,31 @@ public class PaymentService {
 
             p = new Payment();
 
-            p.setAmount(e.getDepositAmount() + e.getDepositAmount() * commissionRate);
+            p.setAmount(e.getDepositAmount());
             p.setDateTime(LocalDateTime.now());
             p.setPaymentType(PaymentType.DEPOSIT);
             p.setEventProperties(e);
             User user = userRepository.findById(userId).orElse(null);
 
+            // Creación de comisión
+            c = new Payment();
+            c.setAmount(e.getDepositAmount() * commissionRate);
+            c.setDateTime(LocalDateTime.now());
+            c.setPaymentType(PaymentType.COMMISSION);
+            c.setEventProperties(e);
+
             if (user == null)
                 return null;
 
             p.setUser(user);
+            c.setUser(user);
 
             paymentRepository.save(p);
+            paymentRepository.save(c);
             Optional<Event> event = eventRepository.findByEventPropertiesId(e.getId());
-            notificationService.createNotification(NotificationType.NEW_DEPOSIT_PAYMENT, e.getVenue() != null ? e.getVenue().getUser() : e.getOtherService().getUser(), event.get(), e, null);
+            notificationService.createNotification(NotificationType.NEW_DEPOSIT_PAYMENT,
+                    e.getVenue() != null ? e.getVenue().getUser() : e.getOtherService().getUser(), event.get(), e,
+                    null);
         } else {
             p = null;
         }
@@ -102,10 +114,11 @@ public class PaymentService {
 
         EventProperties e = eventPropertiesRepository.findById(eventPropertiesId).orElse(null);
         Payment p;
+        Payment c;
 
         Double precioTotal = e.getPricePerService().doubleValue();
-        Double comision = precioTotal * commissionRate;
-        Double precioConComision = precioTotal + comision;
+        Double precioRemaining = precioTotal - e.getDepositAmount();
+        Double comision = precioRemaining * commissionRate;
 
         Payment depositPayment = paymentRepository.filterByEventPropertiesId(eventPropertiesId);
 
@@ -116,19 +129,31 @@ public class PaymentService {
             // Payment de usuario cliente
             p = new Payment();
 
-            p.setAmount(precioConComision - depositPayment.getAmount());
+            p.setAmount(precioRemaining);
             p.setDateTime(LocalDateTime.now());
             p.setPaymentType(PaymentType.REMAINING);
             p.setEventProperties(e);
             User user = userRepository.findById(userId).orElse(null);
 
+            // Payment de comisión
+            c = new Payment();
+
+            c.setAmount(comision);
+            c.setDateTime(LocalDateTime.now());
+            c.setPaymentType(PaymentType.COMMISSION);
+            c.setEventProperties(e);
+
             if (user == null)
                 return null;
 
             p.setUser(user);
+            c.setUser(user);
             paymentRepository.save(p);
+            paymentRepository.save(c);
             Optional<Event> event = eventRepository.findByEventPropertiesId(e.getId());
-            notificationService.createNotification(NotificationType.NEW_REMAINING_PAYMENT, e.getVenue() != null ? e.getVenue().getUser() : e.getOtherService().getUser(), event.get(), e, null);
+            notificationService.createNotification(NotificationType.NEW_REMAINING_PAYMENT,
+                    e.getVenue() != null ? e.getVenue().getUser() : e.getOtherService().getUser(), event.get(), e,
+                    null);
         } else {
             p = null;
         }
@@ -160,5 +185,10 @@ public class PaymentService {
         }
         return payments;
     }
-    
+
+    @Transactional
+    public void deletePayments(List<Payment> payments) {
+        paymentRepository.deleteAll(payments);
+    }
+
 }
