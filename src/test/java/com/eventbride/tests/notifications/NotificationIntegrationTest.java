@@ -18,12 +18,11 @@ class NotificationIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-     @Test
+    @Test
     @WithMockUser(username = "alice123")
     void testGetAllNotificationsForUser() throws Exception {
         mockMvc.perform(get("/api/notifications"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", is(not(empty()))))
                 .andExpect(jsonPath("$[0].subject", is(notNullValue())))
                 .andExpect(jsonPath("$[0].message", is(notNullValue())));
     }

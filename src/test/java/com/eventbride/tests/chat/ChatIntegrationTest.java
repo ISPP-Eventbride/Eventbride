@@ -55,7 +55,7 @@ public class ChatIntegrationTest {
 			User newBob = new User();
 			newBob.setUsername("bob123");
 			newBob.setPassword(passwordEncoder.encode("test"));
-			newBob.setDni("98765432B");
+			newBob.setDni("98765432M");
 			newBob.setRole("SUPPLIER");
 			newBob.setPlan(User.Plan.BASIC);
 			newBob.setReceivesEmails(true);
