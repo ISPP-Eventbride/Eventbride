@@ -307,9 +307,8 @@ function EventDetails() {
 
                   <div className="ed-venue-actions">
                     <button
-                      className={`ed-action-button ed-add-button ${
-                        ["PENDING", "COMPLETED"].includes(p.status) ? "ed-button-disabled" : ""
-                      }`}
+                      className={`ed-action-button ed-add-button ${["PENDING", "COMPLETED"].includes(p.status) ? "ed-button-disabled" : ""
+                        }`}
                       disabled={["PENDING", "COMPLETED"].includes(p.status)}
                       onClick={() =>
                         p.status === "CANCELLED" ? solicitarServicio(p.id) : navigate(`/payment/${p.id}`)
@@ -399,9 +398,8 @@ function EventDetails() {
 
                   <div className="ed-service-actions">
                     <button
-                      className={`ed-action-button ed-add-button ${
-                        ["PENDING", "COMPLETED"].includes(p.status) ? "ed-button-disabled" : ""
-                      }`}
+                      className={`ed-action-button ed-add-button ${["PENDING", "COMPLETED"].includes(p.status) ? "ed-button-disabled" : ""
+                        }`}
                       disabled={["PENDING", "COMPLETED"].includes(p.status)}
                       onClick={() =>
                         p.status === "CANCELLED" ? solicitarServicio(p.id) : navigate(`/payment/${p.id}`)
@@ -459,7 +457,7 @@ function EventDetails() {
                 </div>
               ))}
               <div className="ed-summary-item">
-                <span>Gastos gestión {(commissionRate - 1) * 100}%</span>
+                <span>Gastos de gestión: {((commissionRate - 1) * 100).toFixed(0)}%</span>
                 <span className="ed-price">
                   {(
                     (needDeposit
@@ -588,9 +586,9 @@ function EventDetails() {
                             <span className="ed-payment-value">
                               {totalRem > 0
                                 ? totalRem.toLocaleString("es-ES", {
-                                    style: "currency",
-                                    currency: "EUR",
-                                  })
+                                  style: "currency",
+                                  currency: "EUR",
+                                })
                                 : "Sin pagar"}
                             </span>
                           </div>
@@ -599,9 +597,9 @@ function EventDetails() {
                             <span className="ed-payment-value">
                               {totalDep > 0
                                 ? totalDep.toLocaleString("es-ES", {
-                                    style: "currency",
-                                    currency: "EUR",
-                                  })
+                                  style: "currency",
+                                  currency: "EUR",
+                                })
                                 : "Sin pagar"}
                             </span>
                           </div>
@@ -671,8 +669,8 @@ function EventDetails() {
                 <strong>
                   {decodeText(
                     recintos.find((p) => p.id === propertyToDelete)?.venueDTO?.name ||
-                      servicios.find((p) => p.id === propertyToDelete)?.otherServiceDTO?.name ||
-                      "",
+                    servicios.find((p) => p.id === propertyToDelete)?.otherServiceDTO?.name ||
+                    "",
                   )}
                 </strong>{" "}
                 se eliminará.

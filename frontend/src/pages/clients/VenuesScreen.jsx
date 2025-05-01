@@ -28,6 +28,8 @@ const VenuesScreen = () => {
   // Para almacenar la hora de inicio y fin (solo horas y minutos) de cada venue dentro del evento
   const [venueTimes, setVenueTimes] = useState({})
   const [loading, setLoading] = useState(true)
+  // State to track loading status for each event confirmation button
+  const [confirmingVenue, setConfirmingVenue] = useState({});
 
   const { showAlert } = useAlert()
 
@@ -213,13 +215,18 @@ const VenuesScreen = () => {
   // utilizando las horas de inicio/fin del venue (no cambia la fecha del evento)
   // ------------------------------------------------------------------------------
   const handleConfirmVenue = async (eventObj, venueId) => {
+    // Set loading state for this specific event button
+    setConfirmingVenue(prev => ({ ...prev, [eventObj.id]: true }));
+
     const times = venueTimes[eventObj.id] || {}
     if (!times.startTime || !times.endTime) {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este venue.")
+      setConfirmingVenue(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
     if (times.startTime >= times.endTime) {
       showAlert("Por favor, ingresa un intervalo horario válido.")
+      setConfirmingVenue(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
     // Combinar la fecha del evento con la hora que indicó el usuario
@@ -233,9 +240,18 @@ const VenuesScreen = () => {
       })
       showAlert("¡Operación realizada con éxito!")
       setAddModalVisible(false)
+      // Optionally clear times for this event if needed
+      // setVenueTimes(prev => {
+      //   const newTimes = { ...prev };
+      //   delete newTimes[eventObj.id];
+      //   return newTimes;
+      // });
     } catch (error) {
-      console.error("Error al añadir el venue:", error.code, error.response.data.error)
-      showAlert(error.response.data.error || "Error al añadir el venue")
+      console.error("Error al añadir el venue:", error.code, error.response?.data?.error)
+      showAlert(error.response?.data?.error || "Error al añadir el venue")
+    } finally {
+      // Reset loading state regardless of success or failure
+      setConfirmingVenue(prev => ({ ...prev, [eventObj.id]: false }));
     }
   }
 
@@ -745,9 +761,19 @@ const VenuesScreen = () => {
                         <button
                           className="vs-event-confirm-button"
                           onClick={() => handleConfirmVenue(eventObj, selectedVenueForAdd.id)}
+                          disabled={confirmingVenue[eventObj.id]} // Disable button when confirming
                         >
-                          <ArrowRight className="button-icon" />
-                          <span>Confirmar selección</span>
+                          {confirmingVenue[eventObj.id] ? (
+                            <>
+                              <Loader2 className="button-icon animate-spin" />
+                              <span>Confirmando...</span>
+                            </>
+                          ) : (
+                            <>
+                              <ArrowRight className="button-icon" />
+                              <span>Confirmar selección</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>

@@ -287,9 +287,9 @@ public class UserService {
         mailMessage.setSubject("Cambiar contraseña");
         mailMessage.setText("Hola " + user.getFirstName() + " " + user.getLastName() +
                 ". \nHas solicitado el cambio de contraseña. A continuación le proporcionamos" +
-                "el link para acceder al formulario de modificación de su contraseña" +
-                "\nLink:" + link +
-                ". \nMuchas gracias!");
+                " el link para acceder al formulario de modificación de su contraseña." +
+                "\nLink: " + link +
+                " \nMuchas gracias!");
 
         mailSender.send(mailMessage);
 
