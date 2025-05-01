@@ -14,6 +14,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -39,10 +41,12 @@ public class Rating extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "venue_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
     private Venue venue;
 
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "other_service_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
     private OtherService otherService;
 }

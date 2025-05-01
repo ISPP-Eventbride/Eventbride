@@ -672,12 +672,12 @@ const VenuesScreen = () => {
           <div className="modal-container add-event-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">Añadir a evento: {selectedVenueForAdd.name}</h2>
-              <button className="modal-close-button" onClick={() => setAddModalVisible(false)}>
+              <button className="vs-modal-close-button" onClick={() => setAddModalVisible(false)}>
                 <X className="close-icon" />
               </button>
             </div>
 
-            <div className="modal-content">
+            <div className="vs-modal-content">
               {events.length === 0 ? (
                 <div className="empty-container">
                   <div className="empty-icon-container">
@@ -687,15 +687,15 @@ const VenuesScreen = () => {
                   <p className="empty-text">No tienes eventos a los que puedas añadir este recinto.</p>
                 </div>
               ) : (
-                <div className="events-list">
+                <div className="vs-events-list">
                   {events.map((eventObj) => (
-                    <div key={eventObj.id} className="event-card">
+                    <div key={eventObj.id} className="vs-event-card">
                       <div className="event-header">
                         <div className="event-title-container">
                           <span className={`event-badge ${getEventBadgeColor(eventObj.eventType)}`}>
                             {formatEventType(eventObj.eventType)}
                           </span>
-                          <h3 className="event-title">{eventObj.name}</h3>
+                          <h3 className="vs-event-title">{eventObj.name}</h3>
                         </div>
                         <div className="event-info">
                           <div className="event-info-item">
@@ -741,9 +741,9 @@ const VenuesScreen = () => {
                         </div>
                       </div>
 
-                      <div className="event-actions">
+                      <div className="vs-event-actions">
                         <button
-                          className="event-confirm-button"
+                          className="vs-event-confirm-button"
                           onClick={() => handleConfirmVenue(eventObj, selectedVenueForAdd.id)}
                         >
                           <ArrowRight className="button-icon" />

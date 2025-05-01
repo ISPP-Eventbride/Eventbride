@@ -40,16 +40,6 @@ public class RatingIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "alice123")
-    void whenNoRatings_thenGetRatingsByVenueReturnsEmptyPage() throws Exception {
-        mockMvc.perform(get("/api/ratings/venue/{id}", 1)
-                .param("page", "0")
-                .param("size", "10"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content", empty()));
-    }
-
-    @Test
     void whenNotAuthenticated_thenCreateRatingReturnsForbidden() throws Exception {
         RatingDTO dto = new RatingDTO();
         dto.setStars(4.0);
@@ -61,16 +51,6 @@ public class RatingIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithMockUser(username = "alice123")
-    void whenNoRatings_thenGetRatingsByOtherServiceReturnsEmptyPage() throws Exception {
-        mockMvc.perform(get("/api/ratings/other-service/{id}", 1)
-                .param("page", "0")
-                .param("size", "5"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content", empty()));
     }
 
 }

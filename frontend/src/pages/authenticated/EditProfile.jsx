@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -58,6 +59,24 @@ function EditProfile() {
             [name]: type === "checkbox" ? checked : value,
         }));
     };
+
+    const handleDeleteAccount = (e) => {
+        fetch(`/api/users/myUser`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        })
+          .then(res => {
+            localStorage.removeItem("jwt")
+            localStorage.removeItem("user")
+            window.location.href = "/login"
+          })
+          .catch(e => {
+            console.warn(e)
+          });
+    }
 
     const getRoleText = (role) => {
         switch (role) {
@@ -127,7 +146,7 @@ function EditProfile() {
                 },
                 body: JSON.stringify(userDataToUpdate),
             });
-
+            
             const data = await response.json();
 
             if (!response.ok) {
@@ -275,6 +294,11 @@ function EditProfile() {
                             <button className="action-button danger-button" onClick={handleLogout}>
                                 Cerrar Sesión
                             </button>
+
+                            <button className="action-button danger-button" onClick={handleDeleteAccount}>
+                                Borrar cuenta
+                            </button>
+
                         </div>
                     </div>
                     <div className="profile-info">

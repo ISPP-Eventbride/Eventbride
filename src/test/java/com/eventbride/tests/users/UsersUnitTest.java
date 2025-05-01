@@ -1,6 +1,5 @@
 package com.eventbride.tests.users;
 
-
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -39,7 +38,7 @@ public class UsersUnitTest {
 
     @Mock
     private UserRepository userRepository;
-    
+
     @Mock
     private NotificationService notificationService;
 
@@ -48,7 +47,7 @@ public class UsersUnitTest {
 
     private User user;
 
-    //#region Contructor
+    // #region Contructor
     @BeforeEach
     void setUp() {
         user = new User();
@@ -57,9 +56,9 @@ public class UsersUnitTest {
         user.setLastName("Pérez");
         user.setUsername("juanp");
         user.setEmail("juan@example.com");
-        user.setTelephone(123456789);
+        user.setTelephone(723456789);
         user.setPassword("securePassword");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("ROLE_SUPPLIER");
         user.setPlan(Plan.BASIC);
         user.setPaymentPlanDate(LocalDate.now());
@@ -67,9 +66,9 @@ public class UsersUnitTest {
         user.setReceivesEmails(true);
         user.setProfilePicture("https://example.com/pic.jpg");
     }
-    //#endregion
-    
-    //#region Positivos
+    // #endregion
+
+    // #region Positivos
     @Test
     void shouldReturnCorrectAuthorities() {
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
@@ -83,9 +82,9 @@ public class UsersUnitTest {
         assertEquals("Pérez", user.getLastName());
         assertEquals("juanp", user.getUsername());
         assertEquals("juan@example.com", user.getEmail());
-        assertEquals(123456789, user.getTelephone());
+        assertEquals(723456789, user.getTelephone());
         assertEquals("securePassword", user.getPassword());
-        assertEquals("12345678A", user.getDni());
+        assertEquals("12345678Z", user.getDni());
         assertEquals("ROLE_SUPPLIER", user.getRole());
         assertEquals(Plan.BASIC, user.getPlan());
         assertEquals("https://example.com/pic.jpg", user.getProfilePicture());
@@ -102,9 +101,9 @@ public class UsersUnitTest {
     void shouldBeInstanceOfUserDetails() {
         assertTrue(user instanceof org.springframework.security.core.userdetails.UserDetails);
     }
-    //#endregion
+    // #endregion
 
-    //#region Negativos
+    // #region Negativos
 
     @Test
     void shouldFailWhenFirstNameIsBlank() {
@@ -120,9 +119,9 @@ public class UsersUnitTest {
         // simulación: comprobamos que no contiene @ como algo básico
         assertFalse(user.getEmail().contains("@"), "El email no tiene formato válido");
     }
-    //#endregion
+    // #endregion
 
-    //#region Servicio
+    // #region Servicio
 
     // 1. getAllUsers
     @Test
@@ -215,25 +214,45 @@ public class UsersUnitTest {
     // 7. updateUser
     @Test
     void shouldUpdateUserSuccessfully() {
+        // Usuario ya existente en BD
         User existing = new User();
         existing.setId(1);
         existing.setUsername("oldUsername");
         existing.setEmail("old@example.com");
-        existing.setDni("00000000X");
-    
-        user.setUsername("juanp");
-        user.setEmail("juan@example.com");
-        user.setDni("12345678A");
-    
+        existing.setFirstName("Old");
+        existing.setLastName("User");
+        existing.setTelephone(612345678);
+        existing.setPassword("oldPass");
+        existing.setDni("00000000T");
+        existing.setRole("ROLE_SUPPLIER");
+        existing.setPlan(Plan.BASIC);
+        existing.setPaymentPlanDate(LocalDate.now().minusMonths(1));
+        existing.setExpirePlanDate(LocalDate.now().plusDays(1));
+        existing.setReceivesEmails(false);
+        existing.setProfilePicture(null);
+
+        // Usamos DNI válido
+        user.setDni("12345678Z");
+        user.setTelephone(723456789); 
+
         when(userRepository.findById(1)).thenReturn(Optional.of(existing));
         when(userRepository.existsByUsername("juanp")).thenReturn(false);
         when(userRepository.existsByEmail("juan@example.com")).thenReturn(false);
-        when(userRepository.existsByDni("12345678A")).thenReturn(false);
+        when(userRepository.existsByDni("12345678Z")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
-    
-        User result = userService.updateUser(1, user);
-    
-        assertEquals("juanp", result.getUsername());
+
+        User updated = userService.updateUser(1, user);
+
+        assertEquals("juanp", updated.getUsername());
+        assertEquals("juan@example.com", updated.getEmail());
+        assertEquals("12345678Z", updated.getDni()); // ✅
+        assertEquals("Juan", updated.getFirstName());
+        assertEquals("Pérez", updated.getLastName());
+        assertEquals(723456789, updated.getTelephone());
+        assertEquals("ROLE_SUPPLIER", updated.getRole());
+        assertEquals(Plan.BASIC, updated.getPlan());
+        assertEquals("https://example.com/pic.jpg", updated.getProfilePicture());
+        assertTrue(updated.getReceivesEmails());
     }
 
     @Test
@@ -242,7 +261,7 @@ public class UsersUnitTest {
         User existing = new User();
         existing.setUsername("anterior");
         existing.setEmail("anterior@example.com");
-        existing.setDni("11111111B");
+        existing.setDni("11111111H");
 
         when(userRepository.findById(1)).thenReturn(Optional.of(existing));
 
@@ -260,35 +279,38 @@ public class UsersUnitTest {
     @Test
     void shouldSaveUser() {
         user.setUsername("anag");
-    
+
         when(userRepository.save(user)).thenReturn(user);
         User saved = userService.save(user);
-    
+
         assertEquals("anag", saved.getUsername());
     }
 
     // 10. downgradeUserPlan
-/*     @Test
-    void shouldDowngradeUserPlan() {
-        user.setId(1);
-        user.setPlan(Plan.PREMIUM);
-        user.setPaymentPlanDate(LocalDate.now());
-        user.setExpirePlanDate(LocalDate.now().plusDays(30));
-
-        when(userRepository.findById(1)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
-
-        User result = userService.downgradeUserPlan(1);
-        assertEquals(Plan.BASIC, result.getPlan());
-        assertNull(result.getPaymentPlanDate());
-        assertNull(result.getExpirePlanDate());
-    }
-
-    @Test
-    void shouldThrowWhenDowngradeUserNotFound() {
-        when(userRepository.findById(999)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> userService.downgradeUserPlan(999));
-    } */
+    /*
+     * @Test
+     * void shouldDowngradeUserPlan() {
+     * user.setId(1);
+     * user.setPlan(Plan.PREMIUM);
+     * user.setPaymentPlanDate(LocalDate.now());
+     * user.setExpirePlanDate(LocalDate.now().plusDays(30));
+     * 
+     * when(userRepository.findById(1)).thenReturn(Optional.of(user));
+     * when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+     * 
+     * User result = userService.downgradeUserPlan(1);
+     * assertEquals(Plan.BASIC, result.getPlan());
+     * assertNull(result.getPaymentPlanDate());
+     * assertNull(result.getExpirePlanDate());
+     * }
+     * 
+     * @Test
+     * void shouldThrowWhenDowngradeUserNotFound() {
+     * when(userRepository.findById(999)).thenReturn(Optional.empty());
+     * assertThrows(IllegalArgumentException.class, () ->
+     * userService.downgradeUserPlan(999));
+     * }
+     */
 
     // 11. setPremium
     @Test
@@ -312,10 +334,10 @@ public class UsersUnitTest {
     @Test
     void shouldReturnUserByRole() {
         user.setUsername("anag");
-    
+
         when(userRepository.findByRole("ROLE_USER")).thenReturn(Optional.of(user));
         User found = userService.getUserByRole("ROLE_USER");
-    
+
         assertNotNull(found);
         assertEquals("anag", found.getUsername());
     }
@@ -340,6 +362,6 @@ public class UsersUnitTest {
         Optional<User> result = userService.getUserByEmail("none@example.com");
         assertTrue(result.isEmpty());
     }
-    
-    //#endregion
+
+    // #endregion
 }
