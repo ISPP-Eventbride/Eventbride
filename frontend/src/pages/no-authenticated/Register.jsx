@@ -6,13 +6,10 @@ import apiClient from "../../apiClient"
 import "../../static/resources/css/Register.css"
 import TermsModal from "./TermsModal"
 
-
-
 const dniPattern = /^[0-9]{8}[A-Za-z]$/
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const telephonePattern = /^[0-9]{9}$/
-const profilePicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i;
-                             
+const profilePicturePattern = /^https?:\/\/\S+\.(?:png|jpg|jpeg|gif|bmp|webp)(?:\?\S*)?$/i
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -22,6 +19,7 @@ const Register = () => {
     email: "",
     telephone: "",
     password: "",
+    confirmPassword: "",
     dni: "",
     role: "CLIENT",
     profilePicture: "",
@@ -45,49 +43,16 @@ const Register = () => {
     e.preventDefault()
     setError("")
 
-    if (form.firstName.length > 40) {
-      setError("El nombre no puede tener más de 40 caracteres.")
-      return
-    }
-
-    if (form.lastName.length > 40) {
-      setError("El apellido no puede tener más de 40 caracteres.")
-      return
-    }
-
-    if (form.username.length > 50) {
-      setError("El nombre de usuario no puede tener más de 50 caracteres.")
-      return
-    }
-
-    
-    if (!dniPattern.test(form.dni)) {
-      setError("El DNI es incorrecto.")
-      return
-    }
-
-    if (!emailPattern.test(form.email)) {
-      setError("El correo electrónico no es válido")
-      return
-    }
-
-    if (!telephonePattern.test(form.telephone)) {
-      setError("El teléfono debe tener 9 numeros.")
-      return
-    }
-
-    if (form.profilePicture && !profilePicturePattern.test(form.profilePicture)) {
-      setError("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.");
-      return;
-    }
-
-
-
-    if (!acceptedTerms) {
-      setError("Debes aceptar los términos y condiciones para continuar.")
-      return
-    }
-
+    if (form.firstName.length > 40) return setError("El nombre no puede tener más de 40 caracteres.")
+    if (form.lastName.length > 40) return setError("El apellido no puede tener más de 40 caracteres.")
+    if (form.username.length > 50) return setError("El nombre de usuario no puede tener más de 50 caracteres.")
+    if (!dniPattern.test(form.dni)) return setError("El DNI es incorrecto.")
+    if (!emailPattern.test(form.email)) return setError("El correo electrónico no es válido.")
+    if (!telephonePattern.test(form.telephone)) return setError("El teléfono debe tener 9 números.")
+    if (form.profilePicture && !profilePicturePattern.test(form.profilePicture))
+      return setError("La URL de la foto de perfil no es válida. Debe ser una URL de imagen.")
+    if (form.password !== form.confirmPassword) return setError("Las contraseñas no coinciden.")
+    if (!acceptedTerms) return setError("Debes aceptar los términos y condiciones para continuar.")
 
     setIsLoading(true)
 
@@ -121,6 +86,8 @@ const Register = () => {
     }
   }
 
+  const passwordsMatch = form.password === form.confirmPassword
+
   return (
     <div className="split-layout register-layout">
       <div className="login-side">
@@ -142,30 +109,14 @@ const Register = () => {
               <div className="form-group">
                 <label htmlFor="firstName">Nombre <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Tu nombre"
-                    value={form.firstName}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="text" id="firstName" name="firstName" placeholder="Tu nombre" value={form.firstName} onChange={handleChange} required />
                 </div>
               </div>
 
               <div className="form-group">
                 <label htmlFor="lastName">Apellido <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Tu apellido"
-                    value={form.lastName}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="text" id="lastName" name="lastName" placeholder="Tu apellido" value={form.lastName} onChange={handleChange} required />
                 </div>
               </div>
             </div>
@@ -173,46 +124,21 @@ const Register = () => {
             <div className="form-group">
               <label htmlFor="username">Nombre de usuario <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  placeholder="Elige un nombre de usuario"
-                  value={form.username}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="text" id="username" name="username" placeholder="Elige un nombre de usuario" value={form.username} onChange={handleChange} required />
               </div>
             </div>
 
             <div className="form-group">
               <label htmlFor="profilePicture">URL de foto de perfil</label>
               <div className="input-wrapper">
-                <input
-                  type="url"
-                  id="profilePicture"
-                  name="profilePicture"
-                  placeholder="https://foto.de/perfil"
-                  value={form.profilePicture}
-                  onChange={handleChange}
-                  pattern={profilePicturePattern.source}
-                />
+                <input type="url" id="profilePicture" name="profilePicture" placeholder="https://foto.de/perfil" value={form.profilePicture} onChange={handleChange} pattern={profilePicturePattern.source} />
               </div>
             </div>
 
             <div className="form-group">
               <label htmlFor="email">Correo electrónico <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="tu@email.com"
-                  value={form.email}
-                  onChange={handleChange}
-                  pattern={emailPattern.source}
-                  required
-                />
+                <input type="email" id="email" name="email" placeholder="tu@email.com" value={form.email} onChange={handleChange} pattern={emailPattern.source} required />
               </div>
             </div>
 
@@ -220,32 +146,14 @@ const Register = () => {
               <div className="form-group">
                 <label htmlFor="telephone">Teléfono <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
-                  <input
-                    type="tel"
-                    id="telephone"
-                    name="telephone"
-                    placeholder="Tu número de teléfono"
-                    value={form.telephone}
-                    onChange={handleChange}
-                    pattern={telephonePattern.source}
-                    required
-                  />
+                  <input type="tel" id="telephone" name="telephone" placeholder="Tu número de teléfono" value={form.telephone} onChange={handleChange} pattern={telephonePattern.source} required />
                 </div>
               </div>
 
               <div className="form-group">
                 <label htmlFor="dni">DNI <span className="asterisk">*</span> </label>
                 <div className="input-wrapper">
-                  <input
-                    type="text"
-                    id="dni"
-                    name="dni"
-                    placeholder="Tu DNI"
-                    value={form.dni}
-                    onChange={handleChange}
-                    pattern={dniPattern.source}
-                    required
-                  />
+                  <input type="text" id="dni" name="dni" placeholder="Tu DNI" value={form.dni} onChange={handleChange} pattern={dniPattern.source} required />
                 </div>
               </div>
             </div>
@@ -253,16 +161,18 @@ const Register = () => {
             <div className="form-group">
               <label htmlFor="password">Contraseña <span className="asterisk">*</span> </label>
               <div className="input-wrapper">
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Crea una contraseña segura"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="password" id="password" name="password" placeholder="Crea una contraseña segura" value={form.password} onChange={handleChange} required />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Repite la contraseña <span className="asterisk">*</span> </label>
+              <div className="input-wrapper">
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Vuelve a escribir tu contraseña" value={form.confirmPassword} onChange={handleChange} required />
+              </div>
+              {!passwordsMatch && form.confirmPassword && (
+                <p className="error-message">Las contraseñas no coinciden.</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -278,13 +188,7 @@ const Register = () => {
 
             <div className="form-group terms-checkbox-container">
               <div className="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  id="receivesEmails"
-                  name="receivesEmails"
-                  checked={form.receivesEmails}
-                  onChange={handleChange}
-                />
+                <input type="checkbox" id="receivesEmails" name="receivesEmails" checked={form.receivesEmails} onChange={handleChange} />
                 <label htmlFor="receivesEmails" className="terms-label">
                   Deseo recibir notificaciones y novedades
                 </label>
@@ -293,49 +197,31 @@ const Register = () => {
 
             <div className="form-group terms-checkbox-container">
               <div className="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  id="termsAccept"
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  required
-                />
+                <input type="checkbox" id="termsAccept" checked={acceptedTerms} onChange={(e) => setAcceptedTerms(e.target.checked)} required />
                 <label htmlFor="termsAccept" className="terms-label">
-                  Acepto los Términos y Condiciones de Eventbride<button type="button" className="terms-link" onClick={() => setShowTerms(true)}>Términos y Condiciones</button>
+                  Acepto los Términos y Condiciones de Eventbride <button type="button" className="terms-link" onClick={() => setShowTerms(true)}>Términos y Condiciones</button>
                 </label>
               </div>
             </div>
 
             {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
 
-            <button type="submit" className={`login-button ${isLoading ? "loading" : ""}`} disabled={isLoading}>
-              {isLoading ? (
-                <span className="loading-spinner"></span>
-              ) : (
-                <span>Crear cuenta</span>
-              )}
+            <button type="submit" className={`login-button ${isLoading ? "loading" : ""}`} disabled={isLoading || !passwordsMatch}>
+              {isLoading ? <span className="loading-spinner"></span> : <span>Crear cuenta</span>}
             </button>
           </form>
 
           <div className="login-footer">
-            <p>
-              ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
-            </p>
+            <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link></p>
           </div>
         </div>
       </div>
 
       <div className="collage-side">
         <div className="photo-collage">
-          <div className="collage-item item-1">
-            <div className="collage-label">Bodas</div>
-          </div>
-          <div className="collage-item item-2">
-            <div className="collage-label">Bautizos</div>
-          </div>
-          <div className="collage-item item-3">
-            <div className="collage-label">Comuniones</div>
-          </div>
+          <div className="collage-item item-1"><div className="collage-label">Bodas</div></div>
+          <div className="collage-item item-2"><div className="collage-label">Bautizos</div></div>
+          <div className="collage-item item-3"><div className="collage-label">Comuniones</div></div>
           <div className="collage-item item-4"></div>
           <div className="collage-item item-5"></div>
           <div className="collage-item item-6"></div>
