@@ -3,7 +3,7 @@ name: Deploy to Google App Engine
 on:
   push:
     branches:
-      - rama
+      - develop
 
 jobs:
   deploy:
@@ -65,6 +65,6 @@ jobs:
       #Desplegar a Google App Engine
       - name: Deploy to App Engine
         run: |
-          gcloud app deploy --version=sprint3 --no-promote --quiet
+          gcloud app deploy --version=ppl --no-promote --quiet
 
-# Deploy sprint3 funcionando
+# Deploy ppl funcionando

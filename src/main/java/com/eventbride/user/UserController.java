@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -129,7 +126,7 @@ public class UserController {
     /**
      * Eliminar un usuario por ID.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public void deleteUser(@PathVariable("id") Integer id) throws IllegalArgumentException {
         if (!hasRole("ADMIN")) {
             throw new IllegalArgumentException("No tienes permiso para realizar esta acción");
@@ -157,6 +154,51 @@ public class UserController {
             userService.deleteUser(id);
         }
     }
+
+	/**
+	 * Eliminar tu usuario
+	 */
+	@DeleteMapping("/myUser")
+	public ResponseEntity<?> deleteMyUser() throws IllegalArgumentException {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Optional<User> existingUser = userService.getUserByUsername(auth.getName());
+
+		if (!existingUser.isPresent()) {
+			throw new IllegalArgumentException("No has iniciado sesión con alguna cuenta.");
+		}
+
+		User user = existingUser.get();
+
+		try {
+			List<Venue> venues = venueService.getVenuesByUserId(user.getId());
+			for (Venue v : venues) {
+				v.setUser(null);
+			}
+			venueService.saveAll(venues);
+
+			List<OtherService> otherServices = otherServiceService.getOtherServiceByUserId(user.getId());
+			for (OtherService os : otherServices) {
+				os.setUser(null);
+			}
+			otherServiceService.saveAll(otherServices);
+			String uuid = UUID.randomUUID().toString();
+
+			user.setEmail(uuid + "@anonymous.com");
+			user.setFirstName("Anonymous");
+			user.setLastName("Anonymous");
+			user.setUsername(uuid);
+			user.setPaymentPlanDate(null);
+			user.setExpirePlanDate(null);
+			user.setProfilePicture("https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg");
+			user.setPassword(uuid);
+			userService.save(user);
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(Map.of("error",e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(Map.of("success",true), HttpStatus.OK);
+	}
 
     @GetMapping("/planExpired")
     public ResponseEntity<?> checkUserPlan() throws IllegalArgumentException {

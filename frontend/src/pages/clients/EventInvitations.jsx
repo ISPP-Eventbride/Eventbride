@@ -104,6 +104,8 @@ function EventInvitations() {
           copyLink(fullConfirmationLink);
           showAlert("Link a la invitación copiado al portapapeles");
           setInvitaciones((prev) => [...prev, data]);
+        } else {
+          showAlert(data.error);
         }
       })
       .catch((error) =>
@@ -158,7 +160,7 @@ function EventInvitations() {
         <h2>Total de invitados: {totalInvitados}</h2>
       </div>
       {modalOpen && (
-        <div className="modal">
+        <div className="ei-modal">
           <div className="modal-content">
             <h3>Ingresa los detalles de la invitación</h3>
             <input
@@ -172,7 +174,6 @@ function EventInvitations() {
               value={confirmationEmail}
               onChange={(e) => setConfirmationEmail(e.target.value)}
               placeholder="Correo del invitado"
-              style={{ marginTop: "10px" }}
             />
             <button onClick={handleModalSubmit}>Enviar</button>
             <button onClick={() => setModalOpen(false)}>Cancelar</button>

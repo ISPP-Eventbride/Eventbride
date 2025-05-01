@@ -2,26 +2,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import {
-  Filter,
-  X,
-  MapPin,
-  DollarSign,
-  Users,
-  Clock,
-  Plus,
-  ChevronDown,
-  ChevronUp,
-  Info,
-  Calendar,
-  CheckCircle,
-} from "lucide-react"
+import { Filter, X, MapPin, DollarSign, Users, Clock, Plus, ChevronDown, ChevronUp, Info, Calendar, CheckCircle, Search, Star, MessageCircle, ExternalLink, Loader2, Utensils, Music, Palette, Package } from 'lucide-react'
 import { Link } from "react-router-dom"
-import "../../static/resources/css/OtherService.css"
-import "../../static/resources/css/Alert.css"
 import { useAlert } from "../../context/AlertContext"
+import "../../static/resources/css/OtherService.css"
 
 const OtherServiceScreen = () => {
   const [otherServices, setOtherServices] = useState([])
@@ -38,12 +24,22 @@ const OtherServiceScreen = () => {
   const [serviceDetails, setServiceDetails] = useState(null)
   const [venueTimes, setVenueTimes] = useState({})
   const [loading, setLoading] = useState(true)
-  const [isConfirming, setIsConfirming] = useState(false)
+  const [confirmingService, setConfirmingService] = useState({});
   const navigate = useNavigate();
 
+  // Estados de paginación
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(otherServices.length / itemsPerPage);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(totalPages - 1, 0));
+    }
+  }, [totalPages]);  
 
   const currentUser = JSON.parse(localStorage.getItem("user"))
-  const [jwtToken] = useState(localStorage.getItem("jwt"));
+  const [jwtToken] = useState(localStorage.getItem("jwt"))
 
   const { showAlert } = useAlert()
 
@@ -53,7 +49,7 @@ const OtherServiceScreen = () => {
       const params = { name, city, type }
       const response = await axios.get(`/api/other-services/filter`, {
         params: params,
-        headers: { Authorization: `Bearer ${jwtToken}` }
+        headers: { Authorization: `Bearer ${jwtToken}` },
       })
       setOtherServices(response.data)
     } catch (error) {
@@ -80,7 +76,7 @@ const OtherServiceScreen = () => {
       const response = await fetch(`/api/v1/events/next/${currentUser.id}`, {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${jwtToken}`
+          Authorization: `Bearer ${jwtToken}`,
         },
         method: "GET",
       })
@@ -96,7 +92,7 @@ const OtherServiceScreen = () => {
       const response = await fetch(`/api/v1/events/next/${currentUser.id}/without/${serviceId}`, {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${jwtToken}`
+          Authorization: `Bearer ${jwtToken}`,
         },
         method: "GET",
       })
@@ -109,7 +105,9 @@ const OtherServiceScreen = () => {
 
   const getServiceDetails = async (serviceId) => {
     try {
-      const response = await axios.get(`/api/other-services/${serviceId}`, { headers: { Authorization: `Bearer ${jwtToken}` } })
+      const response = await axios.get(`/api/other-services/${serviceId}`, {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      })
       setServiceDetails(response.data)
       setServiceDetailsVisible(true)
     } catch (error) {
@@ -168,6 +166,32 @@ const OtherServiceScreen = () => {
     }
   }
 
+  const getServiceTypeIcon = (type) => {
+    switch (type) {
+      case "CATERING":
+        return <Utensils className="category-icon" />
+      case "ENTERTAINMENT":
+        return <Music className="category-icon" />
+      case "DECORATION":
+        return <Palette className="category-icon" />
+      default:
+        return <Package className="category-icon" />
+    }
+  }
+
+  const getServiceBadgeColor = (type) => {
+    switch (type) {
+      case "CATERING":
+        return "badge-catering"
+      case "ENTERTAINMENT":
+        return "badge-entertainment"
+      case "DECORATION":
+        return "badge-decoration"
+      default:
+        return "badge-default"
+    }
+  }
+
   const formatEventType = (type) => {
     switch (type) {
       case "WEDDING":
@@ -176,8 +200,29 @@ const OtherServiceScreen = () => {
         return "Bautizo"
       case "COMMUNION":
         return "Comunión"
+      case "BIRTHDAY":
+        return "Cumpleaños"
+      case "CORPORATE":
+        return "Evento corporativo"
       default:
         return "Evento"
+    }
+  }
+
+  const getEventBadgeColor = (eventType) => {
+    switch (eventType) {
+      case "WEDDING":
+        return "badge-wedding"
+      case "COMMUNION":
+        return "badge-communion"
+      case "CHRISTENING":
+        return "badge-christening"
+      case "BIRTHDAY":
+        return "badge-birthday"
+      case "CORPORATE":
+        return "badge-corporate"
+      default:
+        return "badge-default"
     }
   }
 
@@ -188,38 +233,49 @@ const OtherServiceScreen = () => {
 
   const combineDateAndTime = (eventDate, time) => {
     // Extrae la parte de la fecha sin convertir a Date
-    const datePart = eventDate.split("T")[0];
+    const datePart = eventDate.split("T")[0]
     // Devuelve en formato ISO estándar usando "T" como separador
-    return `${datePart}T${time}:00`;
-  };
+    return `${datePart}T${time}:00`
+  }
 
   const handleConfirmService = async (eventObj, selectedOtherServiceId) => {
+    // Set loading state for this specific event button
+    setConfirmingService(prev => ({ ...prev, [eventObj.id]: true }));
+
     const times = venueTimes[eventObj.id] || {}
     if (!times.startTime || !times.endTime) {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este servicio.")
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
     if (times.startTime >= times.endTime) {
       showAlert("Por favor, ingresa un intervalo horario válido.")
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
 
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
 
-    setIsConfirming(true) // Bloquea clics múltiples
     try {
       await axios.put(`/api/event-properties/${eventObj.id}/add-otherservice/${selectedOtherServiceId}`, null, {
         params: { startDate, endDate },
-        headers: { Authorization: `Bearer ${jwtToken}` }
+        headers: { Authorization: `Bearer ${jwtToken}` },
       })
       showAlert("¡Operación realizada con éxito!")
       setModalVisible(false)
+      // Optionally clear times for this event if needed
+      // setVenueTimes(prev => {
+      //   const newTimes = { ...prev };
+      //   delete newTimes[eventObj.id];
+      //   return newTimes;
+      // });
     } catch (error) {
       console.error("Error al añadir el servicio:", error)
-      showAlert(error.response.data.error || "Error al añadir el servicio")
+      showAlert(error.response?.data?.error || "Error al añadir el servicio")
     } finally {
-      setIsConfirming(false)
+      // Reset loading state regardless of success or failure
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false }));
     }
   }
 
@@ -235,226 +291,416 @@ const OtherServiceScreen = () => {
     }
   }, [type])
 
+  const startIndex = page * itemsPerPage;
+  const currentServices = otherServices.slice(startIndex, startIndex + itemsPerPage);
+
+
   return (
     <div className="services-container">
+      {/* Header */}
       <div className="services-header">
-        <h1 className="services-title">Servicios para Eventos</h1>
+        <div className="services-header-content">
+          <h1 className="services-title">Servicios para Eventos</h1>
+          <p className="services-subtitle">Encuentra los mejores servicios para hacer tu evento inolvidable</p>
+        </div>
+      </div>
+      <div style={{ marginBottom: '30px' }}>
+        <button className="filter-toggle-button" onClick={toggleFilters}>
+          <Filter className="button-icon" />
+          <span>{filtersVisible ? "Ocultar filtros" : "Mostrar filtros"}</span>
+          {filtersVisible ? <ChevronUp className="button-icon-right" /> : <ChevronDown className="button-icon-right" />}
+        </button>
       </div>
 
       {/* Categorías */}
-      <div className="category-container">
-        <button className={`category-button ${!category ? "active" : ""}`} onClick={() => handleCategoryClick(null)}>
-          Todos los servicios
+      <div className="categories-panel">
+        <button
+          className={`category-button ${!category ? "active" : ""}`}
+          onClick={() => handleCategoryClick(null)}
+        >
+          <Package className="category-icon" />
+          <span>Todos</span>
         </button>
         <button
           className={`category-button ${category === "CATERING" ? "active" : ""}`}
           onClick={() => handleCategoryClick("CATERING")}
         >
-          Catering
+          <Utensils className="category-icon" />
+          <span>Catering</span>
         </button>
         <button
           className={`category-button ${category === "ENTERTAINMENT" ? "active" : ""}`}
           onClick={() => handleCategoryClick("ENTERTAINMENT")}
         >
-          Entretenimiento
+          <Music className="category-icon" />
+          <span>Entretenimiento</span>
         </button>
         <button
           className={`category-button ${category === "DECORATION" ? "active" : ""}`}
           onClick={() => handleCategoryClick("DECORATION")}
         >
-          Decoración
+          <Palette className="category-icon" />
+          <span>Decoración</span>
         </button>
       </div>
 
       {/* Filtros */}
-      <button className="filter-toggle" onClick={toggleFilters}>
-        <Filter size={18} />
-        {filtersVisible ? "Ocultar filtros" : "Mostrar filtros"}
-        {filtersVisible ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-      </button>
-
       {filtersVisible && (
-        <div className="filter-container">
-          <h2 className="filter-title">Filtros disponibles</h2>
-          <div className="filter-form">
-            <div className="input-group">
-              <label className="input-label">Nombre del servicio</label>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="Ej: Catering Deluxe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+        <div className="filters-panel">
+          <div className="filters-header">
+            <h2 className="filters-title">Filtros de búsqueda</h2>
+          </div>
+          <div className="filters-form">
+            <div className="filter-group">
+              <label className="filter-label">
+                <Package className="filter-icon" />
+                Nombre del servicio
+              </label>
+              <div className="filter-input-wrapper">
+                <input
+                  type="text"
+                  className="filter-input"
+                  placeholder="Ej: Catering Deluxe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="input-group">
-              <label className="input-label">Ciudad</label>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="Ej: Madrid"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
+
+            <div className="filter-group">
+              <label className="filter-label">
+                <MapPin className="filter-icon" />
+                Ciudad
+              </label>
+              <div className="filter-input-wrapper">
+                <input
+                  type="text"
+                  className="filter-input"
+                  placeholder="Ej: Madrid"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </div>
             </div>
           </div>
-          <div className="button-group">
-            <button className="primary-button" onClick={getFilteredOtherServices}>
-              <Filter size={16} />
-              Aplicar filtros
+
+          <div className="filters-actions">
+            <button className="filter-button apply-button" onClick={getFilteredOtherServices}>
+              <Search className="button-icon" />
+              <span>Buscar</span>
             </button>
             <button
-              className="secondary-button"
+              className="filter-button clear-button"
               onClick={() => {
                 setName("")
                 setCity("")
                 getAllOtherServices()
               }}
             >
-              <X size={16} />
-              Borrar filtros
+              <X className="button-icon" />
+              <span>Limpiar</span>
             </button>
           </div>
         </div>
       )}
 
-      <h2 className="services-subtitle">
-        {category ? `Servicios de ${formatServiceType(category)}` : "Todos los servicios disponibles"}
-      </h2>
+      {/* Contenido principal */}
+      <div className="services-content">
+        <h2 className="services-section-title">
+          {category
+            ? `Servicios de ${formatServiceType(category)}`
+            : loading
+              ? "Cargando servicios..."
+              : `${otherServices.length} servicios disponibles`}
+        </h2>
 
-      {/* Grid de servicios */}
-      {loading ? (
-        <div className="empty-state">
-          <div className="loading-spinner"></div>
-          <p>Cargando servicios...</p>
-        </div>
-      ) : otherServices.length === 0 ? (
-        <div className="empty-state">
-          <Info size={48} className="empty-icon" />
-          <h2 className="empty-title">No se encontraron servicios</h2>
-          <p className="empty-text">Intenta con otros filtros o categorías.</p>
-        </div>
-      ) : (
-        <div className="services-grid">
-          {otherServices.map((service) => {
-
-            return (
-              <div key={service.id} className="service-card" >
-                <div className="card-header" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                  <h3 className="service-title">{service.name}</h3>
+        {/* Grid de servicios */}
+        {loading ? (
+          <div className="loading-container">
+            <Loader2 className="loading-spinner" />
+            <h3 className="loading-text">Cargando servicios</h3>
+            <p className="loading-subtext">Espere mientras obtenemos los servicios disponibles...</p>
+          </div>
+        ) : otherServices.length === 0 ? (
+          <div className="empty-container">
+            <div className="empty-icon-container">
+              <Info className="empty-icon" />
+            </div>
+            <h3 className="empty-title">No se encontraron servicios</h3>
+            <p className="empty-text">No hay servicios disponibles con los criterios seleccionados.</p>
+            <button
+              className="reset-button"
+              onClick={() => {
+                setName("")
+                setCity("")
+                setCategory(null)
+                setType(null)
+                getAllOtherServices()
+              }}
+            >
+              <X className="button-icon" />
+              Limpiar filtros
+            </button>
+          </div>
+        ) : (
+          <div className="services-grid fade-in">
+            {currentServices.map((service) => (
+              <div
+                key={service.id}
+                className={`service-card hover-shadow ${!service.available ? "service-unavailable" : ""}`}
+              >
+                {/* Imagen del servicio */}
+                <div className="service-image-container" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
+                  <img
+                    src={service.picture || "https://iili.io/3EpzvZx.png"}
+                    onError={(e) => {
+                      e.target.onerror = null
+                      e.target.src = "https://iili.io/3EpzvZx.png"
+                    }}
+                    alt={service.name}
+                    className="service-image"
+                  />
+                  <div className="service-image-overlay"></div>
+                  {service.userDTO?.plan === "PREMIUM" && (
+                    <div className="premium-badge">
+                      <Star className="premium-icon" />
+                      <span>Promocionado</span>
+                    </div>
+                  )}
+                  {!service.available && (
+                    <div className="unavailable-badge">
+                      <X className="unavailable-icon" />
+                      <span>No disponible</span>
+                    </div>
+                  )}
                 </div>
-                <div className="card-body" style={{ cursor: "pointer" }} onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                  {
-                    service.userDTO?.plan === "PREMIUM" && <span className="service-badge premium-badge">Promocionado</span>
-                  }
-                  <span className="service-badge">{formatServiceType(service.otherServiceType)}</span>
-                  <div className="details-section">
-                    <span className="details-label">Descripción:</span>
-                    <p className="details-text">{service.description}</p>
+
+                {/* Cabecera de la tarjeta */}
+                <div className="service-header" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
+                  <h3 className="services-name">{service.name}</h3>
+                  <div className="service-type">
+                    <span className={`service-badge ${getServiceBadgeColor(service.otherServiceType)}`}>
+                      {getServiceTypeIcon(service.otherServiceType)}
+                      <span>{formatServiceType(service.otherServiceType)}</span>
+                    </span>
                   </div>
                 </div>
-                <div className="card-footer">
+
+                {/* Detalles del servicio */}
+                <div className="service-details" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <MapPin className="detail-icon" />
+                      <div className="detail-content">
+                        <p className="detail-label">Ciudad</p>
+                        <p className="detail-value">{service.cityAvailable}</p>
+                      </div>
+                    </div>
+
+                    <div className="detail-item">
+                      <DollarSign className="detail-icon" />
+                      <div className="detail-content">
+                        <p className="detail-label">Precio</p>
+                        <p className="detail-value">
+                          {service.limitedByPricePerGuest
+                            ? `${service.servicePricePerGuest}€ por invitado`
+                            : service.limitedByPricePerHour
+                              ? `${service.servicePricePerHour}€ por hora`
+                              : `${service.fixedPrice}€ precio fijo`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="service-description">
+                    <p>{service.description}</p>
+                  </div>
+                </div>
+
+                {/* Acciones */}
+                <div className="service-actions">
                   {service.available ? (
                     <>
-                      <button className="add-button" onClick={(e) => handleAddServiceClick(e, service.id)}>
-                        <Plus size={16} />
-                        Añadir a mi evento
+                      <button className="action-button add-button" onClick={(e) => handleAddServiceClick(e, service.id)}>
+                        <Plus className="button-icon" />
+                        <span>Añadir a mi evento</span>
                       </button>
-                      <Link to={`/chat/${service.userDTO.id}`} className="chat-button">
-                        💬 Chatear
+                      <Link to={`/chat/${service.userDTO.id}`} className="action-button chat-button">
+                        <MessageCircle className="button-icon" />
+                        <span>Chatear</span>
                       </Link>
                     </>
                   ) : (
-                    <div className="not-available-banner">No disponible</div>
+                    <div className="unavailable-message">
+                      <Info className="info-icon" />
+                      <span>Este servicio no está disponible actualmente</span>
+                    </div>
                   )}
                 </div>
+
+                {/* Ver más link */}
+                <div className="service-footer">
+                  <button
+                    className="view-details-button"
+                    onClick={() => navigate(`/detallesOtherServices/${service.id}`)}
+                  >
+                    <ExternalLink className="button-icon" />
+                    <span>Ver detalles</span>
+                  </button>
+                </div>
               </div>
-            )
-          })}
+            ))}
+          </div>
+        )}
+
+      {totalPages > 1 && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "24px 0",
+        }}>
+          <button
+            onClick={() => setPage(p => Math.max(p - 1, 0))}
+            disabled={page === 0}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page === 0 ? "not-allowed" : "pointer",
+              marginRight: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(90deg)" }} />
+          </button>
+
+          <span style={{ fontWeight: "bold", margin: "0 12px" }}>
+            Página {page + 1} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+            disabled={page + 1 >= totalPages}
+            style={{
+              backgroundColor: "#f0f0f0",
+              border: "none",
+              borderRadius: 4,
+              width: 40,
+              height: 40,
+              cursor: page + 1 >= totalPages ? "not-allowed" : "pointer",
+              marginLeft: 8,
+              padding: 0,
+            }}
+          >
+            <ChevronDown size={20} color="black" style={{ transform: "rotate(-90deg)" }} />
+          </button>
         </div>
       )}
 
+      </div>
+
       {/* Modal para seleccionar evento */}
       {modalVisible && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => setModalVisible(false)}>
+          <div className="modal-container add-event-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">Selecciona un evento</h2>
+              <button className="vs-modal-close-button" onClick={() => setModalVisible(false)}>
+                <X className="close-icon" />
+              </button>
             </div>
-            <div className="modal-body">
+
+            <div className="vs-modal-content">
               {events.length === 0 ? (
-                <div className="empty-state" style={{ boxShadow: "none" }}>
-                  <Info size={36} className="empty-icon" />
-                  <p className="empty-text">Tus eventos ya tienen este servicio.</p>
+                <div className="empty-container">
+                  <div className="empty-icon-container">
+                    <Info className="empty-icon" />
+                  </div>
+                  <h3 className="empty-title">No hay eventos disponibles</h3>
+                  <p className="empty-text">No tienes eventos a los que puedas añadir este servicio.</p>
                 </div>
               ) : (
-                events.map((eventObj) => (
-                  <div key={eventObj.id} className="event-card">
-                    <span className="event-badge">{eventObj.eventType}</span>
-                    <h3 className="event-title" style={{ height: "10%", marginBottom: "10%" }}>{eventObj.name}</h3>
-
-                    <div className="event-details">
-                      <div className="event-detail">
-                        <Calendar size={18} className="detail-icon" />
-                        <span className="detail-text">{formatDate(eventObj.eventDate)}</span>
+                <div className="vs-events-list">
+                  {events.map((eventObj) => (
+                    <div key={eventObj.id} className="vs-event-card">
+                      <div className="event-header">
+                        <div className="event-title-container">
+                          <span className={`event-badge ${getEventBadgeColor(eventObj.eventType)}`}>
+                            {formatEventType(eventObj.eventType)}
+                          </span>
+                          <h3 className="vs-event-title">{eventObj.name}</h3>
+                        </div>
+                        <div className="event-info">
+                          <div className="event-info-item">
+                            <Users className="info-icon" />
+                            <span>{eventObj.guests} invitados</span>
+                          </div>
+                          <div className="event-info-item">
+                            <Calendar className="info-icon" />
+                            <span>{formatDate(eventObj.eventDate)}</span>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="event-detail">
-                        <Users size={18} className="detail-icon" />
-                        <span className="detail-text">{eventObj.guests} invitados</span>
+                      <div className="event-time-selection">
+                        <h4 className="time-selection-title">Selecciona el horario</h4>
+                        <div className="time-inputs">
+                          <div className="time-input-group">
+                            <label className="time-input-label">
+                              <Clock className="time-icon" />
+                              <span>Hora de inicio</span>
+                            </label>
+                            <input
+                              type="time"
+                              className="time-input"
+                              value={venueTimes[eventObj.id]?.startTime || ""}
+                              required
+                              onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
+                            />
+                          </div>
+                          <div className="time-input-group">
+                            <label className="time-input-label">
+                              <Clock className="time-icon" />
+                              <span>Hora de fin</span>
+                            </label>
+                            <input
+                              type="time"
+                              className="time-input"
+                              min={venueTimes[eventObj.id]?.startTime}
+                              value={venueTimes[eventObj.id]?.endTime || ""}
+                              required
+                              onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="vs-event-actions">
+                        <button
+                          className="vs-event-confirm-button"
+                          onClick={() => handleConfirmService(eventObj, selectedOtherServiceId)}
+                          disabled={confirmingService[eventObj.id]} // Disable button based on specific event ID
+                        >
+                          {confirmingService[eventObj.id] ? ( // Show loading state based on specific event ID
+                            <>
+                              <Loader2 className="button-icon animate-spin" />
+                              <span>Confirmando...</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="button-icon" />
+                              <span>Confirmar selección</span>
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
-
-                    <div className="time-inputs">
-                      <div className="time-group">
-                        <label className="time-label">
-                          <Clock size={16} className="detail-icon" />
-                          Hora de inicio
-                        </label>
-                        <input
-                          type="time"
-                          className="time-input"
-                          value={venueTimes[eventObj.id]?.startTime || ""}
-                          required
-                          onChange={(e) => handleTimeChange(eventObj.id, "startTime", e.target.value)}
-                        />
-                      </div>
-
-                      <div className="time-group">
-                        <label className="time-label">
-                          <Clock size={16} className="detail-icon" />
-                          Hora de fin
-                        </label>
-                        <input
-                          type="time"
-                          className="time-input"
-                          min = {venueTimes[eventObj.id]?.startTime}
-                          value={venueTimes[eventObj.id]?.endTime || ""}
-                          required
-                          onChange={(e) => handleTimeChange(eventObj.id, "endTime", e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="event-actions">
-                      <button
-                        className="primary-button"
-                        style={{ flex: "1" }}
-                        onClick={() => handleConfirmService(eventObj, selectedOtherServiceId)}
-                        disabled={isConfirming}
-                      >
-                        <CheckCircle size={16} />
-                        Confirmar
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
-            </div>
-            <div className="modal-footer">
-              <button className="secondary-button" onClick={() => setModalVisible(false)}>
-                Cerrar
-              </button>
             </div>
           </div>
         </div>
@@ -462,74 +708,105 @@ const OtherServiceScreen = () => {
 
       {/* Modal para detalles del servicio */}
       {serviceDetailsVisible && serviceDetails && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => setServiceDetailsVisible(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">{serviceDetails.name}</h2>
+              <button className="modal-close-button" onClick={() => setServiceDetailsVisible(false)}>
+                <X className="close-icon" />
+              </button>
             </div>
-            <div className="modal-body">
-              <div className="service-details">
-                <div className="details-section">
-                  <span className="service-badge">{formatServiceType(serviceDetails.otherServiceType)}</span>
 
-                  <div className="event-detail" style={{ marginTop: "1rem" }}>
-                    <MapPin size={18} className="detail-icon" />
-                    <span className="detail-text">Ciudad: {serviceDetails.cityAvailable}</span>
+            <div className="modal-content">
+              <div className="service-image-container modal-image">
+                <img
+                  src={serviceDetails.picture || "https://iili.io/3EpzvZx.png"}
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = "https://iili.io/3EpzvZx.png"
+                  }}
+                  alt={serviceDetails.name}
+                  className="service-image"
+                />
+              </div>
+
+              <div className="modal-details">
+                <div className="modal-section">
+                  <h3 className="section-title">Información del servicio</h3>
+                  <div className="service-type-badge">
+                    <span className={`service-badge ${getServiceBadgeColor(serviceDetails.otherServiceType)}`}>
+                      {getServiceTypeIcon(serviceDetails.otherServiceType)}
+                      <span>{formatServiceType(serviceDetails.otherServiceType)}</span>
+                    </span>
                   </div>
 
-                  <div className="event-detail">
-                    <DollarSign size={18} className="detail-icon" />
-                    <span className="detail-text">
-                      Precio:{" "}
-                      {serviceDetails.limitedByPricePerGuest
-                        ? `${serviceDetails.servicePricePerGuest}€ por invitado`
-                        : serviceDetails.limitedByPricePerHour
-                          ? `${serviceDetails.servicePricePerHour}€ por hora`
-                          : `${serviceDetails.fixedPrice}€ precio fijo`}
-                    </span>
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <MapPin className="detail-icon" />
+                      <div className="detail-content">
+                        <p className="detail-label">Ciudad</p>
+                        <p className="detail-value">{serviceDetails.cityAvailable}</p>
+                      </div>
+                    </div>
+
+                    <div className="detail-item">
+                      <DollarSign className="detail-icon" />
+                      <div className="detail-content">
+                        <p className="detail-label">Precio</p>
+                        <p className="detail-value">
+                          {serviceDetails.limitedByPricePerGuest
+                            ? `${serviceDetails.servicePricePerGuest}€ por invitado`
+                            : serviceDetails.limitedByPricePerHour
+                              ? `${serviceDetails.servicePricePerHour}€ por hora`
+                              : `${serviceDetails.fixedPrice}€ precio fijo`}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="details-section">
-                  <span className="details-label">Descripción:</span>
-                  <p className="details-text">{serviceDetails.description}</p>
+                <div className="modal-section">
+                  <h3 className="section-title">Descripción</h3>
+                  <p className="modal-description">{serviceDetails.description}</p>
                 </div>
 
                 {serviceDetails.extraInformation && (
-                  <div className="details-section">
-                    <span className="details-label">Información adicional:</span>
-                    <p className="details-text">{serviceDetails.extraInformation}</p>
+                  <div className="modal-section">
+                    <h3 className="section-title">Información adicional</h3>
+                    <p className="modal-description">{serviceDetails.extraInformation}</p>
                   </div>
                 )}
-                <div className="card-info">
-                  <span className="card-text">
-                    <img style={{ height: "25%", width: "100%" }}
-                      src={serviceDetails.picture || "https://iili.io/3EpzvZx.png"}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "https://iili.io/3EpzvZx.png";
-                      }}
-                      alt="Imagen del servicio"></img>
-                  </span>
-                </div>
               </div>
-            </div>
-            <div className="modal-footer">
-              {serviceDetails.available &&
-                <button
-                  className="primary-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setServiceDetailsVisible(false);
-                    handleAddServiceClick(e, serviceDetails.id);
-                  }}
-                >
-                  <Plus size={16} />
-                  Añadir a mi evento
-                </button>}
-              <button className="secondary-button" onClick={() => setServiceDetailsVisible(false)}>
-                Cerrar
-              </button>
+
+              <div className="modal-actions">
+                {serviceDetails.available ? (
+                  <>
+                    <button
+                      className="modal-button primary-button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setServiceDetailsVisible(false)
+                        handleAddServiceClick(e, serviceDetails.id)
+                      }}
+                    >
+                      <Plus className="button-icon" />
+                      <span>Añadir a mi evento</span>
+                    </button>
+                    <Link
+                      to={`/chat/${serviceDetails.userDTO.id}`}
+                      className="modal-button secondary-button"
+                    >
+                      <MessageCircle className="button-icon" />
+                      <span>Chatear con proveedor</span>
+                    </Link>
+                  </>
+                ) : (
+                  <div className="unavailable-message modal-unavailable">
+                    <Info className="info-icon" />
+                    <span>Este servicio no está disponible actualmente</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

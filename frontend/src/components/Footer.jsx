@@ -34,7 +34,7 @@ function Footer({ user }) {
                                         <Link to="/">Inicio</Link>
                                     </li>
                                     <li>
-                                        <Link to="/venues">Venues</Link>
+                                        <Link to="/venues">Recintos</Link>
                                     </li>
                                     <li>
                                         <Link to="/other-services">Servicios</Link>

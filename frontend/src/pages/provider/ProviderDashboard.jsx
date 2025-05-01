@@ -323,7 +323,7 @@ export default function SupplierDashboard() {
                         {/* Page Title and Actions */}
                         <div className="page-header">
                             <div className="page-title">
-                                <h2>Solicitudes de Servicios</h2>
+                                <h2>Servicios contratados</h2>
                                 <p className="page-description">
                                     Gestiona las solicitudes de tus servicios y visualiza tu calendario de servicios
                                 </p>

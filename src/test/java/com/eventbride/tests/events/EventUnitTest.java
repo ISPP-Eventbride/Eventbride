@@ -53,9 +53,9 @@ public class EventUnitTest {
         user.setLastName("Pérez");
         user.setUsername("juanp");
         user.setEmail("juan@example.com");
-        user.setTelephone(123456789);
+        user.setTelephone(723456789);
         user.setPassword("securePassword");
-        user.setDni("12345678A");
+        user.setDni("12345678Z");
         user.setRole("CLIENT");
         user.setPlan(Plan.PREMIUM);
         user.setPaymentPlanDate(LocalDate.now());

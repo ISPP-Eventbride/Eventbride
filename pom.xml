@@ -217,6 +217,17 @@
         <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
 
+    <!-- Dependencias paypal -->
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

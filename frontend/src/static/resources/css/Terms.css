@@ -12,9 +12,48 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.terms-header {
+.terms-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.modal-content {
+  position: relative;
+  max-height: 80vh;
+  width: 90%;
+  max-width: 1000px;
+  overflow-y: auto;
+  margin: 2rem auto;
+  padding-bottom: 2rem;
+}
+
+.terms-modal-header {
   text-align: center;
   margin-bottom: 3rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 10;
+  padding-top: 1rem;
+}
+
+.terms-header {
+  text-align: center;
+  margin-bottom: 0rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #eaeaea;
   display: flex;
@@ -38,6 +77,7 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
+  margin-top: 50px;
 }
 
 .terms-section {
@@ -98,10 +138,73 @@
   margin-bottom: 0;
 }
 
+/* Headings for structured content inside sections */
+.section-content h3 {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  border-left: 4px solid #d9be75;
+  padding-left: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Generic lists */
+.section-content ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-content ul li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Nested list formatting */
+.nested-list {
+  padding-left: 2rem;
+  list-style-type: disc;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.nested-list li {
+  margin-bottom: 0.35rem;
+  padding-left: 0.25rem;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+/* Close button styling */
+.terms-modal-overlay button {
+  position: sticky;
+  bottom: 1rem;
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 0.75rem 2rem;
+  background-color: #d9be75;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.terms-modal-overlay button:hover {
+  background-color: #c4aa62;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .terms-container {
     padding: 1.5rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
   }
 
   .terms-header {
@@ -128,6 +231,11 @@
 @media (max-width: 480px) {
   .terms-container {
     padding: 1rem;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-height: 90vh;
   }
 
   .terms-header h1 {

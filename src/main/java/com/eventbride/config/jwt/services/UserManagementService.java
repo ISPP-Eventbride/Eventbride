@@ -62,6 +62,8 @@ public class UserManagementService {
 
             if (registrationRequest.getProfilePicture() == null || registrationRequest.getProfilePicture().isBlank()) {
                 user.setProfilePicture("https://static.vecteezy.com/system/resources/previews/005/005/788/non_2x/user-icon-in-trendy-flat-style-isolated-on-grey-background-user-symbol-for-your-web-site-design-logo-app-ui-illustration-eps10-free-vector.jpg");
+            } else {
+                user.setProfilePicture(registrationRequest.getProfilePicture());
             }
 
             if ("SUPPLIER".equals(registrationRequest.getRole())) {
