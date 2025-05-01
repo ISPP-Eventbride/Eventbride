@@ -124,6 +124,7 @@ const Register = () => {
   return (
     <div className="split-layout register-layout">
       <div className="login-side">
+        <div className="top-banner"></div>
         <div className="login-card register-card">
           <div className="login-header">
             <h1>Crear cuenta</h1>
@@ -337,6 +338,7 @@ const Register = () => {
           </div>
           <div className="collage-item item-4"></div>
           <div className="collage-item item-5"></div>
+          <div className="collage-item item-6"></div>
         </div>
       </div>
     </div>
