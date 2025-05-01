@@ -70,7 +70,7 @@
   margin-top: 1.5rem;
   padding: 12px 24px;
   font-size: 1rem;
-  background-color: palevioletred;
+  background-color: #b48c3c;
   color: white;
   border: none;
   border-radius: 4px;
@@ -240,6 +240,7 @@
     height: 50vh;
   }
 }
+
 /* ESTILOS PARA MOSTRAR OBLIGATORIEDAD */
 /* Asterisco rojo junto al label */
 .asterisk {
@@ -250,6 +251,7 @@
 input:required:invalid {
   border: 2px solid #dc2626;
 }
+
 input:required:valid {
   border: 2px solid #16a34a;
 }
@@ -261,13 +263,14 @@ input:required:valid {
   margin-top: 4px;
 }
 
-input:required:invalid + .field-error {
+input:required:invalid+.field-error {
   display: block;
 }
 
 select:required:invalid {
   border: 2px solid #dc2626;
 }
+
 select:required:valid {
   border: 2px solid #16a34a;
 }
@@ -275,14 +278,17 @@ select:required:valid {
 textarea:required:invalid {
   border: 2px solid #dc2626;
 }
+
 textarea:required:valid {
   border: 2px solid #16a34a;
 }
 
 /*Se ha introducido el color-scheme para que detecte que los iconitos y desplegables se usan en un fondo blanco*/
-input[type="time"], input[type="number"] {
+input[type="time"],
+input[type="number"] {
   color-scheme: light;
 }
+
 /* Estilos de la tarjeta de descripción  */
 .service-description {
   margin-bottom: 1rem;
@@ -295,28 +301,32 @@ input[type="time"], input[type="number"] {
 }
 
 .description-text {
-  white-space: pre-wrap;   
-  word-wrap: break-word;   
+  white-space: pre-wrap;
+  word-wrap: break-word;
   overflow-y: auto;
   margin: 0;
 }
 
 /* Scrollbar para navegadores basados en WebKit (Chrome, Safari, Edge Chromium...) */
-.event-services-box::-webkit-scrollbar, .description-text::-webkit-scrollbar {
+.event-services-box::-webkit-scrollbar,
+.description-text::-webkit-scrollbar {
   width: 8px;
 }
 
-.event-services-box::-webkit-scrollbar-track, .description-text::-webkit-scrollbar-track {
+.event-services-box::-webkit-scrollbar-track,
+.description-text::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 8px;
 }
 
-.event-services-box::-webkit-scrollbar-thumb, .description-text::-webkit-scrollbar-thumb {
+.event-services-box::-webkit-scrollbar-thumb,
+.description-text::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 8px;
 }
 
-.event-services-box::-webkit-scrollbar-thumb:hover, .description-text::-webkit-scrollbar-thumb:hover {
+.event-services-box::-webkit-scrollbar-thumb:hover,
+.description-text::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 

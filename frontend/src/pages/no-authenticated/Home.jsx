@@ -1,8 +1,5 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import logo from "../../static/resources/images/logo-eventbride.png"
-import { Calendar, Handshake, Users, TrendingUp, PartyPopper, ChevronRight, Clock, Settings, Palette, CheckCircle } from 'lucide-react'
+import { Calendar, Users, TrendingUp, ChevronRight, Clock, Palette, ArrowRight, Briefcase, Building, Bell, Wallet, BarChart, Shield, Heart } from 'lucide-react'
 import "../../static/resources/css/Home.css"
 
 export default function HomePage() {
@@ -14,7 +11,6 @@ export default function HomePage() {
       const userData = localStorage.getItem("user")
       if (userData) {
         setCurrentUser(JSON.parse(userData))
-        console.log(userData)
       }
     } catch (error) {
       console.error("Error retrieving user data:", error)
@@ -31,105 +27,47 @@ export default function HomePage() {
     )
   }
 
-  // Shared components
   const HeroSection = () => (
     <section className="hero-section">
-      <div className="hero-background">
-        <img
-          src="https://m.media-amazon.com/images/I/81EcVQNQQeL._AC_UF894,1000_QL80_.jpg"
-          alt="Wedding celebration"
-          className="hero-image"
-        />
-        <div className="hero-overlay"></div>
-      </div>
       <div className="hero-content">
-        <div className="hero-card">
-          <img src={logo || "/placeholder.svg"} alt="Eventbride Logo" className="logo" />
-          <h1 className="hero-title">Eventos que brillan, recuerdos que perduran</h1>
-          <p className="hero-subtitle">Especialistas en bodas, bautizos y comuniones</p>
+        <div className="hero-text">
+          <h1 className="hero-title">Celebraciones inolvidables, organizadas sin esfuerzo</h1>
+          <p className="hero-description">
+            Planifica bodas, bautizos y comuniones con nuestra plataforma digital que conecta con los mejores
+            proveedores del sector.
+          </p>
+          <div className="hero-buttons">
+            {currentUser.role === 'CLIENT' ? (
+              <>
+                <a href="/create-events" className="primary-button" style={{ background: '#b48c3c', color: "white" }}>
+                  Crear evento <ArrowRight size={16} className="button-icon" />
+                </a>
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
+        </div>
+        <div className="hero-image-container">
+          <img
+            src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070"
+            alt="Celebración de boda elegante"
+            className="hero-image"
+          />
         </div>
       </div>
-    </section>
-  )
-
-  const AboutSection = () => (
-    <section className="about-section">
-      <div className="about-background"></div>
-      <div className="container">
-        <div className="about-header">
-          <h2 className="section-title">Quiénes Somos</h2>
-          <div className="separator"></div>
-          <p className="about-tagline">Transformando la organización de eventos en una experiencia digital fluida y personalizada</p>
+      <div className="hero-stats">
+        <div className="stat-item">
+          <span className="stat-number">10,000+</span>
+          <span className="stat-label">Eventos organizados</span>
         </div>
-
-        <div className="about-cards-container">
-          <div className="about-card">
-            <div className="about-card-content">
-              <h3 className="about-card-title">Nuestra Misión</h3>
-              <p className="about-card-text">
-                Facilitar la organización de eventos especiales a través de una plataforma digital intuitiva que conecta a clientes con los mejores proveedores del sector.
-              </p>
-              <ul className="about-feature-list">
-                <li><CheckCircle size={16} className="list-icon" /> Herramientas digitales para gestionar todos los detalles</li>
-                <li><CheckCircle size={16} className="list-icon" /> Conexión directa entre proveedores y clientes</li>
-                <li><CheckCircle size={16} className="list-icon" /> Personalización completa de cada evento</li>
-              </ul>
-            </div>
-            <div className="about-card-image">
-              <img
-                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000"
-                alt="Planificación de eventos"
-                className="about-image"
-              />
-              <div className="image-overlay-gradient"></div>
-            </div>
-          </div>
-
-          <div className="about-card reverse">
-            <div className="about-card-content">
-              <h3 className="about-card-title">Nuestra Visión</h3>
-              <p className="about-card-text">
-                Revolucionar la industria de eventos con tecnología que simplifica procesos y permite a cada persona crear celebraciones únicas sin complicaciones.
-              </p>
-              <ul className="about-feature-list">
-                <li><CheckCircle size={16} className="list-icon" /> Plataforma intuitiva para gestionar cada detalle</li>
-                <li><CheckCircle size={16} className="list-icon" /> Experiencia personalizada para cada tipo de evento</li>
-                <li><CheckCircle size={16} className="list-icon" /> Acceso a los mejores proveedores del sector</li>
-              </ul>
-            </div>
-            <div className="about-card-image">
-              <img
-                src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?q=80&w=1000"
-                alt="Celebración de boda"
-                className="about-image"
-              />
-              <div className="image-overlay-gradient"></div>
-            </div>
-          </div>
+        <div className="stat-item">
+          <span className="stat-number">500+</span>
+          <span className="stat-label">Proveedores verificados</span>
         </div>
-
-        <div className="about-values">
-          <div className="value-item">
-            <div className="value-icon-container">
-              <Clock className="value-icon" />
-            </div>
-            <h4 className="value-title">Eficiencia</h4>
-            <p className="value-text">Optimizamos cada paso del proceso</p>
-          </div>
-          <div className="value-item">
-            <div className="value-icon-container">
-              <Palette className="value-icon" />
-            </div>
-            <h4 className="value-title">Personalización</h4>
-            <p className="value-text">Cada detalle adaptado a tus deseos</p>
-          </div>
-          <div className="value-item">
-            <div className="value-icon-container">
-              <Settings className="value-icon" />
-            </div>
-            <h4 className="value-title">Tecnología</h4>
-            <p className="value-text">Innovación al servicio de tus eventos</p>
-          </div>
+        <div className="stat-item">
+          <span className="stat-number">98%</span>
+          <span className="stat-label">Clientes satisfechos</span>
         </div>
       </div>
     </section>
@@ -138,466 +76,499 @@ export default function HomePage() {
   // CLIENT VIEW
   if (currentUser.role === "CLIENT") {
     return (
-      <main className="main-container">
-        <HeroSection />
+      <div className="site-wrapper">
+        <main className="main-content">
+          <HeroSection />
 
-        <section className="welcome-section">
-          <div className="welcome-background"></div>
-          <div className="container">
-            <div className="welcome-header">
-              <h2 className="section-title">Bienvenido a Eventbride</h2>
-              <div className="separator"></div>
-              <p className="welcome-tagline">Tu plataforma digital para organizar bodas, comuniones y bautizos de forma ágil y personalizada</p>
-            </div>
-
-            <div className="benefits-grid">
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <Calendar className="benefit-icon" />
-                </div>
-                <h3 className="benefit-title">Organización Ágil</h3>
-                <p className="benefit-text">
-                  Nuestra plataforma automatiza procesos para que puedas organizar tu evento en menos tiempo y con menos esfuerzo.
-                </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">70%</span>
-                  <span className="stat-label">menos tiempo de planificación</span>
-                </div>
+          <section className="features-section">
+            <div className="container">
+              <div className="section-header">
+                <h2 className="section-title">Organiza tu evento perfecto</h2>
               </div>
 
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <Palette className="benefit-icon" />
+              <div className="features-grid">
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Calendar className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Organizar Eventos</h3>
+                  <p className="feature-description">
+                    Crea y gestiona tus eventos con nuestras herramientas de planificación intuitivas.
+                  </p>
+                  <a href="/create-events" className="feature-link">
+                    Crear evento <ChevronRight size={14} />
+                  </a>
                 </div>
-                <h3 className="benefit-title">Personalización Total</h3>
-                <p className="benefit-text">
-                  Controla cada aspecto de tu evento con herramientas digitales que te permiten personalizar hasta el último detalle.
-                </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">100%</span>
-                  <span className="stat-label">personalizable</span>
-                </div>
-              </div>
 
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <Users className="benefit-icon" />
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Briefcase className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Contratar Servicios</h3>
+                  <p className="feature-description">
+                    Explora y contrata los mejores servicios para tu evento, todos en un solo lugar.
+                  </p>
+                  <a href="/services" className="feature-link">
+                    Ver servicios <ChevronRight size={14} />
+                  </a>
                 </div>
-                <h3 className="benefit-title">Proveedores Verificados</h3>
-                <p className="benefit-text">
-                  Conecta directamente con proveedores verificados para todos los servicios que necesites para tu evento.
-                </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">200+</span>
-                  <span className="stat-label">proveedores en la plataforma</span>
+
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Building className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Reservar Recintos</h3>
+                  <p className="feature-description">
+                    Encuentra y reserva el lugar perfecto para tu celebración especial.
+                  </p>
+                  <a href="/venues" className="feature-link">
+                    Explorar recintos <ChevronRight size={14} />
+                  </a>
                 </div>
               </div>
             </div>
+          </section>
 
-            <div className="welcome-cta">
-              <a href="/other-services" className="text-link">
-                Descubre todas las funcionalidades <ChevronRight size={16} className="inline-icon" />
-              </a>
+          <section className="process-section">
+            <div className="container">
+              <div className="section-header">
+                <h2 className="section-title">Cómo funciona</h2>
+              </div>
+
+              <div className="process-steps">
+                <div className="process-step">
+                  <div className="step-number">1</div>
+                  <div className="step-content">
+                    <h3 className="step-title">Define tu evento</h3>
+                    <p className="step-description">
+                      Selecciona el tipo de evento, fecha y número de invitados para comenzar.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="process-step">
+                  <div className="step-number">2</div>
+                  <div className="step-content">
+                    <h3 className="step-title">Selecciona servicios</h3>
+                    <p className="step-description">
+                      Explora y elige entre cientos de proveedores verificados para tu evento.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="process-step">
+                  <div className="step-number">3</div>
+                  <div className="step-content">
+                    <h3 className="step-title">Personaliza detalles</h3>
+                    <p className="step-description">
+                      Ajusta cada aspecto de tu evento según tus preferencias y necesidades.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="process-step">
+                  <div className="step-number">4</div>
+                  <div className="step-content">
+                    <h3 className="step-title">¡Disfruta tu día!</h3>
+                    <p className="step-description">
+                      Relájate mientras nosotros coordinamos todo para tu celebración perfecta.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="create-section">
-          <div className="create-background"></div>
-          <div className="container">
-            <div className="create-header">
-              <h2 className="section-title">Crea y organiza tu evento</h2>
-              <div className="separator"></div>
-              <p className="create-tagline">Herramientas digitales que simplifican cada paso del proceso</p>
-            </div>
-
-            <div className="process-steps">
-              <div className="process-step">
-                <div className="step-number">1</div>
-                <div className="step-content">
-                  <h3 className="step-title">Selecciona tu tipo de evento</h3>
-                  <p className="step-text">Elige entre boda, bautizo o comunión y personaliza las opciones según tus necesidades.</p>
-                </div>
-              </div>
-
-              <div className="process-step">
-                <div className="step-number">2</div>
-                <div className="step-content">
-                  <h3 className="step-title">Personaliza cada detalle</h3>
-                  <p className="step-text">Configura fechas, ubicaciones, invitados, servicios y todos los elementos de tu evento.</p>
-                </div>
-              </div>
-
-              <div className="process-step">
-                <div className="step-number">3</div>
-                <div className="step-content">
-                  <h3 className="step-title">Conecta con proveedores</h3>
-                  <p className="step-text">Selecciona entre nuestra red de proveedores verificados y gestiona tus contrataciones.</p>
-                </div>
-              </div>
-
-              <div className="process-step">
-                <div className="step-number">4</div>
-                <div className="step-content">
-                  <h3 className="step-title">Gestiona tu evento</h3>
-                  <p className="step-text">Controla todos los aspectos de tu evento desde un único panel centralizado.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="create-options">
-              <div className="create-option-card">
-                <div className="option-icon-container">
-                  <Calendar className="option-icon" />
-                </div>
-                <h3 className="option-title">Crear de cero</h3>
-                <p className="option-text">
-                  Comienza un evento desde cero con total libertad para personalizar cada detalle según tus preferencias.
+          <section className="cta-section">
+            <div className="container">
+              <div className="cta-content">
+                <h2 className="cta-title">¿Listo para crear tu evento perfecto?</h2>
+                <p className="cta-description">
+                  Comienza a planificar hoy mismo y haz que tu celebración sea inolvidable
                 </p>
-                <a href="/create-events" className="option-button">
-                  Crear evento <ChevronRight size={16} className="ml-2" />
-                </a>
-              </div>
-
-              <div className="create-option-card">
-                <div className="option-icon-container">
-                  <PartyPopper className="option-icon" />
-                </div>
-                <h3 className="option-title">Explorar servicios</h3>
-                <p className="option-text">
-                  Descubre todos los servicios disponibles en nuestra plataforma para complementar tu evento.
-                </p>
-                <a href="/other-services" className="option-button">
-                  Ver servicios <ChevronRight size={16} className="ml-2" />
+                <a href="/create-events" className="cta-button">
+                  Crear mi evento <ArrowRight size={16} className="button-icon" />
                 </a>
               </div>
             </div>
-          </div>
-        </section>
-
-        <AboutSection />
-
-        <section className="cta-section">
-          <div className="container">
-            <h2 className="cta-title">¿Listo para crear tu evento perfecto?</h2>
-            <p className="cta-description">
-              Comienza hoy mismo a planificar tu boda, bautizo o comunión con Eventbride
-            </p>
-            <a href="/create-events" className="cta-button">
-              Comenzar ahora <ChevronRight size={16} className="ml-2" />
-            </a>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
     )
   }
 
   // SUPPLIER VIEW
   if (currentUser.role === "SUPPLIER") {
     return (
-      <main className="main-container">
-        <HeroSection />
-
-        <section className="welcome-section">
-          <div className="welcome-background"></div>
-          <div className="container">
-            <div className="welcome-header">
-              <h2 className="section-title">Bienvenido a Eventbride</h2>
-              <div className="separator"></div>
-              <p className="welcome-tagline">Tu plataforma digital para conectar con clientes y gestionar tus servicios de eventos</p>
-            </div>
-
-            <div className="benefits-grid">
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <Users className="benefit-icon" />
-                </div>
-                <h3 className="benefit-title">Más Clientes</h3>
-                <p className="benefit-text">
-                  Accede a una amplia base de clientes buscando servicios para bodas, bautizos y comuniones.
+      <div className="site-wrapper">
+        <main className="main-content">
+          <section className="hero-section supplier-hero">
+            <div className="hero-content">
+              <div className="hero-text">
+                <h1 className="hero-title">Haz crecer tu negocio de eventos</h1>
+                <p className="hero-description">
+                  Conecta con clientes potenciales, gestiona tus servicios y aumenta tus ingresos con nuestra plataforma
+                  especializada.
                 </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">+50%</span>
-                  <span className="stat-label">más visibilidad</span>
-                </div>
+                {currentUser.role === 'SUPPLIER' ? (
+                  <>
+                    <a href="/misservicios/registrar" className="primary-button" style={{ background: '#b48c3c', color: "white" }}>
+                      Registrar servicio <ArrowRight size={16} className="button-icon" />
+                    </a>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
-
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <Calendar className="benefit-icon" />
-                </div>
-                <h3 className="benefit-title">Gestión Simplificada</h3>
-                <p className="benefit-text">
-                  Administra reservas, pagos y comunicaciones con clientes desde un único panel de control.
-                </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">-30%</span>
-                  <span className="stat-label">tiempo administrativo</span>
-                </div>
-              </div>
-
-              <div className="benefit-card">
-                <div className="benefit-icon-container">
-                  <TrendingUp className="benefit-icon" />
-                </div>
-                <h3 className="benefit-title">Crecimiento</h3>
-                <p className="benefit-text">
-                  Expande tu negocio con herramientas digitales diseñadas para proveedores de eventos.
-                </p>
-                <div className="benefit-stat">
-                  <span className="stat-number">+40%</span>
-                  <span className="stat-label">crecimiento promedio</span>
-                </div>
+              <div className="hero-image-container">
+                <img
+                  src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070"
+                  alt="Proveedor de eventos"
+                  className="hero-image"
+                />
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="create-section">
-          <div className="create-background"></div>
-          <div className="container">
-            <div className="create-header">
-              <h2 className="section-title">Gestiona tu negocio</h2>
-              <div className="separator"></div>
-              <p className="create-tagline">Herramientas digitales para optimizar tus servicios de eventos</p>
+            <div className="hero-stats">
+              <div className="stat-item">
+                <span className="stat-number">+40%</span>
+                <span className="stat-label">Aumento en ventas</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">5,000+</span>
+                <span className="stat-label">Clientes potenciales</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">24/7</span>
+                <span className="stat-label">Visibilidad online</span>
+              </div>
             </div>
+          </section>
 
-            <div className="create-options">
-              <div className="create-option-card">
-                <div className="option-icon-container">
-                  <TrendingUp className="option-icon" />
+          <section className="features-section">
+            <div className="container">
+              <div className="section-header">
+                <h2 className="section-title">Gestiona tu negocio eficientemente</h2>
+              </div>
+
+              <div className="features-grid">
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Briefcase className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Gestionar Servicios</h3>
+                  <p className="feature-description">
+                    Añade, edita y administra todos tus servicios desde un único panel de control.
+                  </p>
+                  <a href="/misservicios" className="feature-link">
+                    Mis servicios <ChevronRight size={14} />
+                  </a>
                 </div>
-                <h3 className="option-title">Mis servicios</h3>
-                <p className="option-text">
-                  Visualiza, añade y edita tus servicios para que lleguen a todos nuestros usuarios.
+
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Bell className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Gestionar Solicitudes</h3>
+                  <p className="feature-description">
+                    Recibe y responde a solicitudes de clientes interesados en tus servicios.
+                  </p>
+                  <a href="/solicitudes" className="feature-link">
+                    Ver solicitudes <ChevronRight size={14} />
+                  </a>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon-wrapper">
+                    <Wallet className="feature-icon" />
+                  </div>
+                  <h3 className="feature-title">Retirar Fondos</h3>
+                  <p className="feature-description">
+                    Gestiona tus ingresos y retira fondos de manera segura y rápida.
+                  </p>
+                  <a href="/misVentas" className="feature-link">
+                    Mis finanzas <ChevronRight size={14} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="cta-section">
+            <div className="container">
+              <div className="cta-content">
+                <h2 className="cta-title">Expande tu alcance con nuevos servicios</h2>
+                <p className="cta-description">
+                  Añade nuevos servicios a tu catálogo y llega a más clientes potenciales
                 </p>
-                <a href="/admin-services" className="option-button">
-                  Gestionar servicios <ChevronRight size={16} className="ml-2" />
+                <a href="/misservicios/registrar" className="cta-button">
+                  Añadir nuevo servicio <ArrowRight size={16} className="button-icon" />
                 </a>
               </div>
-
-              <div className="create-option-card">
-                <div className="option-icon-container">
-                  <Handshake className="option-icon" />
-                </div>
-                <h3 className="option-title">Gestiona solicitudes</h3>
-                <p className="option-text">
-                  Administra las solicitudes de clientes de forma intuitiva y eficiente.
-                </p>
-                <a href="/solicitudes" className="option-button">
-                  Ver solicitudes <ChevronRight size={16} className="ml-2" />
-                </a>
-              </div>
             </div>
-          </div>
-        </section>
-
-        <AboutSection />
-
-        <section className="cta-section">
-          <div className="container">
-            <h2 className="cta-title">Haz crecer tu negocio con nosotros</h2>
-            <p className="cta-description">Añade nuevos servicios y llega a más clientes potenciales</p>
-            <a href="/misservicios/registrar" className="cta-button">
-              Añadir servicio <ChevronRight size={16} className="ml-2" />
-            </a>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
     )
   }
 
   // ADMIN VIEW
   if (currentUser.role === "ADMIN") {
     return (
-      <main className="main-container">
+      <div className="site-wrapper">
+        <main className="main-content">
+          <section className="hero-section admin-hero">
+            <div className="hero-content">
+              <div className="hero-text">
+                <h1 className="hero-title">Panel de Administración</h1>
+                <p className="hero-description">
+                  Gestiona todos los aspectos de la plataforma desde un único lugar centralizado.
+                </p>
+              </div>
+              <div className="hero-image-container">
+                <img
+                  src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=2070"
+                  alt="Panel de administración"
+                  className="hero-image"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="admin-dashboard-section">
+            <div className="container">
+              <div className="section-header">
+                <h2 className="section-title">Gestión de la Plataforma</h2>
+              </div>
+
+              <div className="admin-grid">
+                <div className="admin-card">
+                  <div className="admin-icon-wrapper">
+                    <Users className="admin-icon" />
+                  </div>
+                  <h3 className="admin-title">Usuarios</h3>
+                  <p className="admin-description">Gestiona usuarios, roles y permisos en la plataforma.</p>
+                  <a href="/admin-users" className="admin-link">
+                    Gestionar usuarios <ChevronRight size={14} />
+                  </a>
+                </div>
+
+                <div className="admin-card">
+                  <div className="admin-icon-wrapper">
+                    <Briefcase className="admin-icon" />
+                  </div>
+                  <h3 className="admin-title">Servicios</h3>
+                  <p className="admin-description">Supervisa y modera todos los servicios ofrecidos.</p>
+                  <a href="/admin-services" className="admin-link">
+                    Gestionar servicios <ChevronRight size={14} />
+                  </a>
+                </div>
+
+                <div className="admin-card">
+                  <div className="admin-icon-wrapper">
+                    <Calendar className="admin-icon" />
+                  </div>
+                  <h3 className="admin-title">Eventos</h3>
+                  <p className="admin-description">Visualiza y gestiona todos los eventos creados.</p>
+                  <a href="/admin-events" className="admin-link">
+                    Gestionar eventos <ChevronRight size={14} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    )
+  }
+
+  // DEFAULT VIEW (no role)
+  return (
+    <div className="site-wrapper">
+      <main className="main-content">
         <HeroSection />
 
-        <section className="welcome-section">
-          <div className="welcome-background"></div>
+        <section className="services-section">
           <div className="container">
-            <div className="welcome-header">
-              <h2 className="section-title">Administración de Eventbride</h2>
-              <div className="separator"></div>
-              <p className="welcome-tagline">Panel de control para gestionar todos los aspectos de la plataforma</p>
+            <div className="section-header">
+              <h2 className="section-title">Servicios para cada momento especial</h2>
+              <p className="section-description">Todo lo que necesitas para crear celebraciones inolvidables</p>
+            </div>
+
+            <div className="services-grid">
+              <div className="service-card">
+                <div className="service-image">
+                  <img
+                    src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=2070"
+                    alt="Bodas"
+                    className="service-img"
+                  />
+                </div>
+                <div className="service-content">
+                  <h3 className="service-title">Bodas</h3>
+                  <p className="service-description">
+                    Organiza el día más especial de tu vida con nuestros servicios personalizados.
+                  </p>
+                  <a href="/services/weddings" className="service-link">
+                    Explorar <ChevronRight size={14} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="service-card">
+                <div className="service-image">
+                  <img
+                    src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2074"
+                    alt="Bautizos"
+                    className="service-img"
+                  />
+                </div>
+                <div className="service-content">
+                  <h3 className="service-title">Bautizos</h3>
+                  <p className="service-description">
+                    Celebra este momento único con servicios adaptados a tus necesidades.
+                  </p>
+                  <a href="/services/baptisms" className="service-link">
+                    Explorar <ChevronRight size={14} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="service-card">
+                <div className="service-image">
+                  <img
+                    src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2070"
+                    alt="Comuniones"
+                    className="service-img"
+                  />
+                </div>
+                <div className="service-content">
+                  <h3 className="service-title">Comuniones</h3>
+                  <p className="service-description">
+                    Haz que este día sea especial con nuestra selección de servicios.
+                  </p>
+                  <a href="/services/communions" className="service-link">
+                    Explorar <ChevronRight size={14} />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="create-section">
-          <div className="create-background"></div>
+        <section className="features-section">
           <div className="container">
-            <div className="create-header">
-              <h2 className="section-title">Panel de control</h2>
-              <div className="separator"></div>
-              <p className="create-tagline">Gestiona usuarios, servicios y eventos desde un único lugar</p>
+            <div className="section-header">
+              <h2 className="section-title">¿Por qué elegir Eventbride?</h2>
+              <p className="section-description">Ventajas que nos diferencian</p>
             </div>
 
-            <div className="admin-dashboard">
-              <div className="admin-card">
-                <div className="admin-icon-container">
-                  <Users className="admin-icon" />
+            <div className="benefits-grid">
+              <div className="benefit-card">
+                <div className="benefit-icon-wrapper">
+                  <Shield className="benefit-icon" />
                 </div>
-                <h3 className="admin-title">Usuarios</h3>
-                <p className="admin-text">Gestiona los usuarios de la plataforma, tanto clientes como proveedores.</p>
-                <a href="/admin-users" className="admin-button">
-                  Gestionar usuarios <ChevronRight size={16} className="ml-2" />
-                </a>
+                <h3 className="benefit-title">Proveedores Verificados</h3>
+                <p className="benefit-description">
+                  Todos nuestros proveedores pasan por un riguroso proceso de verificación para garantizar calidad.
+                </p>
               </div>
 
-              <div className="admin-card">
-                <div className="admin-icon-container">
-                  <PartyPopper className="admin-icon" />
+              <div className="benefit-card">
+                <div className="benefit-icon-wrapper">
+                  <Clock className="benefit-icon" />
                 </div>
-                <h3 className="admin-title">Servicios</h3>
-                <p className="admin-text">Supervisa y modera todos los servicios ofrecidos en la plataforma.</p>
-                <a href="/admin-services" className="admin-button">
-                  Gestionar servicios <ChevronRight size={16} className="ml-2" />
-                </a>
+                <h3 className="benefit-title">Ahorro de Tiempo</h3>
+                <p className="benefit-description">
+                  Organiza tu evento en menos tiempo gracias a nuestras herramientas digitales.
+                </p>
               </div>
 
-              <div className="admin-card">
-                <div className="admin-icon-container">
-                  <Calendar className="admin-icon" />
+              <div className="benefit-card">
+                <div className="benefit-icon-wrapper">
+                  <Palette className="benefit-icon" />
                 </div>
-                <h3 className="admin-title">Eventos</h3>
-                <p className="admin-text">Visualiza y gestiona todos los eventos creados en la plataforma.</p>
-                <a href="/admin-events" className="admin-button">
-                  Gestionar eventos <ChevronRight size={16} className="ml-2" />
+                <h3 className="benefit-title">Personalización Total</h3>
+                <p className="benefit-description">
+                  Adapta cada detalle de tu evento según tus preferencias y necesidades.
+                </p>
+              </div>
+
+              <div className="benefit-card">
+                <div className="benefit-icon-wrapper">
+                  <Heart className="benefit-icon" />
+                </div>
+                <h3 className="benefit-title">Atención Personalizada</h3>
+                <p className="benefit-description">
+                  Soporte dedicado durante todo el proceso de organización de tu evento.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="how-it-works-section">
+          <div className="container">
+            <div className="section-header">
+              <h2 className="section-title">Cómo funciona</h2>
+              <p className="section-description">Organizar tu evento nunca ha sido tan sencillo</p>
+            </div>
+
+            <div className="process-steps">
+              <div className="process-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <h3 className="step-title">Regístrate</h3>
+                  <p className="step-description">
+                    Crea tu cuenta gratuita en nuestra plataforma en menos de un minuto.
+                  </p>
+                </div>
+              </div>
+
+              <div className="process-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <h3 className="step-title">Define tu evento</h3>
+                  <p className="step-description">Selecciona el tipo de evento, fecha y número de invitados.</p>
+                </div>
+              </div>
+
+              <div className="process-step">
+                <div className="step-number">3</div>
+                <div className="step-content">
+                  <h3 className="step-title">Explora servicios</h3>
+                  <p className="step-description">Descubre y contrata los mejores proveedores para tu celebración.</p>
+                </div>
+              </div>
+
+              <div className="process-step">
+                <div className="step-number">4</div>
+                <div className="step-content">
+                  <h3 className="step-title">¡Disfruta!</h3>
+                  <p className="step-description">Relájate mientras nosotros nos encargamos de coordinar todo.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="cta-section">
+          <div className="container">
+            <div className="cta-content">
+              <h2 className="cta-title">Comienza a planificar tu evento hoy</h2>
+              <p className="cta-description">Regístrate gratis y descubre todas las herramientas que tenemos para ti</p>
+              <div className="cta-buttons">
+                <a href="/register" className="cta-button">
+                  Crear cuenta <ArrowRight size={16} className="button-icon" />
+                </a>
+                <a href="/services" className="cta-secondary">
+                  Explorar servicios
                 </a>
               </div>
             </div>
           </div>
         </section>
       </main>
-    )
-  }
-
-  // DEFAULT VIEW (no role)
-  return (
-    <main className="main-container">
-      <HeroSection />
-
-      <section className="welcome-section">
-        <div className="welcome-background"></div>
-        <div className="container">
-          <div className="welcome-header">
-            <h2 className="section-title">Bienvenido a Eventbride</h2>
-            <div className="separator"></div>
-            <p className="welcome-tagline">Tu plataforma digital para organizar bodas, comuniones y bautizos de forma ágil y personalizada</p>
-          </div>
-
-          <div className="benefits-grid">
-            <div className="benefit-card">
-              <div className="benefit-icon-container">
-                <Calendar className="benefit-icon" />
-              </div>
-              <h3 className="benefit-title">Organización Ágil</h3>
-              <p className="benefit-text">
-                Nuestra plataforma automatiza procesos para que puedas organizar tu evento en menos tiempo y con menos esfuerzo.
-              </p>
-              <div className="benefit-stat">
-                <span className="stat-number">70%</span>
-                <span className="stat-label">menos tiempo de planificación</span>
-              </div>
-            </div>
-
-            <div className="benefit-card">
-              <div className="benefit-icon-container">
-                <Palette className="benefit-icon" />
-              </div>
-              <h3 className="benefit-title">Personalización Total</h3>
-              <p className="benefit-text">
-                Controla cada aspecto de tu evento con herramientas digitales que te permiten personalizar hasta el último detalle.
-              </p>
-              <div className="benefit-stat">
-                <span className="stat-number">100%</span>
-                <span className="stat-label">personalizable</span>
-              </div>
-            </div>
-
-            <div className="benefit-card">
-              <div className="benefit-icon-container">
-                <Users className="benefit-icon" />
-              </div>
-              <h3 className="benefit-title">Proveedores Verificados</h3>
-              <p className="benefit-text">
-                Conecta directamente con proveedores verificados para todos los servicios que necesites para tu evento.
-              </p>
-              <div className="benefit-stat">
-                <span className="stat-number">200+</span>
-                <span className="stat-label">proveedores en la plataforma</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="auth-buttons">
-            <a href="/login" className="auth-button primary">
-              Iniciar sesión
-            </a>
-            <a href="/register" className="auth-button secondary">
-              Registrarse
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section className="create-section">
-        <div className="create-background"></div>
-        <div className="container">
-          <div className="create-header">
-            <h2 className="section-title">Crea y organiza tu evento</h2>
-            <div className="separator"></div>
-            <p className="create-tagline">Herramientas digitales que simplifican cada paso del proceso</p>
-          </div>
-
-          <div className="process-steps">
-            <div className="process-step">
-              <div className="step-number">1</div>
-              <div className="step-content">
-                <h3 className="step-title">Selecciona tu tipo de evento</h3>
-                <p className="step-text">Elige entre boda, bautizo o comunión y personaliza las opciones según tus necesidades.</p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="step-number">2</div>
-              <div className="step-content">
-                <h3 className="step-title">Personaliza cada detalle</h3>
-                <p className="step-text">Configura fechas, ubicaciones, invitados, servicios y todos los elementos de tu evento.</p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="step-number">3</div>
-              <div className="step-content">
-                <h3 className="step-title">Conecta con proveedores</h3>
-                <p className="step-text">Selecciona entre nuestra red de proveedores verificados y gestiona tus contrataciones.</p>
-              </div>
-            </div>
-
-            <div className="process-step">
-              <div className="step-number">4</div>
-              <div className="step-content">
-                <h3 className="step-title">Gestiona tu evento</h3>
-                <p className="step-text">Controla todos los aspectos de tu evento desde un único panel centralizado.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <AboutSection />
-
-      <section className="cta-section">
-        <div className="container">
-          <h2 className="cta-title">Comienza a planificar tu evento hoy</h2>
-          <p className="cta-description">Regístrate para acceder a todas las herramientas y servicios de Eventbride</p>
-          <a href="/register" className="cta-button">
-            Crear cuenta <ChevronRight size={16} className="ml-2" />
-          </a>
-        </div>
-      </section>
-    </main>
+    </div>
   )
 }
+

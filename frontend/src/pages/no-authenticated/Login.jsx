@@ -34,7 +34,6 @@ function Login({ setUser }) {
       });
       const user = await updated.json();
 
-
       setUser(user);
       window.localStorage.setItem("user", JSON.stringify(data.user));
       window.localStorage.setItem("jwt", response.data.token);
@@ -49,6 +48,7 @@ function Login({ setUser }) {
   return (
     <div className="split-layout">
       <div className="login-side">
+        <div className="top-banner"></div>
         <div className="login-card">
           <div className="login-header">
             <h1>Bienvenido</h1>
@@ -129,6 +129,7 @@ function Login({ setUser }) {
           </div>
           <div className="collage-item item-4"></div>
           <div className="collage-item item-5"></div>
+          <div className="collage-item item-6"></div>
         </div>
       </div>
     </div>

@@ -1,9 +1,9 @@
 .service-container {
     background-color: #ffffff;    
     border-radius: 8px;             
-    padding: 16px;                  
+    padding: 16px;  
+    width: 100%;                
     margin: 16px auto;              
-    max-width: 600px;               
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
   }
   
