@@ -24,7 +24,7 @@ const OtherServiceScreen = () => {
   const [serviceDetails, setServiceDetails] = useState(null)
   const [venueTimes, setVenueTimes] = useState({})
   const [loading, setLoading] = useState(true)
-  const [isConfirming, setIsConfirming] = useState(false)
+  const [confirmingService, setConfirmingService] = useState({});
   const navigate = useNavigate();
 
   // Estados de paginación
@@ -239,20 +239,24 @@ const OtherServiceScreen = () => {
   }
 
   const handleConfirmService = async (eventObj, selectedOtherServiceId) => {
+    // Set loading state for this specific event button
+    setConfirmingService(prev => ({ ...prev, [eventObj.id]: true }));
+
     const times = venueTimes[eventObj.id] || {}
     if (!times.startTime || !times.endTime) {
       showAlert("Por favor, ingresa la hora de inicio y la hora de fin para este servicio.")
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
     if (times.startTime >= times.endTime) {
       showAlert("Por favor, ingresa un intervalo horario válido.")
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false })); // Reset loading state
       return
     }
 
     const startDate = combineDateAndTime(eventObj.eventDate, times.startTime)
     const endDate = combineDateAndTime(eventObj.eventDate, times.endTime)
 
-    setIsConfirming(true) // Bloquea clics múltiples
     try {
       await axios.put(`/api/event-properties/${eventObj.id}/add-otherservice/${selectedOtherServiceId}`, null, {
         params: { startDate, endDate },
@@ -260,11 +264,18 @@ const OtherServiceScreen = () => {
       })
       showAlert("¡Operación realizada con éxito!")
       setModalVisible(false)
+      // Optionally clear times for this event if needed
+      // setVenueTimes(prev => {
+      //   const newTimes = { ...prev };
+      //   delete newTimes[eventObj.id];
+      //   return newTimes;
+      // });
     } catch (error) {
       console.error("Error al añadir el servicio:", error)
-      showAlert(error.response.data.error || "Error al añadir el servicio")
+      showAlert(error.response?.data?.error || "Error al añadir el servicio")
     } finally {
-      setIsConfirming(false)
+      // Reset loading state regardless of success or failure
+      setConfirmingService(prev => ({ ...prev, [eventObj.id]: false }));
     }
   }
 
@@ -671,14 +682,19 @@ const OtherServiceScreen = () => {
                         <button
                           className="vs-event-confirm-button"
                           onClick={() => handleConfirmService(eventObj, selectedOtherServiceId)}
-                          disabled={isConfirming}
+                          disabled={confirmingService[eventObj.id]} // Disable button based on specific event ID
                         >
-                          {isConfirming ? (
-                            <Loader2 className="button-icon spinner" />
+                          {confirmingService[eventObj.id] ? ( // Show loading state based on specific event ID
+                            <>
+                              <Loader2 className="button-icon animate-spin" />
+                              <span>Confirmando...</span>
+                            </>
                           ) : (
-                            <CheckCircle className="button-icon" />
+                            <>
+                              <CheckCircle className="button-icon" />
+                              <span>Confirmar selección</span>
+                            </>
                           )}
-                          <span>Confirmar selección</span>
                         </button>
                       </div>
                     </div>
