@@ -46,5 +46,4 @@ spring.web.cors.allowed-origins=http://localhost:5173
 spring.web.cors.allowed-methods=GET,POST,PUT,DELETE
 spring.web.cors.allowed-headers=*
 spring.web.cors.allow-credentials=true
-
 app.base-url=http://localhost:5173
