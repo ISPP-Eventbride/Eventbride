@@ -3,15 +3,15 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-    background-color: #f9f9f9;
+    font-family: "Playfair Display", serif;
+    color: #1a202c;
+    background-color: #f7fafc;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-/* Encabezado */
-.ventas-header {
+  }
+  
+  /* Encabezado */
+  .ventas-header {
     margin-top: 60px;
 
     display: flex;
@@ -19,219 +19,219 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.ventas-title {
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .ventas-title {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #333;
+    color: #1a202c;
     margin: 0;
-}
-
-.resaltado {
-    color: #4a6fa5;
+  }
+  
+  .resaltado {
+    color: #d9be75;
     position: relative;
-}
-
-.resaltado::after {
+  }
+  
+  .resaltado::after {
     content: "";
     position: absolute;
     bottom: -5px;
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: #4a6fa5;
+    background-color: #d9be75;
     border-radius: 2px;
-}
-
-.ventas-summary {
+  }
+  
+  .ventas-summary {
     display: flex;
     align-items: center;
-}
-
-.summary-item {
-    background-color: #fff;
+  }
+  
+  .summary-item {
+    background-color: #ffffff;
     padding: 0.8rem 1.2rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-}
-
-.summary-label {
+  }
+  
+  .summary-label {
     font-size: 0.9rem;
-    color: #666;
+    color: #4a5568;
     margin-bottom: 0.3rem;
-}
-
-.summary-value {
+  }
+  
+  .summary-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #4a6fa5;
-}
-
-/* Tabla de ventas */
-.tabla-container {
-    background-color: #fff;
+    color: #d9be75;
+  }
+  
+  /* Tabla de ventas */
+  .tabla-container {
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     margin-bottom: 2rem;
-}
-
-.tabla-scroll {
+  }
+  
+  .tabla-scroll {
     overflow-x: auto;
     padding: 1rem;
-}
-
-.ventas-tabla {
+  }
+  
+  .ventas-tabla {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-}
-
-.ventas-tabla th {
-    background-color: #f5f7fa;
-    color: #4a6fa5;
+  }
+  
+  .ventas-tabla th {
+    background-color: #f5efd9;
+    color: #d9be75;
     font-weight: 600;
     text-align: left;
     padding: 1rem;
-    border-bottom: 2px solid #e0e6ed;
+    border-bottom: 2px solid #e2e8f0;
     position: sticky;
     top: 0;
-}
-
-.ventas-tabla td {
+  }
+  
+  .ventas-tabla td {
     padding: 1rem;
-    border-bottom: 1px solid #e0e6ed;
+    border-bottom: 1px solid #e2e8f0;
     transition: background-color 0.2s;
-}
-
-.ventas-tabla tr:last-child td {
+  }
+  
+  .ventas-tabla tr:last-child td {
     border-bottom: none;
-}
-
-.ventas-tabla tr:hover td {
-    background-color: #f5f7fa;
-}
-
-.row-even {
-    background-color: #fff;
-}
-
-.row-odd {
-    background-color: #f9fafc;
-}
-
-.payment-type {
+  }
+  
+  .ventas-tabla tr:hover td {
+    background-color: #f5efd9;
+  }
+  
+  .row-even {
+    background-color: #ffffff;
+  }
+  
+  .row-odd {
+    background-color: #f7fafc;
+  }
+  
+  .payment-type {
     display: inline-block;
     padding: 0.4rem 0.8rem;
     border-radius: 4px;
     font-size: 0.85rem;
     font-weight: 500;
-}
-
-.payment-type.deposit {
-    background-color: #e3f2fd;
-    color: #1976d2;
-}
-
-.payment-type.remaining {
+  }
+  
+  .payment-type.deposit {
+    background-color: #f5efd9;
+    color: #c4a95a;
+  }
+  
+  .payment-type.remaining {
     background-color: #e8f5e9;
     color: #388e3c;
-}
-
-.payment-type.commission {
+  }
+  
+  .payment-type.commission {
     background-color: #fff3e0;
     color: #f57c00;
-}
-
-.payment-type.plan {
+  }
+  
+  .payment-type.plan {
     background-color: #f3e5f5;
     color: #8e24aa;
-}
-
-.comision-note {
+  }
+  
+  .comision-note {
     padding: 1rem;
-    color: #666;
+    color: #4a5568;
     font-size: 0.9rem;
     font-style: italic;
-    border-top: 1px solid #e0e6ed;
+    border-top: 1px solid #e2e8f0;
     margin: 0;
-}
-
-/* Estado vacío */
-.empty-state {
+  }
+  
+  /* Estado vacío */
+  .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 2rem;
-}
-
-.empty-icon {
+  }
+  
+  .empty-icon {
     font-size: 3rem;
     margin-bottom: 3rem;
-    color: #ccc;
-}
-
-/* Sección de retiro */
-.withdraw-section {
-    background-color: #fff;
+    color: #e2e8f0;
+  }
+  
+  /* Sección de retiro */
+  .withdraw-section {
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: 1.5rem;
-}
-
-.withdraw-title {
+  }
+  
+  .withdraw-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #1a202c;
     margin-top: 0;
     margin-bottom: 1.5rem;
     padding-bottom: 0.8rem;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.withdraw-content {
+    border-bottom: 2px solid #e2e8f0;
+  }
+  
+  .withdraw-content {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-}
-
-.withdraw-info {
+  }
+  
+  .withdraw-info {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-
-.withdraw-amount {
+  }
+  
+  .withdraw-amount {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #f5f7fa;
+    background-color: #f5efd9;
     padding: 1rem;
     border-radius: 6px;
-}
-
-.amount-label {
+  }
+  
+  .amount-label {
     font-weight: 500;
-    color: #666;
-}
-
-.amount-value {
+    color: #4a5568;
+  }
+  
+  .amount-value {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #4a6fa5;
-}
-
-.withdraw-button {
-    background-color: #4a6fa5;
+    color: #d9be75;
+  }
+  
+  .withdraw-button {
+    background-color: #d9be75;
     color: white;
     border: none;
     border-radius: 6px;
@@ -241,62 +241,62 @@
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
     align-self: flex-start;
-}
-
-.withdraw-button:hover {
-    background-color: #3d5d8a;
-}
-
-.withdraw-button:active {
+  }
+  
+  .withdraw-button:hover {
+    background-color: #c4a95a;
+  }
+  
+  .withdraw-button:active {
     transform: translateY(1px);
-}
-
-.withdraw-button:disabled {
-    background-color: #ccc;
+  }
+  
+  .withdraw-button:disabled {
+    background-color: #e2e8f0;
     cursor: not-allowed;
-}
-
-.no-funds-message {
-    color: #666;
+  }
+  
+  .no-funds-message {
+    color: #4a5568;
     font-style: italic;
-}
-
-/* Mensajes de éxito y error */
-.success-message,
-.error-message {
+  }
+  
+  /* Mensajes de éxito y error */
+  .success-message,
+  .error-message {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem;
     border-radius: 6px;
     margin-top: 1rem;
-}
-
-.success-message {
+  }
+  
+  .success-message {
     background-color: #e8f5e9;
-    border-left: 4px solid #4caf50;
-}
-
-.error-message {
+    border-left: 4px solid #10b981;
+  }
+  
+  .error-message {
     background-color: #ffebee;
-    border-left: 4px solid #f44336;
-}
-
-.success-icon,
-.error-icon {
+    border-left: 4px solid #ef4444;
+  }
+  
+  .success-icon,
+  .error-icon {
     font-size: 1.5rem;
-}
-
-.success-icon {
-    color: #4caf50;
-}
-
-.error-icon {
-    color: #f44336;
-}
-
-/* Modal de confirmación */
-.confirmation-overlay {
+  }
+  
+  .success-icon {
+    color: #10b981;
+  }
+  
+  .error-icon {
+    color: #ef4444;
+  }
+  
+  /* Modal de confirmación */
+  .confirmation-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -307,107 +307,107 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
-
-.confirmation-modal {
+  }
+  
+  .confirmation-modal {
     background-color: white;
     border-radius: 8px;
     padding: 2rem;
     width: 90%;
     max-width: 500px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.confirmation-modal h3 {
+  }
+  
+  .confirmation-modal h3 {
     margin-top: 0;
-    color: #333;
+    color: #1a202c;
     font-size: 1.5rem;
-}
-
-.confirmation-note {
-    color: #f44336;
+  }
+  
+  .confirmation-note {
+    color: #ef4444;
     font-size: 0.9rem;
     font-style: italic;
-}
-
-.confirmation-buttons {
+  }
+  
+  .confirmation-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 2rem;
-}
-
-.cancel-button,
-.confirm-button {
+  }
+  
+  .cancel-button,
+  .confirm-button {
     padding: 0.8rem 1.5rem;
     border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
-}
-
-.cancel-button {
-    background-color: #f5f5f5;
-    color: #333;
-    border: 1px solid #ddd;
-}
-
-.cancel-button:hover {
-    background-color: #e0e0e0;
-}
-
-.confirm-button {
-    background-color: #4a6fa5;
+  }
+  
+  .cancel-button {
+    background-color: #f7fafc;
+    color: #1a202c;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .cancel-button:hover {
+    background-color: #e2e8f0;
+  }
+  
+  .confirm-button {
+    background-color: #d9be75;
     color: white;
     border: none;
-}
-
-.confirm-button:hover {
-    background-color: #3d5d8a;
-}
-
-/* Estados de carga y error */
-.loading-container,
-.error-container {
+  }
+  
+  .confirm-button:hover {
+    background-color: #c4a95a;
+  }
+  
+  /* Estados de carga y error */
+  .loading-container,
+  .error-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     text-align: center;
-}
-
-.loading-spinner {
+  }
+  
+  .loading-spinner {
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #4a6fa5;
+    border-top: 4px solid #d9be75;
     border-radius: 50%;
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
-}
-
-@keyframes spin {
+  }
+  
+  @keyframes spin {
     0% {
-        transform: rotate(0deg);
+      transform: rotate(0deg);
     }
-
+  
     100% {
-        transform: rotate(360deg);
+      transform: rotate(360deg);
     }
-}
-
-.error-container .error-icon {
+  }
+  
+  .error-container .error-icon {
     font-size: 3rem;
-    color: #f44336;
+    color: #ef4444;
     margin-bottom: 1rem;
-}
-
-.retry-button {
-    background-color: #4a6fa5;
+  }
+  
+  .retry-button {
+    background-color: #d9be75;
     color: white;
     border: none;
     border-radius: 6px;
@@ -417,38 +417,38 @@
     cursor: pointer;
     margin-top: 1rem;
     transition: background-color 0.2s;
-}
-
-.retry-button:hover {
-    background-color: #3d5d8a;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+  }
+  
+  .retry-button:hover {
+    background-color: #c4a95a;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
     .ventas-container {
-        padding: 1rem;
+      padding: 1rem;
     }
-
+  
     .ventas-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
     }
-
+  
     .ventas-title {
-        font-size: 1.8rem;
+      font-size: 1.8rem;
     }
-
+  
     .withdraw-button {
-        width: 100%;
+      width: 100%;
     }
-
+  
     .confirmation-buttons {
-        flex-direction: column;
+      flex-direction: column;
     }
-
+  
     .cancel-button,
     .confirm-button {
-        width: 100%;
+      width: 100%;
     }
-}
+  }

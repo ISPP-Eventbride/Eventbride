@@ -224,8 +224,8 @@
 }
 
 .solicitud-avatar {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 4rem;
+    width: 4rem;
     border-radius: 9999px;
     object-fit: cover;
     border: 2px solid white;
@@ -410,6 +410,7 @@
     background-color: white;
     border: 1px solid #d1d5db;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin-right: 10px;
 }
 
 .btn-reject:hover:not(:disabled) {
@@ -432,6 +433,7 @@
     background-color: #10b981;
     border: 1px solid transparent;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin-left: 10px;
 }
 
 .btn-confirm:hover:not(:disabled) {

@@ -741,9 +741,9 @@ const VenuesScreen = () => {
                         </div>
                       </div>
 
-                      <div className="event-actions">
+                      <div className="vs-event-actions">
                         <button
-                          className="event-confirm-button"
+                          className="vs-event-confirm-button"
                           onClick={() => handleConfirmVenue(eventObj, selectedVenueForAdd.id)}
                         >
                           <ArrowRight className="button-icon" />
