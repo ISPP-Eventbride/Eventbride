@@ -3,7 +3,7 @@ instance_class: F2
 
 env_variables:
   # Configuración de la base de datos MySQL en Cloud SQL
-  SPRING_DATASOURCE_URL: jdbc:mysql://google/sprint3DB?cloudSqlInstance=ispp-2425-03:europe-west1:eventbrideserverdb&socketFactory=com.google.cloud.sql.mysql.SocketFactory&useSSL=false&serverTimezone=Europe/Madrid&useLegacyDatetimeCode=false&zeroDateTimeBehavior=convertToNull
+  SPRING_DATASOURCE_URL: jdbc:mysql://google/pplDB?cloudSqlInstance=ispp-2425-03:europe-west1:eventbrideserverdb&socketFactory=com.google.cloud.sql.mysql.SocketFactory&useSSL=false&serverTimezone=Europe/Madrid&useLegacyDatetimeCode=false&zeroDateTimeBehavior=convertToNull
   SPRING_DATASOURCE_USERNAME: root
   SPRING_DATASOURCE_PASSWORD: root
   SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
