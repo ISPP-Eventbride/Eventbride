@@ -278,7 +278,7 @@ public class UserService {
         user.setChangePasswordToken(uuid);
         userRepository.save(user);
 
-        String link = getBaseUrl() + "/cambiar-contraseña/" + uuid;
+        String link = String.format("%s/cambiar-contraseña/%s", getBaseUrl(), uuid);
 
         // ENVIAR CORREO
         SimpleMailMessage mailMessage = new SimpleMailMessage();
