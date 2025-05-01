@@ -78,7 +78,7 @@ public class InvitationController {
 	@PutMapping
 	public ResponseEntity<?> fillInvitation(@RequestBody @Valid Invitation invitation) throws IllegalArgumentException {
 		Invitation res = invitationService.fillInvitation(invitation);
-		InvitationDTO invitationDTO = new InvitationDTO(invitation);
+		InvitationDTO invitationDTO = new InvitationDTO(res);
 		return new ResponseEntity<>(invitationDTO, HttpStatus.CREATED);
 	}
 

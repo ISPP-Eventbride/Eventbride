@@ -104,6 +104,8 @@ function EventInvitations() {
           copyLink(fullConfirmationLink);
           showAlert("Link a la invitación copiado al portapapeles");
           setInvitaciones((prev) => [...prev, data]);
+        } else {
+          showAlert(data.error);
         }
       })
       .catch((error) =>

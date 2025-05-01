@@ -55,7 +55,7 @@ public class InvitationService {
 				.anyMatch(eventProperties -> eventProperties.getVenue() != null);
 
 		if (!hasVenue) {
-			throw new IllegalArgumentException("No se puede crear una invitación para un evento sin venue");
+			throw new IllegalArgumentException("No se puede crear una invitación para un evento sin recinto");
 		}
 
 		Invitation invitation = new Invitation();
@@ -80,8 +80,8 @@ public class InvitationService {
 				+ ", con dirección "
 				+ event.getEventProperties().stream()
 						.filter(eventProperties -> eventProperties.getVenue() != null).findFirst().get().getVenue().getAddress()
-				+ ". \n Para confirmar su asistencia debe acceder al siguiente enlace: "
-				+ confirmationLink + "/" + savedInvitation.getId() + ". \nMuchas gracias!");
+				+ ". \nPara confirmar su asistencia debe acceder al siguiente enlace: "
+				+ confirmationLink + "/" + savedInvitation.getId() + " \nMuchas gracias!");
 		
 		emailService.sendEmail(mailMessage);
 		
