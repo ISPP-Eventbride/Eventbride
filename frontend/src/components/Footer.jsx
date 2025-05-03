@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import { Link } from "react-router-dom"
-import { Mail, Phone, MapPin, Instagram, Linkedin, Music2 } from "lucide-react"
+import { Mail, MapPin, Instagram, Linkedin, Music2 } from "lucide-react"
 import "../static/resources/css/Footer.css"
 
 // eslint-disable-next-line react/prop-types
@@ -67,7 +68,7 @@ function Footer({ user }) {
                 </div>
 
                 <div className="footer-bottom">
-                    <p style={{ color: "#a0a0a0" }}>© {new Date().getFullYear()} Eventbride. Todos los derechos reservados. <a href="/terminos-y-condiciones">Nuestros términos y condiciones</a></p>
+                    <p style={{ color: "#474747" }}>© {new Date().getFullYear()} Eventbride. Todos los derechos reservados. <a href="/terminos-y-condiciones">Nuestros términos y condiciones</a></p>
                 </div>
             </footer>
         </div>

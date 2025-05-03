@@ -39,7 +39,7 @@ export default function HomePage() {
           <div className="hero-buttons">
             {currentUser.role === 'CLIENT' ? (
               <>
-                <a href="/create-events" className="primary-button" style={{ background: '#b48c3c', color: "white" }}>
+                <a href="/create-events" className="primary-button" style={{ background: '#d9be75', color: "white" }}>
                   Crear evento <ArrowRight size={16} className="button-icon" />
                 </a>
               </>

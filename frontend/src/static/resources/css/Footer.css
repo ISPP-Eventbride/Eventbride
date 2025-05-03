@@ -7,7 +7,7 @@
 }
 
 .site-footer {
-    background-color: #1a1a1a;
+    background-color: #d0af6d;
     color: #ffffff;
     padding: 40px 20px 20px;
     width: 100%;
@@ -29,14 +29,14 @@
 }
 
 .footer-section h3 {
-    color: #ffffff;
+    color: #000000;
     font-size: 18px;
     margin-bottom: 15px;
     font-weight: 600;
 }
 
 .footer-section p {
-    color: #a0a0a0;
+    color: #474747;
     line-height: 1.6;
     margin-bottom: 20px;
 }
@@ -47,7 +47,7 @@
 }
 
 .social-icons a {
-    color: #a0a0a0;
+    color: #474747;
     transition: color 0.3s;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .footer-section ul li a {
-    color: #a0a0a0;
+    color: #474747;
     text-decoration: none;
     transition: color 0.3s;
 }
@@ -79,7 +79,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #a0a0a0;
+    color: #474747;
 }
 
 .footer-bottom {
@@ -87,7 +87,7 @@
     padding-top: 20px;
     margin-top: 20px;
     border-top: 1px solid #333;
-    color: #a0a0a0;
+    color: #474747;
     font-size: 14px;
 }
 
