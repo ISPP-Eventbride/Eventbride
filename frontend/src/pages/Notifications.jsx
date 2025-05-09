@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const itemsPerPage = 5;
 
   const jwt = window.localStorage.getItem("jwt");
 
@@ -33,12 +36,19 @@ function Notifications() {
       .catch((error) => console.error('Error fetching notifications:', error));
   }, []);
 
+  const totalPages = Math.ceil(notifications.length / itemsPerPage);
+  const startIndex = page * itemsPerPage;
+  const currentNotifications = notifications.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   return (
-    <div style={{ marginTop: 70, padding: '20px' }}>
+    <div style={{ marginTop: 70, padding: '20px', minHeight: '80vh', display: 'flex', flex: 1, flexDirection: 'column' }}>
       {notifications.length > 0 ? (
-        notifications.map((notification, index) => (
+        currentNotifications.map((notification, idx) => (
           <div
-            key={index}
+            key={startIndex+idx}
             style={{
               border: '1px solid #ccc',
               borderRadius: '10px',
@@ -56,6 +66,23 @@ function Notifications() {
         ))
       ) : (
         <p>No hay notificaciones disponibles.</p>
+      )}
+      {notifications.length > itemsPerPage && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
+          <button
+            onClick={() => setPage(p => Math.max(p - 1, 0))}
+            disabled={page === 0}
+          >
+            ← Anterior
+          </button>
+          <span>Página {page + 1} de {totalPages}</span>
+          <button
+            onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
+            disabled={page + 1 >= totalPages}
+          >
+            Siguiente →
+          </button>
+        </div>
       )}
     </div>
   );
