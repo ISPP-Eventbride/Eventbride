@@ -318,7 +318,7 @@ const TermsModal = ({ onClose }) => {
 
               <h3>Contacto para gestión de cancelaciones</h3>
               <p>
-                Escribir a <strong>soporte@eventbride.fun</strong> con el asunto: "Cancelación del servicio [NOMBRE DEL
+                Escribir a <strong>eventbride6@gmail.com</strong> con el asunto: "Cancelación del servicio [NOMBRE DEL
                 SERVICIO] para el evento del día [FECHA DEL EVENTO]".
               </p>
             </div>
@@ -394,7 +394,7 @@ const TermsModal = ({ onClose }) => {
                 Ante incumplimientos graves, podrá eliminar la oferta y prohibir el uso de la plataforma.
               </p>
               <p>
-                Para incidencias, contactar a <strong>soporte@eventbride.fun</strong> con el asunto "Incidencia del
+                Para incidencias, contactar a <strong>eventbride6@gmail.com</strong> con el asunto "Incidencia del
                 servicio [NOMBRE DEL SERVICIO] para el evento del día [FECHA DEL EVENTO]".
               </p>
             </div>

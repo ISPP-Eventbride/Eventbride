@@ -55,10 +55,10 @@ function Footer({ user }) {
                                 <MapPin size={16} /> Escuela Superior de Ingeniería Informática, Sevilla
                             </li>
                             <li>
-                                <Mail size={16} />Email corporativo: eventbride6@gmail.com
+                                <Mail size={16} />Correo corporativo: eventbride6@gmail.com
                             </li>
                             <li>
-                                <Mail size={16} />Email soporte: soporte@eventbride.fun
+                                <Mail size={16} />Correo de información: info@eventbride.fun
 
                             </li>
                             <li>

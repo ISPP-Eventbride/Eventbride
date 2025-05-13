@@ -21,7 +21,7 @@ INSERT IGNORE INTO users (id, username, role, email, first_name, last_name, tele
 -- para probar notificaciones
 (19, 'Urgoneta', 'SUPPLIER', 'gonnavrem@alum.us.es', 'Urgon', 'Furgoneta', '934782651', '56473829C', 'https://carwow-es-wp-0.imgix.net/mercedes-benz_sprinter_panel_van_1.jpeg', '$2a$10$gyqEuh5bpJVhwuN44YwkjeaR6/1u2KqFTGhjYxWtH27Dmka569AmK', "PREMIUM", '2025-03-20', '2030-04-20', true),
 -- admin
-(15, 'Admin', 'ADMIN', 'soporte@eventbride.fun', 'Admin', 'Soyadmin', '855203974', '47586931T', 'https://iili.io/3R8p4yu.png', '$2a$10$gyqEuh5bpJVhwuN44YwkjeaR6/1u2KqFTGhjYxWtH27Dmka569AmK', null, null, null, false);
+(15, 'Admin', 'ADMIN', 'info@eventbride.fun', 'Admin', 'Soyadmin', '855203974', '47586931T', 'https://iili.io/3R8p4yu.png', '$2a$10$gyqEuh5bpJVhwuN44YwkjeaR6/1u2KqFTGhjYxWtH27Dmka569AmK', null, null, null, false);
 
 INSERT IGNORE INTO venues (id, postal_code, coordinates, address, max_guests, surface, name, available, city_available, service_price_guest, service_price_hour, picture, description, user_id, limited_by_price_per_guest, limited_by_price_per_hour, fixed_price, earliest_time, latest_time) VALUES 
 (1, '41000', '37.42571305296568, -5.82959169111589', 'Cam. Rocío, 404', 110, 100.00, 'Castillo de Maxi' ,TRUE, 'Sevilla', null, null, 'https://www.guiacatering.com/site/company/a7/1176/images/366309/el-castillo-de-maxi_ci3.jpg', '¿Sabías que entre nuestros servicios se encuentra la posibilidad de disfrutar de un castillo hinchable? ¡Los más pequeños se lo pasarán en grande!', 6, FALSE, FALSE, 1500.00, '09:00:00', '23:59:00'),
