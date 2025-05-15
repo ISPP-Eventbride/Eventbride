@@ -105,6 +105,26 @@ public class OtherServiceController {
 			return new ResponseEntity<>("No tienes permisos para eliminar este servicio", HttpStatus.UNAUTHORIZED);
 		}
 
+		// Asegurarse que no se puede hacer disable si existen eventos asociados al
+		// servicio
+		boolean eventoPorVenir = false;
+		for (Event e : eventService.findAll()) {
+			for (EventProperties ep : e.getEventProperties()) {
+				if (ep.getOtherService() != null && ep.getOtherService().getId() == service.getId()) {
+					if (e.getEventDate().isAfter(LocalDate.now())) {
+						eventoPorVenir = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (eventoPorVenir) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(Map.of("error",
+					"No puedes deshabilitar servicios asociados a eventos que todavia no se han celebrado"));
+		}
+
 		otherServiceService.deleteOtherService(id);
 		return new ResponseEntity<>("Eliminado correctamente", HttpStatus.OK);
 	}
@@ -240,27 +260,6 @@ public class OtherServiceController {
 		if (!isAdmin && !isSupplierAndOwner) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN)
 					.body(Map.of("error", "No tienes permisos para modificar este servicio"));
-		}
-
-		// Asegurarse que no se puede hacer disable si existen eventos asociados al
-		// servicio
-
-		boolean eventoPorVenir = false;
-		for (Event e : eventService.findAll()) {
-			for (EventProperties ep : e.getEventProperties()) {
-				if (ep.getOtherService() != null && ep.getOtherService().getId() == service.getId()) {
-					if (e.getEventDate().isAfter(LocalDate.now())) {
-						eventoPorVenir = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (eventoPorVenir) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Map.of("error",
-							"No puedes deshabilitar servicios asociados a eventos que todavia no se han celebrado"));
 		}
 
 		service.setAvailable(!service.getAvailable());

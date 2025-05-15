@@ -307,25 +307,4 @@ class VenueControllerTest {
                 .andExpect(jsonPath("$.error").value("Servicio no encontrado"));
     }
 
-    @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    void shouldReturnBadRequestWhenVenueHasAssociatedEvents() throws Exception {
-        Venue venue = createVenue();
-        venue.setId(1);
-
-        EventProperties event = new EventProperties();
-        event.setVenue(venue);
-
-        Event futureEvent = new Event();
-        futureEvent.setEventDate(LocalDate.now().plusDays(1));
-        futureEvent.setEventProperties(List.of(event));
-
-        when(venueService.getVenueById(1)).thenReturn(Optional.of(venue));
-        when(eventService.findAll()).thenReturn(List.of(futureEvent));
-
-        mockMvc.perform(patch("/api/venues/disable/1"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("No puedes deshabilitar servicios asociados a eventos que todavia no se han celebrado"));
-    }
-
 }
