@@ -51,21 +51,27 @@
 }
 
 .brand-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;     
+  flex: 1;
 }
 
 .navbar-logo {
-    width: 15vh;
-    height: auto;
-    margin-right: 12px;
-    transition: transform var(--transition-fast);
+  display: block;        /* o inline-block si lo prefieres */
+  height: 200px;          /* el tamaño que quieras */
+  width: auto;
+  margin: 0 auto;        /* si necesitas centrarlo horizontal */
+  margin-bottom: -1.9vh;   /* ajusta este valor positivo (sube) o negativo (baja) */
+  transition: transform var(--transition-fast);
 }
 
 .brand-link:hover .navbar-logo {
     transform: scale(1.05);
+}
+
+.navbar.scrolled .navbar-container {
+  align-items: center;
 }
 
 .navbar-title {
