@@ -113,6 +113,38 @@ public class VenueController {
 				.map(GrantedAuthority::getAuthority)
 				.anyMatch(role -> role.equals("SUPPLIER") || role.equals("ROLE_SUPPLIER"));
 
+		// Asegurarse que no se puede hacer disable si existen eventos asociados al
+		// recinto
+
+		Optional<Venue> optionalService = venueService.getVenueById(id);
+
+		if (optionalService.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("error", "Servicio no encontrado"));
+		}
+
+		Venue service = optionalService.get();
+
+		boolean eventoPorVenir = false;
+
+		for (Event e : eventService.findAll()) {
+			for (EventProperties ep : e.getEventProperties()) {
+				if (ep.getVenue() != null && ep.getVenue().getId() == service.getId()) {
+					if (e.getEventDate().isAfter(LocalDate.now())) {
+						eventoPorVenir = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (eventoPorVenir) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error",
+							"No puedes deshabilitar servicios asociados a eventos que todavia no se han celebrado"));
+		}
+
+
 		if (hasSupplierRole) {
 			venueService.deleteVenue(id);
 			return new ResponseEntity<>("Deleted successfully", HttpStatus.OK);
@@ -158,6 +190,7 @@ public class VenueController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 		List<String> roles = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+
 		if (roles.contains("ADMIN")) {
 			venueService.deleteVenue(id);
 			return new ResponseEntity<>("Deleted successfully", HttpStatus.OK);
@@ -211,26 +244,6 @@ public class VenueController {
 					.body(Map.of("error", "No tienes permisos para modificar este servicio"));
 		}
 
-		// Asegurarse que no se puede hacer disable si existen eventos asociados al
-		// recinto
-		boolean eventoPorVenir = false;
-
-		for (Event e : eventService.findAll()) {
-			for (EventProperties ep : e.getEventProperties()) {
-				if (ep.getVenue() != null && ep.getVenue().getId() == service.getId()) {
-					if (e.getEventDate().isAfter(LocalDate.now())) {
-						eventoPorVenir = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (eventoPorVenir) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Map.of("error",
-							"No puedes deshabilitar servicios asociados a eventos que todavia no se han celebrado"));
-		}
 
 		service.setAvailable(!service.getAvailable());
 		venueService.save(service);
