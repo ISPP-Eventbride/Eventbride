@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Calendar, Users, TrendingUp, ChevronRight, Clock, Palette, ArrowRight, Briefcase, Building, Bell, Wallet, BarChart, Shield, Heart } from 'lucide-react'
+import { Calendar, Users, ChevronRight, Clock, Palette, ArrowRight, Briefcase, Building, Bell, Wallet, Shield, Heart } from 'lucide-react'
 import "../../static/resources/css/Home.css"
 
 export default function HomePage() {
@@ -392,65 +392,6 @@ export default function HomePage() {
             <div className="section-header">
               <h2 className="section-title">Servicios para cada momento especial</h2>
               <p className="section-description">Todo lo que necesitas para crear celebraciones inolvidables</p>
-            </div>
-
-            <div className="services-grid">
-              <div className="service-card">
-                <div className="service-image">
-                  <img
-                    src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?q=80&w=2070"
-                    alt="Bodas"
-                    className="service-img"
-                  />
-                </div>
-                <div className="service-content">
-                  <h3 className="service-title">Bodas</h3>
-                  <p className="service-description">
-                    Organiza el día más especial de tu vida con nuestros servicios personalizados.
-                  </p>
-                  <a href="/services/weddings" className="service-link">
-                    Explorar <ChevronRight size={14} />
-                  </a>
-                </div>
-              </div>
-
-              <div className="service-card">
-                <div className="service-image">
-                  <img
-                    src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2074"
-                    alt="Bautizos"
-                    className="service-img"
-                  />
-                </div>
-                <div className="service-content">
-                  <h3 className="service-title">Bautizos</h3>
-                  <p className="service-description">
-                    Celebra este momento único con servicios adaptados a tus necesidades.
-                  </p>
-                  <a href="/services/baptisms" className="service-link">
-                    Explorar <ChevronRight size={14} />
-                  </a>
-                </div>
-              </div>
-
-              <div className="service-card">
-                <div className="service-image">
-                  <img
-                    src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2070"
-                    alt="Comuniones"
-                    className="service-img"
-                  />
-                </div>
-                <div className="service-content">
-                  <h3 className="service-title">Comuniones</h3>
-                  <p className="service-description">
-                    Haz que este día sea especial con nuestra selección de servicios.
-                  </p>
-                  <a href="/services/communions" className="service-link">
-                    Explorar <ChevronRight size={14} />
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </section>
