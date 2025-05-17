@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Filter, X, MapPin, Users, SquareIcon, Clock, Plus, ChevronDown, ChevronUp, Info, Calendar, ArrowRight, Search, Loader2, Star, MessageCircle} from 'lucide-react'
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import LeafletMap from "../../components/LeafletMap"
 import { useAlert } from "../../context/AlertContext.jsx"
 import "../../static/resources/css/VenueScreen.css"
@@ -16,6 +16,7 @@ const VenuesScreenPublic = () => {
   const [filtersVisible, setFiltersVisible] = useState(false)
   const [jwtToken] = useState(localStorage.getItem("jwt"))
   const [venuesWithCoordinates, setVenuesWithCoordinates] = useState([])
+  const navigate = useNavigate();
 
   // Modal para ver detalles del venue al hacer click en la card
   const [selectedVenue, setSelectedVenue] = useState(null)
@@ -448,7 +449,7 @@ const VenuesScreenPublic = () => {
                   className={`venue-card hover-shadow ${!venue.available ? "venue-unavailable" : ""}`}
                 >
                   {/* Imagen del venue */}
-                  <div className="venue-image-container">
+                  <div className="venue-image-container" onClick={() => navigate(`/detallesVenuesPublic/${venue.id}`)}>
                     <img
                       src={venue.picture || "https://iili.io/3EpzvZx.png"}
                       onError={(e) => {
@@ -474,7 +475,7 @@ const VenuesScreenPublic = () => {
                   </div>
 
                   {/* Cabecera de la tarjeta */}
-                  <div className="venue-header">
+                  <div className="venue-header" onClick={() => navigate(`/detallesVenuesPublic/${venue.id}`)}>
                     <h3 className="venue-name">{venue.name}</h3>
                     <div className="venue-location">
                       <MapPin className="location-icon" />
@@ -483,7 +484,7 @@ const VenuesScreenPublic = () => {
                   </div>
 
                   {/* Detalles del venue */}
-                  <div className="venue-details">
+                  <div className="venue-details" onClick={() => navigate(`/detallesVenuesPublic/${venue.id}`)}>
                     <div className="details-grid">
                       <div className="detail-item">
                         <Users className="detail-icon" />

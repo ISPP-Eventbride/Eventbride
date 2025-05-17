@@ -42,6 +42,8 @@ import ChangePassword from "./pages/no-authenticated/ChangePassword.jsx";
 import HomePage from "./pages/no-authenticated/Home.jsx"
 import VenuesScreenPublic from "./pages/no-authenticated/VenueScreenPublic.jsx"
 import OtherServiceScreenPublic from "./pages/no-authenticated/OtherServiceScreenPublic.jsx"
+import ServiceDetailsPagePublic from "./pages/no-authenticated/DetallesOtherServicePublic.jsx"
+import VenueDetailsPagePublic from "./pages/no-authenticated/DetallesVenuesPublic.jsx"
 
 
 function App() {
@@ -117,6 +119,8 @@ function App() {
               <Route path="/invitaciones/confirmar/:invitationId" element={<ConfirmEmailInvitation />} />
               <Route path="/other-services-public" element={<OtherServiceScreenPublic />} />
               <Route path="/venues-public" element={<VenuesScreenPublic />} />
+              <Route path="/detallesOtherServicesPublic/:id" element={<ServiceDetailsPagePublic />} />
+              <Route path="/detallesVenuesPublic/:id" element={<VenueDetailsPagePublic />} />
             </Routes>
             <FloatingChatButton />
           </div>

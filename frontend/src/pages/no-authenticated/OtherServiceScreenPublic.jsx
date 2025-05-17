@@ -478,7 +478,7 @@ const OtherServiceScreenPublic = () => {
                     minHeight: "600px"
                 }}
                 >
-                <div className="service-image-container">
+                <div className="service-image-container" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
                     <img
                     src={service.picture || "https://iili.io/3EpzvZx.png"}
                     onError={(e) => {
@@ -503,7 +503,7 @@ const OtherServiceScreenPublic = () => {
                     )}
                 </div>
 
-                <div className="service-header">
+                <div className="service-header" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
                     <h3 className="services-name">{service.name}</h3>
                     <div className="service-type">
                     <span className={`service-badge ${getServiceBadgeColor(service.otherServiceType)}`}>
@@ -513,7 +513,7 @@ const OtherServiceScreenPublic = () => {
                     </div>
                 </div>
 
-                <div className="service-details">
+                <div className="service-details" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
                     <div className="details-grid">
                     <div className="detail-item">
                         <MapPin className="detail-icon" />
