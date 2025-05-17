@@ -59,7 +59,7 @@
 
 .navbar-logo {
   display: block;        /* o inline-block si lo prefieres */
-  height: 200px;          /* el tamaño que quieras */
+  height: 50px;          /* el tamaño que quieras */
   width: auto;
   margin: 0 auto;        /* si necesitas centrarlo horizontal */
   margin-bottom: -1.9vh;   /* ajusta este valor positivo (sube) o negativo (baja) */
