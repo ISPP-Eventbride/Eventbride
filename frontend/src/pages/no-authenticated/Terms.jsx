@@ -190,7 +190,7 @@ function Terms() {
             </ul>
 
             <h3>Contacto para gestión de cancelaciones</h3>
-            <p>Escribir a <strong>soporte@eventbride.fun</strong> con el asunto: "Cancelación del servicio [NOMBRE DEL SERVICIO] para el evento del día [FECHA DEL EVENTO]".</p>
+            <p>Escribir a <strong>eventbride6@gmail.com</strong> con el asunto: "Cancelación del servicio [NOMBRE DEL SERVICIO] para el evento del día [FECHA DEL EVENTO]".</p>
           </div>
         </section>
 
@@ -232,7 +232,7 @@ function Terms() {
             </ul>
             <p>En relaciones B2B, y solo cuando lo permita la ley, Eventbride podrá proponer un límite de responsabilidad proporcional al importe pagado en los últimos 6 meses como comisiones o el Plan Premium, si procede.</p>
             <p>Eventbride actúa como intermediario entre usuarios y proveedores. No se responsabiliza por la calidad o cumplimiento de los servicios, aunque facilitará mecanismos de evaluación y resolución de incidencias. Ante incumplimientos graves, podrá eliminar la oferta y prohibir el uso de la plataforma.</p>
-            <p>Para incidencias, contactar a <strong>soporte@eventbride.fun</strong> con el asunto "Incidencia del servicio [NOMBRE DEL SERVICIO] para el evento del día [FECHA DEL EVENTO]".</p>
+            <p>Para incidencias, contactar a <strong>eventbride6@gmail.com</strong> con el asunto "Incidencia del servicio [NOMBRE DEL SERVICIO] para el evento del día [FECHA DEL EVENTO]".</p>
           </div>
         </section>
         <section className="terms-section" id="id10">

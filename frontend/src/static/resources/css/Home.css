@@ -296,7 +296,7 @@ a {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: var(--primary-light);
+    background-color: #d6c187;
     color: white;
     margin-bottom: 1.5rem;
 }
@@ -367,7 +367,7 @@ a {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--primary);
+    background-color: #d9be75;
     color: white;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -671,8 +671,9 @@ a {
 /* CTA Section */
 .cta-section {
     padding: 5rem 0;
-    background-color: var(--primary);
+    background-color: #e3d09e;
     color: white;
+    border-bottom: #0f172a;
 }
 
 .cta-content {
@@ -685,12 +686,13 @@ a {
     font-size: 2.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    color:#816428;
 }
 
 .cta-description {
     font-size: 1.125rem;
     margin-bottom: 2rem;
-    opacity: 0.9;
+    color:#816428;
 }
 
 .cta-buttons {
