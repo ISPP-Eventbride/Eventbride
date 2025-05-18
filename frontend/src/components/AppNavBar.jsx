@@ -81,8 +81,8 @@ function Navbar({ user }) {
     if (!currentUser || !currentUser.role) {
       return (
         <ul className="nav-links">
-          <li><Link to="/other-services-public" className="nav-link">Otros servicios</Link></li>
           <li><Link to="/venues-public" className="nav-link">Recintos</Link></li>
+          <li><Link to="/other-services-public" className="nav-link">Otros servicios</Link></li>
         </ul>
       );
     }
