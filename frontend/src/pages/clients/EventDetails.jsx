@@ -22,6 +22,10 @@ function EventDetails() {
   const { showAlert } = useAlert()
   const jwtToken = localStorage.getItem("jwt")
   const commissionRate = 1.05
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedName, setEditedName] = useState("")
+  const [editedGuests, setEditedGuests] = useState(0)
+  const [editedEventType, setEditedEventType] = useState("")
 
   function getEvents() {
     setIsLoading(true)
@@ -55,6 +59,14 @@ function EventDetails() {
     getEvents()
   }, [id])
 
+  useEffect(() => {
+    if (evento) {
+      setEditedName(evento.name)
+      setEditedGuests(evento.guests)
+      setEditedEventType(evento.eventType)
+    }
+  }, [evento])
+
   const deleteEvent = () => {
     fetch(`/api/v1/events/${id}`, {
       method: "DELETE",
@@ -68,6 +80,31 @@ function EventDetails() {
         else throw new Error()
       })
       .catch(() => showAlert("No puedes eliminar un evento con algún servicio pagado."))
+  }
+
+  const updateEvent = () => {
+    fetch(`/api/v1/events/updateEventDetails/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify({
+        eventType: editedEventType,
+        guests: editedGuests,
+        name: editedName,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          getEvents()
+          setIsEditing(false)
+          showAlert("Evento actualizado correctamente")
+        } else {
+          throw new Error()
+        }
+      })
+      .catch(() => showAlert("Error al actualizar el evento"))
   }
 
   const solicitarServicio = (propId) => {
@@ -183,7 +220,76 @@ function EventDetails() {
               </Link>
               <h1 className="ed-title">Detalles del Evento</h1>
             </div>
-            <h2 className="ed-event-name">{decodeText(evento.name)}</h2>
+            {isEditing ? (
+              <div
+                className="ed-edit-form"
+                style={{ marginTop: "15px", padding: "15px", backgroundColor: "#f5f5f5", borderRadius: "8px" }}
+              >
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                    Nombre del evento:
+                  </label>
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
+                  />
+                </div>
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>
+                    Número de invitados:
+                  </label>
+                  <input
+                    type="number"
+                    value={editedGuests}
+                    onChange={(e) => setEditedGuests(Number.parseInt(e.target.value))}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
+                  />
+                </div>
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Tipo de evento:</label>
+                  <select
+                    value={editedEventType}
+                    onChange={(e) => setEditedEventType(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
+                  >
+                    <option value="WEDDING">Boda</option>
+                    <option value="COMMUNION">Comunión</option>
+                    <option value="CHRISTENING">Bautizo</option>
+                  </select>
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    style={{
+                      padding: "8px 16px",
+                      background: "#f5f5f5",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={updateEvent}
+                    style={{
+                      padding: "8px 16px",
+                      background: "#4a90e2",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Guardar cambios
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <h2 className="ed-event-name">{decodeText(evento.name)}</h2>
+            )}
           </div>
         </div>
 
@@ -194,14 +300,34 @@ function EventDetails() {
             <span>Eliminar evento</span>
           </button>
         </div>
+        <div className="ed-delete-button-container">
+          {!isEditing && (
+            <button
+              className="ed-edit-button"
+              onClick={() => setIsEditing(true)}
+              style={{
+                marginLeft: "auto",
+                padding: "8px 16px",
+                background: "#4a90e2",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Editar detalles
+            </button>
+          )}
+        </div>
 
         {/* Advertencia */}
-        {(evento.eventType === "WEDDING" || evento.eventType === "COMMUNION") && (sumaPagado() < sumaCoste()) && (
+        {(evento.eventType === "WEDDING" || evento.eventType === "COMMUNION") && sumaPagado() < sumaCoste() && (
           <div className="ed-warning">
             <AlertCircle size={20} className="ed-warning-icon" />
             <span>
               Fecha límite de pago{" "}
-              <b>{evento.eventType === "WEDDING" ? 3 : evento.eventType === "COMMUNION" ? 2 : 0}</b> meses antes del evento.
+              <b>{evento.eventType === "WEDDING" ? 3 : evento.eventType === "COMMUNION" ? 2 : 0}</b> meses antes del
+              evento.
             </span>
           </div>
         )}

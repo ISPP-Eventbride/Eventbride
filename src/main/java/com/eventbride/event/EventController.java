@@ -274,6 +274,15 @@ public class EventController {
             actualEvent.setEventType(incomingEvent.getEventType());
         }
 
+        // Recalcular paymentDate si el eventType o eventDate han cambiado
+        if (actualEvent.getEventDate() != null && actualEvent.getEventType() != null) {
+            switch (actualEvent.getEventType()) {
+                case WEDDING -> actualEvent.setPaymentDate(actualEvent.getEventDate().minusMonths(3));
+                case CHRISTENING -> actualEvent.setPaymentDate(actualEvent.getEventDate());
+                case COMMUNION -> actualEvent.setPaymentDate(actualEvent.getEventDate().minusMonths(2));
+            }
+        }
+
         eventService.save(actualEvent);
         return new ResponseEntity<>(actualEvent, HttpStatus.OK);
     }
