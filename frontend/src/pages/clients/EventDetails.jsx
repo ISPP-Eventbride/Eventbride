@@ -268,6 +268,7 @@ function EventDetails() {
                       border: "1px solid #ddd",
                       borderRadius: "4px",
                       cursor: "pointer",
+                      backgroundColor: "red",
                     }}
                   >
                     Cancelar
@@ -295,7 +296,7 @@ function EventDetails() {
 
         {/* Delete button - moved here */}
         <div className="ed-delete-button-container">
-          <button className="ed-delete-button" onClick={() => setIsDeleteModalOpen(true)}>
+          <button className="ed-delete-button" style={{justifyContent:"center"}} onClick={() => setIsDeleteModalOpen(true)}>
             <X className="ed-button-icon" />
             <span>Eliminar evento</span>
           </button>
