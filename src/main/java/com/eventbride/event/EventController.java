@@ -25,6 +25,7 @@ import com.eventbride.invitation.InvitationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,7 +78,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventPublicDTO findById(@PathVariable("id") Integer id) throws IllegalArgumentException, DataAccessException {
+    public EventPublicDTO findById(@PathVariable("id") Integer id)
+            throws IllegalArgumentException, DataAccessException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> user = userService.getUserByUsername(auth.getName());
 
@@ -250,5 +252,29 @@ public class EventController {
             eventDTOs.add(eventMapper.toPublicDTO(event));
         }
         return new ResponseEntity<>(eventDTOs, HttpStatus.OK);
+    }
+
+    @PatchMapping("/updateEventDetails/{eventId}")
+    public ResponseEntity<?> patchEventDetails(@PathVariable Integer eventId, @RequestBody Event incomingEvent) {
+        Event actualEvent = eventService.findById(eventId);
+
+        if (actualEvent.equals(null)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (incomingEvent.getGuests() != null) {
+            actualEvent.setGuests(incomingEvent.getGuests());
+        }
+
+        if (incomingEvent.getName() != null) {
+            actualEvent.setName(incomingEvent.getName());
+        }
+
+        if (incomingEvent.getEventType() != null) {
+            actualEvent.setEventType(incomingEvent.getEventType());
+        }
+
+        eventService.save(actualEvent);
+        return new ResponseEntity<>(actualEvent, HttpStatus.OK);
     }
 }
