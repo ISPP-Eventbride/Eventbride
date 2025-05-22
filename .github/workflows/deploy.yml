@@ -3,7 +3,7 @@ name: Deploy to Google App Engine
 on:
   push:
     branches:
-      - develop
+      - rama
 
 jobs:
   deploy:
