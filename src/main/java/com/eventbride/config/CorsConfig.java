@@ -19,7 +19,8 @@ public class CorsConfig {
                         .allowedOrigins("http://localhost:5173", "https://ispp-2425-03.ew.r.appspot.com",
                                 "http://localhost:8080", "http://localhost:5174",
                                 "https://sprint3-dot-ispp-2425-03.ew.r.appspot.com",
-                                "https://ppl-dot-ispp-2425-03.ew.r.appspot.com")
+                                "https://ppl-dot-ispp-2425-03.ew.r.appspot.com",
+                                "https://wpl-dot-ispp-2425-03.ew.r.appspot.com")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
