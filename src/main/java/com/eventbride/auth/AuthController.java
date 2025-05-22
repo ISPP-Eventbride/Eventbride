@@ -66,4 +66,19 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
     }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Verifica que el usuario esté autenticado y que no sea anónimo
+        if (authentication != null &&
+            authentication.isAuthenticated() &&
+            authentication.getPrincipal() instanceof UserDetails) {
+            return ResponseEntity.ok("Token válido");
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+    }
+
 }

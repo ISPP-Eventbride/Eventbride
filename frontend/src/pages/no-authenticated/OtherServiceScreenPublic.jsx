@@ -9,7 +9,7 @@ import { Link } from "react-router-dom"
 import { useAlert } from "../../context/AlertContext"
 import "../../static/resources/css/OtherService.css"
 
-const OtherServiceScreen = () => {
+const OtherServiceScreenPublic = () => {
   const [otherServices, setOtherServices] = useState([])
   const [category, setCategory] = useState(null)
   const [name, setName] = useState("")
@@ -43,33 +43,47 @@ const OtherServiceScreen = () => {
 
   const { showAlert } = useAlert()
 
-  const getFilteredOtherServices = async () => {
-    try {
-      setLoading(true)
-      const params = { name, city, type }
-      const response = await axios.get(`/api/other-services/filter`, {
-        params: params,
-        headers: { Authorization: `Bearer ${jwtToken}` },
-      })
-      setOtherServices(response.data)
-    } catch (error) {
-      console.error("Error fetching data:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    const getFilteredOtherServices = async () => {
+        try {
+            setLoading(true);
 
-  const getAllOtherServices = async () => {
-    try {
-      setLoading(true)
-      const response = await axios.get("/api/other-services", { headers: { Authorization: `Bearer ${jwtToken}` } })
-      setOtherServices(response.data)
-    } catch (error) {
-      console.error("Error fetching data:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+            const params = { name, city, type };
+
+            const config = { params };
+            if (jwtToken) {
+            config.headers = {
+                Authorization: `Bearer ${jwtToken}`,
+            };
+            }
+
+            const response = await axios.get("/api/other-services/filter", config);
+            setOtherServices(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getAllOtherServices = async () => {
+        try {
+            setLoading(true);
+
+            const config = {};
+            if (jwtToken) {
+            config.headers = {
+                Authorization: `Bearer ${jwtToken}`,
+            };
+            }
+
+            const response = await axios.get("/api/other-services", config);
+            setOtherServices(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
   const getUserEvents = async () => {
     try {
@@ -443,130 +457,94 @@ const OtherServiceScreen = () => {
             </button>
           </div>
         ) : (
-        <div
-          className="services-grid fade-in"
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "20px",
-            justifyContent: "flex-start",
-            minHeight: "650px",
-            alignItems: "stretch",
-          }}
-        >
-          {currentServices.map((service) => (
-            <div
-              key={service.id}
-              className={`service-card hover-shadow ${!service.available ? "service-unavailable" : ""}`}
-              style={{
-                flex: "0 1 calc(33.333% - 20px)",
-                maxWidth: "calc(33.333% - 20px)",
-                minWidth: "300px",
-                minHeight: "750px"
-              }}
+          <div
+            className="services-grid fade-in"
+            style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "20px",
+                justifyContent: "flex-start",
+                minHeight: "650px"
+            }}
             >
-              {/* Imagen del servicio */}
-              <div className="service-image-container" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                <img
-                  src={service.picture || "https://iili.io/3EpzvZx.png"}
-                  onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src = "https://iili.io/3EpzvZx.png"
-                  }}
-                  alt={service.name}
-                  className="service-image"
-                />
-                <div className="service-image-overlay"></div>
-                {service.userDTO?.plan === "PREMIUM" && (
-                  <div className="premium-badge">
-                    <Star className="premium-icon" />
-                    <span>Promocionado</span>
-                  </div>
-                )}
-                {!service.available && (
-                  <div className="unavailable-badge">
-                    <X className="unavailable-icon" />
-                    <span>No disponible</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Cabecera de la tarjeta */}
-              <div className="service-header" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                <h3 className="services-name">{service.name}</h3>
-                <div className="service-type">
-                  <span className={`service-badge ${getServiceBadgeColor(service.otherServiceType)}`}>
-                    {getServiceTypeIcon(service.otherServiceType)}
-                    <span>{formatServiceType(service.otherServiceType)}</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Detalles del servicio */}
-              <div className="service-details" onClick={() => navigate(`/detallesOtherServices/${service.id}`)}>
-                <div className="details-grid">
-                  <div className="detail-item">
-                    <MapPin className="detail-icon" />
-                    <div className="detail-content">
-                      <p className="detail-label">Ciudad</p>
-                      <p className="detail-value">{service.cityAvailable}</p>
-                    </div>
-                  </div>
-
-                  <div className="detail-item">
-                    <DollarSign className="detail-icon" />
-                    <div className="detail-content">
-                      <p className="detail-label">Precio</p>
-                      <p className="detail-value">
-                        {service.limitedByPricePerGuest
-                          ? `${service.servicePricePerGuest}€ por invitado`
-                          : service.limitedByPricePerHour
-                            ? `${service.servicePricePerHour}€ por hora`
-                            : `${service.fixedPrice}€ precio fijo`}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="service-description">
-                  <p>{service.description}</p>
-                </div>
-              </div>
-
-              {/* Acciones */}
-              <div className="service-actions">
-                {service.available ? (
-                  <>
-                    <button className="action-button add-button" onClick={(e) => handleAddServiceClick(e, service.id)}>
-                      <Plus className="button-icon" />
-                      <span>Añadir a mi evento</span>
-                    </button>
-                    <Link to={`/chat/${service.userDTO.id}`} className="action-button chat-button">
-                      <MessageCircle className="button-icon" />
-                      <span>Chatear</span>
-                    </Link>
-                  </>
-                ) : (
-                  <div className="unavailable-message">
-                    <Info className="info-icon" />
-                    <span>Este servicio no está disponible actualmente</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Ver más link */}
-              <div className="service-footer">
-                <button
-                  className="view-details-button"
-                  onClick={() => navigate(`/detallesOtherServices/${service.id}`)}
+            {currentServices.map((service) => (
+                <div
+                key={service.id}
+                className={`service-card hover-shadow ${!service.available ? "service-unavailable" : ""}`}
+                style={{
+                    flex: "none",
+                    width: "calc(33.333% - 20px)",
+                    maxWidth: "400px",
+                    minHeight: "600px"
+                }}
                 >
-                  <ExternalLink className="button-icon" />
-                  <span>Ver detalles</span>
-                </button>
-              </div>
+                <div className="service-image-container" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
+                    <img
+                    src={service.picture || "https://iili.io/3EpzvZx.png"}
+                    onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = "https://iili.io/3EpzvZx.png"
+                    }}
+                    alt={service.name}
+                    className="service-image"
+                    />
+                    <div className="service-image-overlay"></div>
+                    {service.userDTO?.plan === "PREMIUM" && (
+                    <div className="premium-badge">
+                        <Star className="premium-icon" />
+                        <span>Promocionado</span>
+                    </div>
+                    )}
+                    {!service.available && (
+                    <div className="unavailable-badge">
+                        <X className="unavailable-icon" />
+                        <span>No disponible</span>
+                    </div>
+                    )}
+                </div>
+
+                <div className="service-header" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
+                    <h3 className="services-name">{service.name}</h3>
+                    <div className="service-type">
+                    <span className={`service-badge ${getServiceBadgeColor(service.otherServiceType)}`}>
+                        {getServiceTypeIcon(service.otherServiceType)}
+                        <span>{formatServiceType(service.otherServiceType)}</span>
+                    </span>
+                    </div>
+                </div>
+
+                <div className="service-details" onClick={() => navigate(`/detallesOtherServicesPublic/${service.id}`)}>
+                    <div className="details-grid">
+                    <div className="detail-item">
+                        <MapPin className="detail-icon" />
+                        <div className="detail-content">
+                        <p className="detail-label">Ciudad</p>
+                        <p className="detail-value">{service.cityAvailable}</p>
+                        </div>
+                    </div>
+
+                    <div className="detail-item">
+                        <DollarSign className="detail-icon" />
+                        <div className="detail-content">
+                        <p className="detail-label">Precio</p>
+                        <p className="detail-value">
+                            {service.limitedByPricePerGuest
+                            ? `${service.servicePricePerGuest}€ por invitado`
+                            : service.limitedByPricePerHour
+                                ? `${service.servicePricePerHour}€ por hora`
+                                : `${service.fixedPrice}€ precio fijo`}
+                        </p>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div className="service-description">
+                    <p>{service.description}</p>
+                    </div>
+                </div>
+          </div>
+            ))}
             </div>
-          ))}
-        </div>
         )}
 
       {totalPages > 1 && (
@@ -831,4 +809,4 @@ const OtherServiceScreen = () => {
   )
 }
 
-export default OtherServiceScreen
+export default OtherServiceScreenPublic

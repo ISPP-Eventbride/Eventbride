@@ -46,13 +46,11 @@ public class SecurityConfig {
                                                                 "/ws/**",
                                                                 "/ws/info/**",
                                                                 "/api/chat/**",
-                                                                "/api/venues/{id}",
-                                                                "/api/venues",
-                                                                "/api/other-services",
+                                                                "/api/venues/**",
+                                                                "/api/other-services/**",
                                                                 "/api/invitation",
                                                                 "/api/invitation/{id}",
                                                                 "/api/invitation/**",
-                                                                "/api/other-services/{id}",
                                                                 "/change-password/token/{token}," +
                                                                                 "/change-password-request/{email}")
                                                 .permitAll()

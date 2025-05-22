@@ -65,6 +65,6 @@ jobs:
       #Desplegar a Google App Engine
       - name: Deploy to App Engine
         run: |
-          gcloud app deploy --version=ppl --no-promote --quiet
+          gcloud app deploy --version=wpl --no-promote --quiet
 
-# Deploy ppl funcionando
+# Deploy wpl funcionando

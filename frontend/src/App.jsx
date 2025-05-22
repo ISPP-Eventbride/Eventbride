@@ -1,7 +1,6 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import Login from "./pages/no-authenticated/Login.jsx"
 import Register from "./pages/no-authenticated/Register.jsx"
-import Home from "./pages/no-authenticated/Home.jsx"
 import OtherServiceScreen from "./pages/clients/OtherServiceScreen.jsx"
 import Servicios from "./pages/provider/Servicios"
 import RegistrarServicio from "./pages/provider/RegistrarServicio.jsx"
@@ -40,6 +39,12 @@ import DetallesOtherService from "./pages/clients/DetallesOtherService.jsx"
 import DetallesVenues from "./pages/clients/DetallesVenues.jsx"
 import ChangePasswordRegistration from "./pages/no-authenticated/ChangePasswordRegistration.jsx";
 import ChangePassword from "./pages/no-authenticated/ChangePassword.jsx";
+import HomePage from "./pages/no-authenticated/Home.jsx"
+import VenuesScreenPublic from "./pages/no-authenticated/VenueScreenPublic.jsx"
+import OtherServiceScreenPublic from "./pages/no-authenticated/OtherServiceScreenPublic.jsx"
+import ServiceDetailsPagePublic from "./pages/no-authenticated/DetallesOtherServicePublic.jsx"
+import VenueDetailsPagePublic from "./pages/no-authenticated/DetallesVenuesPublic.jsx"
+
 
 function App() {
   const { currentUser, loading, setCurrentUser } = useCurrentUser(null)
@@ -103,7 +108,7 @@ function App() {
                 </>
               )}
               {/*Rutas públicas*/}
-              <Route path="/" element={currentUser ? <Home user={currentUser} /> : <Navigate to="/login" />} />
+              <Route path="/" element={<HomePage user={currentUser} />} />
               <Route path="/login" element={<Login setUser={setCurrentUser} />} />
               <Route path="/register" element={<Register />} />
               <Route path="/cambiar-contraseña" element={<ChangePasswordRegistration />} />
@@ -112,6 +117,10 @@ function App() {
               <Route path="/faqs" element={<FAQ />} />
               <Route path="/invitaciones/registro/:invitationId" element={<RegisterInvitation />} />
               <Route path="/invitaciones/confirmar/:invitationId" element={<ConfirmEmailInvitation />} />
+              <Route path="/other-services-public" element={<OtherServiceScreenPublic />} />
+              <Route path="/venues-public" element={<VenuesScreenPublic />} />
+              <Route path="/detallesOtherServicesPublic/:id" element={<ServiceDetailsPagePublic />} />
+              <Route path="/detallesVenuesPublic/:id" element={<VenueDetailsPagePublic />} />
             </Routes>
             <FloatingChatButton />
           </div>

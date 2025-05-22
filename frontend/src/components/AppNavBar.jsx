@@ -78,7 +78,14 @@ function Navbar({ user }) {
   };
 
   const renderNavItems = () => {
-    if (!currentUser || !currentUser.role) return null;
+    if (!currentUser || !currentUser.role) {
+      return (
+        <ul className="nav-links">
+          <li><Link to="/venues-public" className="nav-link">Recintos</Link></li>
+          <li><Link to="/other-services-public" className="nav-link">Otros servicios</Link></li>
+        </ul>
+      );
+    }
 
     if (currentUser.role === "CLIENT") {
       return (
@@ -130,7 +137,6 @@ function Navbar({ user }) {
 
   return (
     <div>
-      {currentUser && (
         <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
           <div className="navbar-container">
             <div className="navbar-brand">
@@ -156,7 +162,7 @@ function Navbar({ user }) {
 
             <div className={`navbar-menu ${isMobileMenuOpen ? "active" : ""}`}>
               {renderNavItems()}
-              {currentUser && currentUser.role && (
+              {currentUser && currentUser.role ? (
                 <div className="navbar-actions">
                   <Link to="/notifications" className="nav-link">
                     <BellRing className="emote" style={{ width: "30px", height: "auto" }} />
@@ -222,11 +228,18 @@ function Navbar({ user }) {
                     </button>
                   </li>
                 </div>
+              ) : (
+                <li className="navbar-brand">
+                <Link to="/login">
+                  <button className="logout-button" style={{ marginBottom: "3%" }}>
+                    Iniciar sesión
+                  </button>
+                </Link>
+              </li>
               )}
             </div>
           </div>
         </nav>
-      )}
     </div>
   );
 }
